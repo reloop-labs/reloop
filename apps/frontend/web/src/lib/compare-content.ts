@@ -7,6 +7,11 @@ import { loopsComparisonCategories } from "@reloop/web/app/compare/loops/compari
 import { mailgunComparisonCategories } from "@reloop/web/app/compare/mailgun/comparison-data";
 import { resendComparisonCategories } from "@reloop/web/app/compare/resend/comparison-data";
 import {
+	type BlogComparePage,
+	getBlogComparePage,
+	listBlogComparePages,
+} from "@reloop/web/lib/blog-compare-pages";
+import {
 	freeDailyEmails,
 	freeMonthlyEmails,
 	freePlanSummary,
@@ -426,12 +431,29 @@ export const comparePages: ComparePageContent[] = [
 	},
 ];
 
-export function getComparePage(slug: string): ComparePageContent | undefined {
-	return comparePages.find((page) => page.slug === slug);
+function fromBlogComparePage(page: BlogComparePage): ComparePageContent {
+	return {
+		slug: page.slug,
+		competitor: page.competitor,
+		title: page.title,
+		description: page.description,
+		summary: page.description,
+		lastUpdated: page.publishedAt,
+		features: page.features,
+		faqs: page.faqs,
+	};
 }
 
+export function getComparePage(slug: string): ComparePageContent | undefined {
+	const handWritten = comparePages.find((page) => page.slug === slug);
+	if (handWritten) return handWritten;
+	const fromBlog = getBlogComparePage(slug);
+	return fromBlog ? fromBlogComparePage(fromBlog) : undefined;
+}
+
+/** Hand-written pages, then the /compare/[slug] pages built from blog posts. */
 export function listComparePages(): ComparePageContent[] {
-	return comparePages;
+	return [...comparePages, ...listBlogComparePages().map(fromBlogComparePage)];
 }
 
 function featuresTableMarkdown(

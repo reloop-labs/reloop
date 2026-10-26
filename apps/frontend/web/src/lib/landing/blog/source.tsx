@@ -306,6 +306,18 @@ export function getPost(slug: string): BlogPostPage | null {
 	};
 }
 
+/** Frontmatter, raw MDX and FAQ without compiling the body, for pages that reuse a post's content. */
+export function getPostSource(
+	slug: string,
+): { post: BlogPostDefinition; content: string; faq: BlogFaqItem[] } | null {
+	const file = readPostFile(slug);
+	if (!file) {
+		return null;
+	}
+
+	return { post: file.post, content: file.content, faq: file.faq };
+}
+
 export function getPostsByCategory(categorySlug: string) {
 	const category = getCategoryBySlug(categorySlug);
 

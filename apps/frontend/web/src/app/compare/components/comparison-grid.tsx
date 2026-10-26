@@ -1,116 +1,245 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Logo } from "@reloop/ui/logo";
+import { BlogPostCoverImage } from "@reloop/web/components/landing/blog/blog-post-cover-image";
+import { listBlogComparePages } from "@reloop/web/lib/blog-compare-pages";
+import { listMigrationGuides } from "@reloop/web/lib/migration-guides";
 import Link from "next/link";
+import { type CostMode, formatUsd, quoteCosts } from "../compare-hero-costs";
 import { competitorBrands } from "../competitor-brands";
-import { BrandIcon } from "./brand-icon";
 
-function isDarkBrandHex(hex: string) {
-	const clean = hex.replace("#", "").toLowerCase();
-	if (clean === "000" || clean === "000000") return true;
-	if (clean.length !== 6) return false;
-	const r = Number.parseInt(clean.slice(0, 2), 16);
-	const g = Number.parseInt(clean.slice(2, 4), 16);
-	const b = Number.parseInt(clean.slice(4, 6), 16);
-	return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.25;
-}
+type CardQuote = { reloop: string; theirs: string; plan: string };
 
-const BRAND_DESCRIPTIONS: Record<string, string> = {
-	Resend:
-		"Apache 2.0 engine, send-based Reloop Cloud pricing, and a built-in agent inbox.",
-	SendGrid:
-		"Modern React/JSX templates and fast developer UI without legacy enterprise clutter.",
-	Mailgun:
-		"Unified transactional and marketing email platform with predictable flat pricing.",
-	"AWS SES":
-		"AWS SES-level pricing with a modern dashboard UI and deliverability controls.",
-	Postmark:
-		"High deliverability across both transactional and broadcast marketing streams.",
-	Loops:
-		"Native KumoMTA engine with full developer APIs and self-hosting freedom.",
-	Mailchimp:
-		"Pay only for sent email volume without contact list size penalty pricing.",
+type BrandCard = {
+	mode: CostMode;
+	volume: number;
+	blurb: (quote: CardQuote) => string;
 };
 
-export function ComparisonBrandCards({
-	excludeHref,
+/** Card copy per competitor; prices come from the same quotes as the calculator. */
+const BRAND_CARDS: Record<string, BrandCard> = {
+	Resend: {
+		mode: "transactional",
+		volume: 100_000,
+		blurb: (q) =>
+			`Resend's free plan sends 3,000 emails a month; Reloop's sends 6,000. At 100,000 emails Reloop costs ${q.reloop} a month and Resend ${q.theirs}, and Reloop is open source.`,
+	},
+	Mailgun: {
+		mode: "transactional",
+		volume: 100_000,
+		blurb: (q) =>
+			`Mailgun bills $1.10 to $1.80 per 1,000 emails past the plan. At 100,000 emails Reloop costs ${q.reloop} a month and Mailgun ${q.plan} ${q.theirs}.`,
+	},
+	SendGrid: {
+		mode: "transactional",
+		volume: 100_000,
+		blurb: (q) =>
+			`SendGrid's free plan is a 60-day trial at 100 emails a day. At 100,000 emails Reloop costs ${q.reloop} a month and SendGrid ${q.plan} ${q.theirs}.`,
+	},
+	"AWS SES": {
+		mode: "transactional",
+		volume: 100_000,
+		blurb: (q) =>
+			`SES is the cheapest pipe at $0.10 per 1,000 emails, with no dashboard, templates or contacts. Reloop adds all three for ${q.reloop} a month at 100,000.`,
+	},
+	Postmark: {
+		mode: "transactional",
+		volume: 100_000,
+		blurb: (q) =>
+			`Postmark's free plan is 100 emails a month. At 100,000 emails Reloop costs ${q.reloop} a month and Postmark ${q.plan} ${q.theirs}.`,
+	},
+	Loops: {
+		mode: "marketing",
+		volume: 10_000,
+		blurb: (q) =>
+			`Loops prices by contacts. At 10,000 contacts and a weekly send, Reloop costs ${q.reloop} a month and Loops ${q.theirs}, with no limit on contacts.`,
+	},
+	Mailchimp: {
+		mode: "marketing",
+		volume: 10_000,
+		blurb: (q) =>
+			`Mailchimp charges for every contact on the list. At 10,000 contacts and a weekly send, Reloop costs ${q.reloop} a month and Mailchimp ${q.plan} ${q.theirs}.`,
+	},
+};
+
+const compactCount = (value: number) =>
+	new Intl.NumberFormat("en-US").format(value);
+
+function quoteFor(card: BrandCard, providerId: string): CardQuote {
+	const rows = quoteCosts(card.mode, card.volume);
+	const reloop = rows.find((row) => row.id === "reloop");
+	const theirs = rows.find((row) => row.id === providerId);
+	return {
+		reloop: formatUsd(reloop?.usd ?? 0).toLowerCase(),
+		theirs: formatUsd(theirs?.usd ?? 0).toLowerCase(),
+		plan: theirs?.plan ?? "",
+	};
+}
+
+type ComparisonEntry = {
+	name: string;
+	href: string;
+	/** Cover image from the matching "Reloop vs X" blog post. */
+	image: string;
+	description: string;
+	pricing?: { card: BrandCard; quote: CardQuote };
+	migrationHref?: string;
+};
+
+/** Hand-written /compare pages first, then the pages built from "Reloop vs X" posts. */
+function getComparisonEntries(includeBlogPosts: boolean): ComparisonEntry[] {
+	const guideSlugs = new Set(listMigrationGuides().map((guide) => guide.slug));
+	const dedicated = competitorBrands.map((brand): ComparisonEntry => {
+		const slug = brand.href.replace("/compare/", "");
+		const card = BRAND_CARDS[brand.name];
+		const quote = card ? quoteFor(card, slug) : null;
+		return {
+			name: brand.name,
+			href: brand.href,
+			image: `/blog/images/reloop-vs-${slug}.png`,
+			description:
+				card && quote
+					? card.blurb(quote)
+					: "Compare Reloop's open-source engine, pricing and features.",
+			pricing: card && quote ? { card, quote } : undefined,
+			migrationHref: guideSlugs.has(slug) ? `/migrate/${slug}` : undefined,
+		};
+	});
+	if (!includeBlogPosts) return dedicated;
+
+	const fromBlog = listBlogComparePages()
+		.filter((page) => page.image)
+		.map(
+			(page): ComparisonEntry => ({
+				name: page.competitor,
+				href: `/compare/${page.slug}`,
+				image: page.image ?? "",
+				description: page.description,
+				migrationHref: guideSlugs.has(page.slug)
+					? `/migrate/${page.slug}`
+					: undefined,
+			}),
+		);
+
+	return [...dedicated, ...fromBlog];
+}
+
+function ComparisonBrandCard({
+	entry,
+	padded,
 }: {
-	excludeHref?: string;
+	entry: ComparisonEntry;
+	padded: boolean;
 }) {
-	const brands = excludeHref
-		? competitorBrands.filter((brand) => brand.href !== excludeHref)
-		: competitorBrands;
+	const { pricing } = entry;
 
 	return (
-		<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{brands.map((brand) => {
-				const description =
-					BRAND_DESCRIPTIONS[brand.name] ??
-					"Compare Reloop's open-source architecture, pricing, and features.";
-				const glow = `#${brand.icon.hex}`;
-				const dark = isDarkBrandHex(brand.icon.hex);
+		<article
+			className={cn(
+				"group relative flex h-full flex-col transition-colors duration-200",
+				padded &&
+					"px-4 py-12 hover:bg-bg-weak-50 sm:px-8 sm:py-14 lg:px-12 lg:py-16 dark:hover:bg-white/[0.04]",
+			)}
+		>
+			<BlogPostCoverImage
+				slug={entry.href}
+				image={entry.image}
+				alt={`Reloop vs ${entry.name}`}
+				variant="list"
+			/>
 
-				return (
+			<h3 className="mt-5 font-semibold text-[16px] text-text-strong-950 leading-[1.45] tracking-[-0.01em] dark:text-white">
+				<Link
+					href={entry.href}
+					className="outline-none after:absolute after:inset-0 focus-visible:underline"
+				>
+					Reloop vs {entry.name}
+				</Link>
+			</h3>
+			<p className="mt-2 line-clamp-4 flex-1 text-pretty text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
+				{entry.description}
+			</p>
+
+			{pricing ? (
+				<p className="mt-5 rounded-lg bg-bg-weak-50 px-3 py-2 text-[13px] text-text-sub-600 tabular-nums dark:bg-white/[0.05] dark:text-white/50">
+					{compactCount(pricing.card.volume)}{" "}
+					{pricing.card.mode === "marketing" ? "contacts" : "emails"}:{" "}
+					<span className="font-medium text-text-strong-950 dark:text-white">
+						{pricing.quote.reloop}
+					</span>{" "}
+					vs{" "}
+					<span className="font-medium text-text-strong-950 dark:text-white">
+						{pricing.quote.theirs}
+					</span>
+				</p>
+			) : null}
+
+			<div className="relative z-10 mt-5 flex items-center gap-5 text-[14px]">
+				<Link
+					href={entry.href}
+					tabIndex={-1}
+					className="group/link inline-flex items-center gap-1.5 font-medium text-text-strong-950 dark:text-white"
+				>
+					Compare
+					<Icon
+						name="arrow-right"
+						className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+						aria-hidden="true"
+					/>
+				</Link>
+				{entry.migrationHref ? (
 					<Link
-						key={brand.href}
-						href={brand.href}
-						aria-label={`Reloop vs ${brand.name}`}
-						className="group relative flex flex-col justify-between gap-3.5 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 transition-all duration-200 hover:border-stroke-soft-300 hover:bg-bg-weak-50 max-lg:p-4 max-xl:gap-3 dark:border-white/10 dark:bg-black dark:hover:border-white/20 dark:hover:bg-white/[0.04]"
+						href={entry.migrationHref}
+						className="text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
 					>
-						<div
-							aria-hidden
-							className="pointer-events-none absolute inset-x-6 bottom-2 h-12 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-65"
-							style={{
-								background: `radial-gradient(ellipse at center, color-mix(in srgb, ${glow} 55%, transparent) 0%, transparent 75%)`,
-							}}
-						/>
-
-						<div className="relative z-10 flex items-center justify-between gap-3.5">
-							<div className="flex min-w-0 flex-1 items-center gap-2.5 max-xl:gap-2">
-								<div className="flex shrink-0 items-center gap-1.5">
-									<div className="relative flex size-8 items-center justify-center overflow-hidden rounded-[28%] border border-stroke-soft-200/80 dark:border-white/10">
-										<Logo className="size-[135%]" />
-									</div>
-									<span className="font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
-										vs
-									</span>
-									<div className="relative flex size-8 items-center justify-center overflow-hidden rounded-[28%] border border-stroke-soft-200/80 p-1.5 dark:border-white/10">
-										<BrandIcon
-											icon={brand.icon}
-											fill={dark ? "currentColor" : `#${brand.icon.hex}`}
-											className={cn(
-												"size-full object-contain",
-												dark && "text-text-strong-950 dark:text-white",
-											)}
-										/>
-									</div>
-								</div>
-								<div className="flex min-w-0 flex-1 flex-col">
-									<h4 className="font-semibold text-sm text-text-strong-950 dark:text-white">
-										{brand.name}
-									</h4>
-									<p className="shrink truncate text-text-sub-600 text-xs dark:text-white/50">
-										Reloop vs {brand.name}
-									</p>
-								</div>
-							</div>
-
-							<Icon
-								name="arrow-right"
-								className="size-3.5 shrink-0 text-text-sub-600 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-white/60"
-								aria-hidden="true"
-							/>
-						</div>
-
-						<div className="relative z-10 flex flex-col gap-1">
-							<p className="line-clamp-2 text-pretty pr-2 font-medium text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
-								{description}
-							</p>
-						</div>
+						Migration guide
+						<span className="sr-only"> from {entry.name}</span>
 					</Link>
-				);
-			})}
-		</div>
+				) : null}
+			</div>
+		</article>
+	);
+}
+
+/**
+ * "cells" draws blog-index style bordered cells that meet the page frame and
+ * lists every comparison; "grid" is a plain gapped grid for padded sections
+ * and lists only the dedicated /compare pages.
+ */
+export function ComparisonBrandCards({
+	excludeHref,
+	layout = "grid",
+}: {
+	excludeHref?: string;
+	layout?: "cells" | "grid";
+}) {
+	const entries = getComparisonEntries(layout === "cells").filter(
+		(entry) => entry.href !== excludeHref,
+	);
+
+	if (layout === "cells") {
+		// -mb-px lets the last row's border sit under the next section's top rule.
+		return (
+			<ul className="-mb-px grid sm:grid-cols-2 lg:grid-cols-3">
+				{entries.map((entry) => (
+					<li
+						key={entry.href}
+						className="border-stroke-soft-100 border-b sm:border-r dark:border-white/10 sm:max-lg:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(3n)]:border-r-0"
+					>
+						<ComparisonBrandCard entry={entry} padded />
+					</li>
+				))}
+			</ul>
+		);
+	}
+
+	return (
+		<ul className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+			{entries.map((entry) => (
+				<li key={entry.href}>
+					<ComparisonBrandCard entry={entry} padded={false} />
+				</li>
+			))}
+		</ul>
 	);
 }
 
@@ -145,8 +274,8 @@ export function ComparisonGrid() {
 			</div>
 
 			{/* Full-width Divider & Grid Section */}
-			<div className="border-stroke-soft-200 border-t px-6 py-12 sm:px-10 lg:px-12 dark:border-white/10">
-				<ComparisonBrandCards />
+			<div className="border-stroke-soft-100 border-t dark:border-white/10">
+				<ComparisonBrandCards layout="cells" />
 			</div>
 		</section>
 	);

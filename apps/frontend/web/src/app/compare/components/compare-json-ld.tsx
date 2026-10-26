@@ -22,7 +22,7 @@ export function CompareIndexJsonLd() {
 					"@type": "CollectionPage",
 					name: "Reloop vs the competition",
 					description:
-						"Compare Reloop with Resend, SendGrid, Mailgun, AWS SES, Postmark, Loops, and Mailchimp.",
+						"Compare Reloop with Resend, SendGrid, Mailgun, AWS SES, Postmark, Loops, Mailchimp, Brevo, Mailjet, SparkPost and other email providers.",
 					url: `${siteUrl}/compare`,
 				},
 				pricingProductJsonLd(siteUrl),

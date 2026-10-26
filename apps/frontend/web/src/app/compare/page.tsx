@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { CompareCalculator } from "./components/compare-calculator";
 import { CompareHeroHeader } from "./components/compare-hero-header";
 import { CompareIndexJsonLd } from "./components/compare-json-ld";
-import { CompareMasterMatrix } from "./components/compare-master-matrix";
 import { ComparisonGrid } from "./components/comparison-grid";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -53,32 +52,29 @@ const CompareIndexPage = () => {
 	return (
 		<>
 			<CompareIndexJsonLd />
-			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				{/* Top Hero Header */}
 				<CompareHeroHeader />
 
 				{/* Volume & ROI Cost Calculator */}
-				<section className="border-stroke-soft-200 border-b px-6 pt-12 pb-0 sm:px-10 sm:pt-16 sm:pb-0 lg:px-12 dark:border-white/10">
+				<section className="border-stroke-soft-100 border-b px-6 sm:px-10 lg:px-12 dark:border-white/10">
 					<CompareCalculator />
-				</section>
-
-				{/* Master Feature Matrix */}
-				<section className="border-stroke-soft-200 border-b px-6 pt-12 pb-0 sm:px-10 sm:pt-16 sm:pb-0 lg:px-12 dark:border-white/10">
-					<CompareMasterMatrix />
 				</section>
 
 				{/* Dedicated Brand Directory Grid */}
 				<ComparisonGrid />
-			</div>
 
-			{/* Bottom Blog-Style CTA Band */}
-			<BlogCta
-				category="Comparison"
-				headline="Ready to switch to Reloop?"
-				sub="Apache 2.0 engine, send-based Reloop Cloud pricing, SMTP + REST APIs, and a self-host path. No lock-in."
-				primaryLabel="Get started free"
-				secondaryLabel="Documentation"
-			/>
+				{/* Closing CTA, inside the frame so it shares the side rails and inset */}
+				<BlogCta
+					framed
+					category="Comparison"
+					headline="Ready to switch to Reloop?"
+					sub="Apache 2.0 engine, send-based Reloop Cloud pricing, SMTP + REST APIs, and a self-host path. No lock-in."
+					primaryLabel="Get started free"
+					secondaryLabel="Documentation"
+					secondaryHref="/docs"
+				/>
+			</div>
 		</>
 	);
 };

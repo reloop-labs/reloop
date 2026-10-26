@@ -152,6 +152,12 @@ export interface BlogCtaProps {
 	blast?: boolean | BlastColors;
 	illustrationPosition?: "left" | "right";
 	insetBorder?: boolean;
+	/**
+	 * Renders inside a page frame that already draws the side rails: the card
+	 * fills the frame and uses the same px-6 / sm:px-10 / lg:px-12 inset as the
+	 * sections above it.
+	 */
+	framed?: boolean;
 }
 
 // The dashboard is a separate app, so client-side navigation can't reach it;
@@ -201,6 +207,7 @@ export function BlogCta({
 	showTopRule = true,
 	illustrationPosition = "right",
 	insetBorder = true,
+	framed = false,
 }: BlogCtaProps) {
 	const categoryVariant = category ? CATEGORY_VARIANTS[category] : undefined;
 
@@ -264,15 +271,25 @@ export function BlogCta({
 		>
 			<div
 				className={cn(
-					"mx-auto w-full px-4 sm:px-6 lg:px-8",
+					"mx-auto w-full",
+					framed
+						? // The footer opens with an h-24 spacer, so pt-24 centers the card between rules.
+							"px-6 pt-24 sm:px-10 lg:px-12"
+						: "px-4 sm:px-6 lg:px-8",
 					// Flush CTAs end the page: the footer opens with its own h-24
 					// spacer, so mirror it on top to center the card between rules.
-					flush
-						? "pt-24"
-						: "max-w-5xl border-stroke-soft-100 py-8 sm:py-12 md:max-w-7xl xl:border-x dark:border-white/10",
+					!framed &&
+						(flush
+							? "pt-24"
+							: "max-w-5xl border-stroke-soft-100 py-8 sm:py-12 md:max-w-7xl xl:border-x dark:border-white/10"),
 				)}
 			>
-				<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/10 bg-black px-8 py-8 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-10 lg:px-14 lg:py-12 dark:border-white/10 dark:bg-[#000]">
+				<div
+					className={cn(
+						"group relative mx-auto w-full overflow-hidden rounded-[28px] border border-white/10 bg-black px-8 py-8 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-10 lg:px-14 lg:py-12 dark:border-white/10 dark:bg-[#000]",
+						!framed && "max-w-6xl",
+					)}
+				>
 					{/* 8px Inset white border matching landing page */}
 					{insetBorder ? (
 						<div

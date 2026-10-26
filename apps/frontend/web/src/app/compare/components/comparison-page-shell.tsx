@@ -8,9 +8,12 @@ export function ComparisonPageShell({
 	titleLines,
 	description,
 	updatedAt,
+	competitorName,
 	children,
 }: {
 	pagePath: string;
+	/** For competitors without an entry in competitor-brands (no brand icon yet). */
+	competitorName?: string;
 	titleLines: string[];
 	/** Kept so existing compare pages can still pass hero copy. */
 	description?: string;
@@ -29,7 +32,7 @@ export function ComparisonPageShell({
 			 */}
 			<CompareHero
 				titleLines={titleLines}
-				competitorName={brand?.name}
+				competitorName={brand?.name ?? competitorName}
 				icon={brand?.icon}
 				description={description}
 				updatedAt={updatedAt}

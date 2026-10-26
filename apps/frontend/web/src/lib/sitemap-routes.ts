@@ -6,11 +6,13 @@ import {
 } from "../app/changelog/changelog-utils";
 import { FRAMEWORK_SLUGS } from "../app/sdk/frameworks";
 import { LANGUAGE_SLUGS } from "../app/sdk/languages";
+import { listBlogComparePages } from "./blog-compare-pages";
 import { MCP_CLIENT_SLUGS } from "./landing/ai-tools/mcp";
 import {
 	generateStaticParams as generateBlogStaticParams,
 	generateCategoryStaticParams,
 } from "./landing/blog/source";
+import { listMigrationGuides } from "./migration-guides";
 
 const APP_DIR = join(process.cwd(), "src/app");
 
@@ -63,6 +65,14 @@ function collectStaticRoutes(dir: string, segments: string[] = []): string[] {
 			} else if (entry === "[client]" && segmentPath === "features/mcp") {
 				for (const client of MCP_CLIENT_SLUGS) {
 					routes.push(`/features/mcp/${client}`);
+				}
+			} else if (entry === "[slug]" && segmentPath === "compare") {
+				for (const page of listBlogComparePages()) {
+					routes.push(`/compare/${page.slug}`);
+				}
+			} else if (entry === "[slug]" && segmentPath === "migrate") {
+				for (const guide of listMigrationGuides()) {
+					routes.push(`/migrate/${guide.slug}`);
 				}
 			} else if (entry === "[slug]" && segmentPath === "blog") {
 				for (const { slug } of generateBlogStaticParams()) {
