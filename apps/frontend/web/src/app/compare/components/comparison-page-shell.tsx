@@ -61,6 +61,7 @@ export function ComparisonPageShell({
 			/>
 			{afterHero ? (
 				<>
+					<SectionSeparator hideTop className="h-24 sm:h-24" />
 					{afterHero}
 					<SectionSeparator hideTop className="h-24 sm:h-24" />
 				</>
@@ -77,9 +78,10 @@ export function ComparisonPageShell({
 					<CompareAgentsSection />
 					<SectionSeparator hideTop className="h-24 sm:h-24" />
 					<CompareOpenSourceSection competitorNote={openSourceNote} />
-					<SectionSeparator hideTop className="h-24 sm:h-24" />
+					{/* Bands on both sides of the grey migration banner. */}
 					{name && getMigrationGuide(slug) ? (
 						<>
+							<SectionSeparator hideTop className="h-24 sm:h-24" />
 							<CompareMigrateBanner
 								competitorName={name}
 								icon={brand?.icon}
@@ -87,7 +89,9 @@ export function ComparisonPageShell({
 							/>
 							<SectionSeparator hideTop className="h-24 sm:h-24" />
 						</>
-					) : null}
+					) : (
+						<SectionSeparator hideTop className="h-24 sm:h-24" />
+					)}
 				</>
 			) : null}
 			{children}

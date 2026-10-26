@@ -17,8 +17,8 @@ export function CompareMigrateBanner({
 	guideHref: string;
 }) {
 	return (
-		<section className="border-stroke-soft-100 border-b bg-bg-weak-50/60 px-4 py-16 sm:px-8 sm:py-20 lg:px-12 dark:border-white/10 dark:bg-white/[0.03]">
-			<div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
+		<section className="bg-bg-weak-50/60 px-4 py-20 sm:px-8 sm:py-24 lg:px-12 dark:bg-white/[0.03]">
+			<div className="grid gap-12 lg:grid-cols-2 lg:items-center">
 				<div className="max-w-xl">
 					<h2 className="text-balance font-semibold text-[1.9rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[2.3rem] dark:text-white">
 						Moving from {competitorName}?
@@ -51,24 +51,34 @@ export function CompareMigrateBanner({
 					</div>
 				</div>
 
-				<div aria-hidden className="flex items-center gap-5 self-center">
-					<span className="flex items-center gap-2.5 font-semibold text-[20px] text-text-strong-950 tracking-tight dark:text-white">
+				{/* Centred in the right half rather than pushed to the edge. */}
+				<div
+					aria-hidden
+					className="flex items-center justify-center gap-6 sm:gap-8"
+				>
+					<span className="flex items-center gap-3 font-semibold text-[1.75rem] text-text-strong-950 tracking-tight sm:text-[2rem] dark:text-white">
 						{icon ? (
 							<BrandIcon
 								icon={icon}
 								fill="currentColor"
-								className="size-6 text-text-strong-950 dark:text-white"
+								className="size-8 text-text-strong-950 sm:size-9 dark:text-white"
 							/>
 						) : null}
 						{competitorName}
 					</span>
-					<Icon
-						name="arrow-right"
-						className="size-5 text-text-sub-600 dark:text-white/40"
-					/>
-					<span className="flex items-center gap-2.5 font-semibold text-[20px] text-text-strong-950 tracking-tight dark:text-white">
-						<span className="flex size-7 items-center justify-center overflow-hidden">
-							<Logo className="size-10 shrink-0" />
+					<span className="flex items-center text-text-sub-600 dark:text-white/40">
+						{[0, 1, 2].map((index) => (
+							<Icon
+								key={index}
+								name="chevron-right"
+								className="-mx-1 size-5 sm:size-6"
+								style={{ opacity: 0.35 + index * 0.3 }}
+							/>
+						))}
+					</span>
+					<span className="flex items-center gap-3 font-semibold text-[1.75rem] text-text-strong-950 tracking-tight sm:text-[2rem] dark:text-white">
+						<span className="flex size-10 items-center justify-center overflow-hidden sm:size-11">
+							<Logo className="size-14 shrink-0 sm:size-16" />
 						</span>
 						Reloop
 					</span>
