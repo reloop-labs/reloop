@@ -4,6 +4,7 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./authoritative": "./src/authoritative.ts",
 		"./resolver": "./src/resolver.ts",
 		"./is-local": "./src/is-local.ts",
 		"./verify-records": "./src/verify-records.ts"

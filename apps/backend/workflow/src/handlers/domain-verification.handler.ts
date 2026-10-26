@@ -111,8 +111,13 @@ export async function processDomainVerification({
 	const domainName = domainWithRecords.domain;
 	const records = domainWithRecords.dnsRecords;
 
-	const dbl = await applySpamhausDblCheck({ domainId, domainName });
-	if (dbl.outcome !== "unchanged") {
+	// Once per verify run: retries are frequent and the listing won't change
+	// between them.
+	const dbl =
+		job.attemptsMade === 0
+			? await applySpamhausDblCheck({ domainId, domainName })
+			: null;
+	if (dbl && dbl.outcome !== "unchanged") {
 		log.info({
 			message: "Spamhaus DBL check changed sending block",
 			domainId,

@@ -1,3 +1,8 @@
+import {
+	resolveCnameAuthoritative,
+	resolveMxAuthoritative,
+	resolveTxtAuthoritative,
+} from "./authoritative";
 import { isLocal } from "./is-local";
 import { resolver } from "./resolver";
 
@@ -55,12 +60,67 @@ async function defaultCname(name: string): Promise<string[]> {
 	return withTimeout(resolver.resolveCname(name), 5_000);
 }
 
+async function authoritativeTxt(name: string): Promise<string[][]> {
+	return withTimeout(resolveTxtAuthoritative(name), 5_000);
+}
+
+async function authoritativeMx(
+	name: string,
+): Promise<{ exchange: string; priority: number }[]> {
+	return withTimeout(resolveMxAuthoritative(name), 5_000);
+}
+
+async function authoritativeCname(name: string): Promise<string[]> {
+	return withTimeout(resolveCnameAuthoritative(name), 5_000);
+}
+
 async function defaultAddresses(name: string): Promise<string[]> {
 	const [v4, v6] = await Promise.all([
 		withTimeout(resolver.resolve4(name), 2_500).catch(() => [] as string[]),
 		withTimeout(resolver.resolve6(name), 2_500).catch(() => [] as string[]),
 	]);
 	return [...v4, ...v6];
+}
+
+/** Match wins; lookup_failed only when every source failed to answer. */
+export function combineOutcomes(outcomes: DnsCheckOutcome[]): DnsCheckOutcome {
+	if (outcomes.includes("match")) return "match";
+	if (outcomes.length > 0 && outcomes.every((o) => o === "lookup_failed")) {
+		return "lookup_failed";
+	}
+	return "mismatch";
+}
+
+/**
+ * Run one check per lookup source and resolve on the first match, so a
+ * fresh authoritative answer never waits on a slow public resolver.
+ * Sources are judged separately: merging them could pair a stale cached
+ * SPF with the new one and fail the duplicate check.
+ */
+function firstMatch(
+	runs: Promise<DnsCheckOutcome>[],
+): Promise<DnsCheckOutcome> {
+	return new Promise((resolve) => {
+		const outcomes: DnsCheckOutcome[] = [];
+		for (const run of runs) {
+			run.then((outcome) => {
+				if (outcome === "match") resolve("match");
+				outcomes.push(outcome);
+				if (outcomes.length === runs.length) {
+					resolve(combineOutcomes(outcomes));
+				}
+			});
+		}
+	});
+}
+
+/** A caller-supplied lookup (tests) is used alone; otherwise zone NS + public. */
+function txtSources(custom?: TxtLookup): TxtLookup[] {
+	return custom ? [custom] : [authoritativeTxt, defaultTxt];
+}
+
+function mxSources(custom?: MxLookup): MxLookup[] {
+	return custom ? [custom] : [authoritativeMx, defaultMx];
 }
 
 export function countSpfRecords(flattenedRecords: string[]): number {
@@ -158,55 +218,67 @@ export function mxRecordMatches(
 export async function checkSpfRecord(
 	name: string,
 	value: string,
-	resolveTxt: TxtLookup = defaultTxt,
+	resolveTxt?: TxtLookup,
 ): Promise<DnsCheckOutcome> {
 	if (isLocal(name)) return "match";
-	try {
-		const records = await resolveTxt(name);
-		return spfRecordMatches(records.flat(), value) ? "match" : "mismatch";
-	} catch (error) {
-		console.error(`Error verifying SPF record for ${name}:`, error);
-		return classifyDnsError(error);
-	}
+	return firstMatch(
+		txtSources(resolveTxt).map(async (lookup) => {
+			try {
+				const records = await lookup(name);
+				return spfRecordMatches(records.flat(), value) ? "match" : "mismatch";
+			} catch (error) {
+				console.error(`Error verifying SPF record for ${name}:`, error);
+				return classifyDnsError(error);
+			}
+		}),
+	);
 }
 
 export async function checkDkimRecord(
 	name: string,
 	value: string,
-	resolveTxt: TxtLookup = defaultTxt,
+	resolveTxt?: TxtLookup,
 ): Promise<DnsCheckOutcome> {
 	if (isLocal(name)) return "match";
-	try {
-		const records = await resolveTxt(name);
-		const combinedRecord = records.flat().join("");
-		return dkimRecordMatches(combinedRecord, value) ? "match" : "mismatch";
-	} catch (error) {
-		console.error(`Error verifying DKIM record for ${name}:`, error);
-		return classifyDnsError(error);
-	}
+	return firstMatch(
+		txtSources(resolveTxt).map(async (lookup) => {
+			try {
+				const records = await lookup(name);
+				const combinedRecord = records.flat().join("");
+				return dkimRecordMatches(combinedRecord, value) ? "match" : "mismatch";
+			} catch (error) {
+				console.error(`Error verifying DKIM record for ${name}:`, error);
+				return classifyDnsError(error);
+			}
+		}),
+	);
 }
 
 export async function checkDmarcRecord(
 	name: string,
 	value: string,
-	resolveTxt: TxtLookup = defaultTxt,
+	resolveTxt?: TxtLookup,
 ): Promise<DnsCheckOutcome> {
 	if (isLocal(name)) return "match";
-	try {
-		const records = await resolveTxt(name);
-		const combinedRecord = records.flat().join("");
-		return dmarcRecordMatches(combinedRecord, value) ? "match" : "mismatch";
-	} catch (error) {
-		console.error(`Error verifying DMARC record for ${name}:`, error);
-		return classifyDnsError(error);
-	}
+	return firstMatch(
+		txtSources(resolveTxt).map(async (lookup) => {
+			try {
+				const records = await lookup(name);
+				const combinedRecord = records.flat().join("");
+				return dmarcRecordMatches(combinedRecord, value) ? "match" : "mismatch";
+			} catch (error) {
+				console.error(`Error verifying DMARC record for ${name}:`, error);
+				return classifyDnsError(error);
+			}
+		}),
+	);
 }
 
 export async function checkMxRecord(
 	name: string,
 	value: string,
 	priority: number,
-	resolveMx: MxLookup = defaultMx,
+	resolveMx?: MxLookup,
 ): Promise<DnsCheckOutcome> {
 	const lookupName = normalizeMxLookupName(name);
 	if (!lookupName || lookupName === "@") {
@@ -214,13 +286,17 @@ export async function checkMxRecord(
 		return "mismatch";
 	}
 	if (isLocal(lookupName)) return "match";
-	try {
-		const records = await resolveMx(lookupName);
-		return mxRecordMatches(records, value, priority) ? "match" : "mismatch";
-	} catch (error) {
-		console.error(`Error verifying MX record for ${lookupName}:`, error);
-		return classifyDnsError(error);
-	}
+	return firstMatch(
+		mxSources(resolveMx).map(async (lookup) => {
+			try {
+				const records = await lookup(lookupName);
+				return mxRecordMatches(records, value, priority) ? "match" : "mismatch";
+			} catch (error) {
+				console.error(`Error verifying MX record for ${lookupName}:`, error);
+				return classifyDnsError(error);
+			}
+		}),
+	);
 }
 
 export async function checkCnameRecord(
@@ -233,8 +309,23 @@ export async function checkCnameRecord(
 ): Promise<DnsCheckOutcome> {
 	if (isLocal(name)) return "match";
 
-	const resolveCname = lookups.resolveCname ?? defaultCname;
 	const resolveAddresses = lookups.resolveAddresses ?? defaultAddresses;
+	const cnameSources = lookups.resolveCname
+		? [lookups.resolveCname]
+		: [authoritativeCname, defaultCname];
+	return firstMatch(
+		cnameSources.map((resolveCname) =>
+			checkCnameWith(name, value, resolveCname, resolveAddresses),
+		),
+	);
+}
+
+async function checkCnameWith(
+	name: string,
+	value: string,
+	resolveCname: CnameLookup,
+	resolveAddresses: AddressLookup,
+): Promise<DnsCheckOutcome> {
 	const expected = value.toLowerCase().replace(/\.$/, "");
 	const cleanName = name.toLowerCase().replace(/\.$/, "");
 
@@ -304,16 +395,20 @@ export function ownershipRecordMatches(
 export async function checkOwnershipRecord(
 	name: string,
 	value: string,
-	resolveTxt: TxtLookup = defaultTxt,
+	resolveTxt?: TxtLookup,
 ): Promise<DnsCheckOutcome> {
 	if (isLocal(name)) return "match";
-	try {
-		const records = await resolveTxt(name);
-		return ownershipRecordMatches(records, value) ? "match" : "mismatch";
-	} catch (error) {
-		console.error(`Error verifying ownership record for ${name}:`, error);
-		return classifyDnsError(error);
-	}
+	return firstMatch(
+		txtSources(resolveTxt).map(async (lookup) => {
+			try {
+				const records = await lookup(name);
+				return ownershipRecordMatches(records, value) ? "match" : "mismatch";
+			} catch (error) {
+				console.error(`Error verifying ownership record for ${name}:`, error);
+				return classifyDnsError(error);
+			}
+		}),
+	);
 }
 
 export async function verifyOwnershipRecord(
