@@ -52,16 +52,15 @@ for acme_file in "${ACME_FILES[@]}"; do
     done < <(jq -r --arg dom "$DOMAIN" '.. | objects | select(.Certificates?) | .Certificates[]? | select(.domain.main == $dom or ((.domain.sans // []) | index($dom))) | "\(.certificate) \(.key)"' "$acme_file" 2>/dev/null)
 done
 
-# 2. Caddy certificate paths (if Coolify is using Caddy proxy)
-CADDY_CERT_PATHS=(
-    "/traefik/caddy/certificates/acme-v02.api.letsencrypt.org-directory/$DOMAIN/$DOMAIN.crt"
-    "/data/coolify/proxy/caddy/certificates/acme-v02.api.letsencrypt.org-directory/$DOMAIN/$DOMAIN.crt"
-)
-for caddy_cert in "${CADDY_CERT_PATHS[@]}"; do
-    caddy_key="${caddy_cert%.crt}.key"
-    if [ -f "$caddy_cert" ] && [ -f "$caddy_key" ]; then
-        consider_cert "$caddy_cert" "$caddy_key" "$caddy_cert"
-    fi
+# 2. Caddy certificate files (<domain>.crt + .key). Caddy's data dir sits
+# at different depths depending on how the proxy volume is mounted, so
+# search the mounted proxy directories instead of fixed paths.
+for root in /traefik /data/coolify/proxy /certs; do
+    [ -d "$root" ] || continue
+    while read -r caddy_cert; do
+        caddy_key="${caddy_cert%.crt}.key"
+        [ -f "$caddy_key" ] && consider_cert "$caddy_cert" "$caddy_key" "$caddy_cert"
+    done < <(find "$root" -maxdepth 8 -type f -name "$DOMAIN.crt" -path "*/certificates/*" 2>/dev/null)
 done
 
 rm -rf "$CANDIDATE_DIR"
