@@ -1,7 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { formatPrice, pricingPlans } from "@reloop/web/lib/pricing";
+import { pricingPlans } from "@reloop/web/lib/pricing";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -11,12 +11,6 @@ const REPO = "reloop-labs/reloop";
 const freeEmails =
 	pricingPlans.find((plan) => plan.id === "free")?.comparison.monthlyEmails ??
 	"6,000";
-
-const cheapestPaidPlan = Math.min(
-	...pricingPlans.flatMap((plan) =>
-		plan.monthlyPrice ? [plan.monthlyPrice] : [],
-	),
-);
 
 function OptionCard({
 	title,
@@ -120,7 +114,7 @@ export function CompareOpenSourceSection({
 
 				<OptionCard
 					title="Reloop Cloud"
-					price={`From ${formatPrice(cheapestPaidPlan)} a month`}
+					price={`${freeEmails} emails / month free`}
 					highlighted
 					action={
 						<FancyButton.Root

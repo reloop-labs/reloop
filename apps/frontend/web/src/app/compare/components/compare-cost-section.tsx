@@ -167,14 +167,14 @@ export function CompareCostSection({
 		},
 		{
 			id: "credits",
-			label: "Credits",
+			label: "Pay as you go",
 			icon: "invoice",
 			rows: quoted.map((row) => ({
 				volume: row.volume,
 				reloop: {
 					usd: row.credits,
-					label: "Credits",
-					note: `Valid for ${creditPack.validityMonths} months`,
+					label: "Pay as you go",
+					note: `Credits, valid for ${creditPack.validityMonths} months`,
 				},
 				competitor: row.competitor,
 			})),
@@ -200,10 +200,11 @@ export function CompareCostSection({
 					{mode === "marketing"
 						? `Sending one campaign a week, about ${marketingSendsPerContact} emails per contact a month. Reloop counts emails sent, not contacts.`
 						: "The cheapest way to pay for each monthly volume, in US dollars."}{" "}
-					Plans start at {formatUsd(cheapestPaidPlan)} a month. Credits need no
-					subscription: the free {count(freeMonthlyEmails)} a month, then $
-					{creditPack.usdPerThousand.toFixed(2)} per 1,000, valid{" "}
-					{creditPack.validityMonths} months.
+					Plans start at {formatUsd(cheapestPaidPlan)} a month. Or pay as you
+					go, with no subscription: the first {count(freeMonthlyEmails)} emails
+					each month are free, then ${creditPack.usdPerThousand.toFixed(2)} per
+					1,000 you send. Prepaid emails last {creditPack.validityMonths}{" "}
+					months.
 				</p>
 				<p className="mt-3 text-[13px] text-text-sub-600 dark:text-white/45">
 					Source:{" "}
