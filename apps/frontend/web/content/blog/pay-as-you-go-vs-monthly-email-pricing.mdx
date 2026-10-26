@@ -1,0 +1,147 @@
+---
+title: "Pay as You Go vs Monthly: How to Choose the Right Email Plan"
+description: "Credits or a monthly plan? Worked numbers for every volume from 6,000 to 150,000 emails a month, the 26,000-email break-even point, and when bursty sending makes credits the cheaper choice."
+keywords:
+  - pay as you go vs subscription
+  - email api pricing
+  - prepaid email credits
+  - monthly email plan
+  - cheapest email api
+  - transactional email cost
+  - email pricing calculator
+  - reloop pricing
+publishedAt: 2026-10-26
+category: Features
+tags: [pricing, pay-as-you-go, email-api, guide]
+readTime: 6 min read
+image: /blog/images/pay-as-you-go-vs-monthly-email-pricing.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - introducing-pay-as-you-go
+  - introducing-monthly-plans
+  - reloop-free-tier
+  - email-provider-comparison-2026
+  - best-transactional-email-apis-2026
+---
+
+Reloop has two ways to pay past the [free tier](/blog/reloop-free-tier): **credits** you buy once, or a **monthly plan**. Both cost $0.50 per 1,000 emails at the margin, so the right choice comes down to one question:
+
+**Is your volume steady, or does it spike?**
+
+This guide gives you the numbers to answer it. For what each option includes, see [introducing pay as you go](/blog/introducing-pay-as-you-go) and [introducing monthly plans](/blog/introducing-monthly-plans).
+
+## The short answer
+
+- **Under 6,000 emails a month:** stay on **Free**. It costs nothing and never expires.
+- **Under about 26,000 a month, or spiky volume:** buy **credits**.
+- **Steady 26,000 to 66,000 a month:** **Pro**, $10 / month.
+- **Steady 66,000 to 250,000 a month:** **Growth**, $20 / month.
+- **Over 250,000 a month:** talk to us about **Enterprise**.
+
+The rest of this post shows where those lines come from.
+
+## How each option is priced
+
+**Credits.** $0.50 per 1,000 emails, valid for 6 months. Your free 6,000 each month is used first, so you only spend credits on what goes past it.
+
+**Pro.** $10 a month for 50,000 emails, then $0.50 per 1,000.
+
+**Growth.** $20 a month for 100,000 emails, then $0.50 per 1,000.
+
+Monthly allowances reset every billing period. Credits carry over for 6 months. That one difference decides most cases.
+
+## Steady volume: the numbers
+
+If you send roughly the same amount every month, here is what each option costs per month:
+
+| Emails / month | Credits | Cheapest plan | Best choice |
+|---|---|---|---|
+| 6,000 | $0 | $0 (Free) | Free |
+| 10,000 | $2 | $10 (Pro) | Credits |
+| 20,000 | $7 | $10 (Pro) | Credits |
+| 26,000 | $10 | $10 (Pro) | Either |
+| 30,000 | $12 | $10 (Pro) | Pro |
+| 50,000 | $22 | $10 (Pro) | Pro |
+| 75,000 | $34.50 | $20 (Growth) | Growth |
+| 100,000 | $47 | $20 (Growth) | Growth |
+| 150,000 | $72 | $45 (Growth) | Growth |
+
+Credits cost `(emails - 6,000) / 1,000 × $0.50`. The free 6,000 is why credits win at low volume: at 20,000 emails you only pay for 14,000.
+
+**Break-even with Pro is 26,000 emails a month.** That's 6,000 free plus 20,000 on credits ($10). Below it, credits are cheaper. Above it, Pro is.
+
+**Pro to Growth is around 66,000.** Past 50,000, Pro charges $0.50 per 1,000 on top of $10. At about 66,000 emails Pro reaches $18, and Growth's flat $20 for 100,000 becomes the better deal, with more inboxes, domains and a dedicated IP.
+
+<Callout type="tip">
+  Plan for the volume you expect in three months, not today. If you're at 20,000 and growing fast, you'll cross 26,000 soon and Pro will be cheaper.
+</Callout>
+
+## Spiky volume: where credits win
+
+Steady averages hide the real advantage of credits: **they don't reset every month.**
+
+Take an app that sends 5,000 emails most months and 40,000 in a launch month, twice a year.
+
+**On Pro:** 6 months × $10 = **$60**, and most of the 50,000 allowance goes unused in quiet months.
+
+**On credits:** quiet months are covered by the free 6,000. Each launch month needs 34,000 on credits. Two launches = 68,000 emails = **$34**.
+
+Same sending, about half the cost. The more your volume swings, the bigger the gap.
+
+Credits also fit:
+
+- **Seasonal businesses.** Big in November and December, quiet the rest of the year.
+- **New products.** You don't know your volume yet, and you don't want a subscription before you do.
+- **Agencies and side projects.** Many small projects that each send in bursts.
+- **One-off sends.** A migration notice or a policy update to your whole user base.
+
+## When a monthly plan wins
+
+- **Steady volume above 26,000 a month.** Pro is simply cheaper.
+- **You want a fixed bill.** The same charge every month is easier to budget and expense.
+- **You need Growth's extras.** 10 agent inboxes, 10 webhooks, 10 domains, 3 of your own SMTP servers and a dedicated IP.
+- **You'd rather not watch a balance.** Plans keep sending and charge $0.50 per 1,000 past the allowance, so there's nothing to top up.
+
+## A quick way to decide
+
+1. **Look at your last 3 to 6 months of sending.** Your current provider's dashboard shows it, or check Reloop's analytics if you're already here.
+2. **Find your average and your peak.**
+3. **If your average is under 26,000, buy credits.** Size the pack to cover 6 months of sending past 6,000 a month.
+4. **If your average is over 26,000 and your peak is less than double it, pick a plan.** Pro up to about 66,000, Growth above.
+5. **If your peak is several times your average, run both numbers.** Credits usually win.
+
+You can switch whenever your volume changes. Your domains, templates, contacts and API keys stay the same, so there's nothing to migrate.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is pay as you go more expensive per email?">
+    No. Credits and plan overage both cost $0.50 per 1,000 emails. The
+    difference is that a plan charges a fixed fee for an allowance that resets
+    monthly, while credits last 6 months.
+  </Accordion>
+
+  <Accordion title="Do I still get the free 6,000 emails with credits?">
+    Yes. Each month the free 6,000 is used first and credits only cover what
+    goes past it.
+  </Accordion>
+
+  <Accordion title="Is there a daily limit on credits?">
+    No. The 200-a-day cap only applies to the free tier. While you hold
+    credits there is no daily cap.
+  </Accordion>
+
+  <Accordion title="What if I buy credits and then need a plan?">
+    Switch to a plan from the billing page whenever your volume becomes
+    steady. Your account, domains and API keys stay the same.
+  </Accordion>
+
+  <Accordion title="How big can a credit pack be?">
+    Packs range from 3,000 to 100,000 emails. You can buy more than one, and
+    each top-up resets the 6-month expiry on your whole balance.
+  </Accordion>
+</AccordionGroup>

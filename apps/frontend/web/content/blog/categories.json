@@ -25,6 +25,11 @@
 		"description": "Company updates, product releases, and why open source email matters."
 	},
 	{
+		"slug": "features",
+		"name": "Features",
+		"description": "New Reloop features and pricing: what launched, what it does and how to use it."
+	},
+	{
 		"slug": "self-hosting",
 		"name": "Self-Hosting",
 		"description": "Deploy and operate Reloop on your own infrastructure."
