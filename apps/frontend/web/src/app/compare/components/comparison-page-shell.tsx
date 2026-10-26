@@ -61,7 +61,6 @@ export function ComparisonPageShell({
 			/>
 			{afterHero ? (
 				<>
-					<SectionSeparator hideTop className="h-24 sm:h-24" />
 					{afterHero}
 					<SectionSeparator hideTop className="h-24 sm:h-24" />
 				</>

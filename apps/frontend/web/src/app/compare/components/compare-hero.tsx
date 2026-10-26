@@ -199,7 +199,7 @@ export function CompareHero({
 
 	return (
 		<section className="w-full border-stroke-soft-100 border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			<div className="grid gap-12 px-4 pt-28 pb-16 sm:px-10 sm:pt-36 sm:pb-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center lg:gap-16 lg:px-12">
+			<div className="grid gap-12 px-4 pt-36 pb-24 sm:px-10 sm:pt-48 sm:pb-32 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center lg:gap-16 lg:px-12">
 				<div className="min-w-0">
 					<nav
 						aria-label="Breadcrumb"
