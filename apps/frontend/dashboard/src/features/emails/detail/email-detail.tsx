@@ -15,6 +15,7 @@ import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { emailSendVia } from "#/features/emails/lib/email-send-via";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import { useSmtpProviders } from "#/features/smtp/own-smtp/use-smtp-providers";
+import { EmailActivity } from "./email-activity";
 import { EmailHtmlPreview } from "./email-html-preview";
 import { EmailInsightsPanel } from "./email-insights-panel";
 import { formatHtml } from "./format-html";
@@ -798,6 +799,10 @@ export const EmailDetail = ({
 					}
 				/>
 			</section>
+
+			{!isLoading && email?.events ? (
+				<EmailActivity events={email.events} />
+			) : null}
 
 			{!isLoading && email?.errorMessage && (
 				<ErrorDetailsPanel

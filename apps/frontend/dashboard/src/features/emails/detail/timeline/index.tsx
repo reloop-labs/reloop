@@ -129,7 +129,13 @@ export function EmailTimeline({
 	}, [isFailed, onDeliveredClick]);
 
 	const rows = steps.map((step) => {
-		const event = allEvents.find((e) => e.type === step.stepType);
+		// Apple Mail Privacy Protection and link scanners aren't a person
+		// reading: the Opened/Clicked steps use the first human event.
+		const event = allEvents.find(
+			(e) =>
+				e.type === step.stepType &&
+				(e.metadata as { machine?: boolean } | null)?.machine !== true,
+		);
 		return {
 			...step,
 			isCompleted: !!event,

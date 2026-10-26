@@ -69,6 +69,7 @@ export async function getEngagementController({
 	const where = sql.join(filters, sql` and `);
 
 	// One row per engagement event, with the context captured at open/click.
+	// Opens inferred from a click count as opens but have no email client.
 	// Events recorded before capture existed have no `machine` flag and count
 	// as human with an unknown client.
 	const events = sql`
@@ -78,6 +79,7 @@ export async function getEngagementController({
 			e.created_at,
 			coalesce((e.metadata->>'machine')::boolean, false) as machine,
 			e.metadata->>'client' as client,
+			e.metadata->>'inferred' as inferred,
 			e.metadata->>'device' as device,
 			e.metadata->>'country' as country
 		from email_event e
@@ -106,7 +108,7 @@ export async function getEngagementController({
 		db.execute(sql`
 				with ev as (${events})
 				select coalesce(client, 'Unknown') as name, count(distinct email_id)::int as count
-				from ev where type = 'opened' and not machine
+				from ev where type = 'opened' and not machine and inferred is null
 				group by 1 order by 2 desc limit ${TOP_N}
 			`),
 		db.execute(sql`
