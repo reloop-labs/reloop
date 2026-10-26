@@ -87,7 +87,7 @@ export function BlogPostCard({ post }: { post: BlogPostDefinition }) {
 
 			<BlogPostMeta post={post} className="mt-5" />
 
-			<h2 className="mt-2 text-[17px] text-text-strong-950 leading-[1.45] tracking-[-0.01em] transition-colors dark:text-white">
+			<h2 className="mt-2 font-semibold text-[16px] text-text-strong-950 leading-[1.45] tracking-[-0.01em] transition-colors dark:text-white">
 				{post.title}
 			</h2>
 
