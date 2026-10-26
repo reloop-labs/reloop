@@ -1,0 +1,616 @@
+---
+title: "How to Send Email in Ruby: Net::SMTP, Rails and API"
+description: "Send email from Ruby with Net::SMTP, the mail gem, Rails Action Mailer or Sinatra, or with an email API. Copy-paste examples for HTML email, attachments, background jobs and retries without duplicates."
+keywords:
+  - send email Ruby
+  - Ruby send email
+  - Ruby Net::SMTP example
+  - send HTML email Ruby
+  - Rails send email
+  - Action Mailer SMTP settings
+  - Rails deliver_later
+  - Sinatra send email
+  - Ruby email attachment
+  - Ruby email API
+publishedAt: 2026-10-26
+category: Tutorials
+tags: [ruby, rails, action-mailer, sinatra, smtp, sdk]
+readTime: 13 min read
+image: /blog/images/send-email-ruby.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - send-email-python
+  - send-email-nodejs
+  - send-email-php
+  - smtp-ports-explained
+  - transactional-email-best-practices
+  - spf-dkim-dmarc-setup-guide
+---
+
+**Ruby can send email with `Net::SMTP`, and Rails apps already have Action Mailer built in.** For anything in production, send through a provider: either over SMTP with Action Mailer or the `mail` gem, or over HTTPS with an email API SDK.
+
+This guide covers plain `Net::SMTP`, the `mail` gem, the Reloop Ruby SDK, Rails and Sinatra, then the production details: attachments, background jobs and safe retries.
+
+Working in another language? See the guides for [Python](/blog/send-email-python) and [Node.js](/blog/send-email-nodejs).
+
+---
+
+## Which approach should you use?
+
+| | `Net::SMTP` / Action Mailer | Email API SDK |
+|---|-----------------------------|---------------|
+| **Install** | `net-smtp` gem (Rails includes it) | `bundle add reloop` |
+| **Transport** | SMTP on port 587 (STARTTLS) | HTTPS on port 443 |
+| **Building the message** | `mail` gem or mailer views | A hash with `html`, `text`, `attachments` |
+| **Errors** | `Net::SMTPError` subclasses | `Reloop::Error` and `Faraday::Error` |
+| **Safe retries** | No, a retry can send twice | Yes, with an idempotency key |
+| **Works with Action Mailer and Devise** | Yes, natively | Through SMTP settings |
+
+If you are wiring up Devise emails, Action Mailer views or a third-party gem, use SMTP settings. If you are writing the send call yourself, use the API.
+
+---
+
+## Prerequisites
+
+1. **Ruby 3.1 or later**
+2. A **verified sending domain** with [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide)
+3. An **API key** from the [Reloop dashboard](https://reloop.sh/dashboard). Keys start with `rl_`, and the same key works for the API and SMTP.
+
+```bash
+export RELOOP_API_KEY=rl_your_api_key
+```
+
+Keep the key in the environment, Rails credentials or a secrets manager, never in your code or git.
+
+---
+
+## Method 1: Send email with Net::SMTP
+
+`Net::SMTP` speaks the protocol. Since Ruby 3.1 it ships as a bundled gem rather than part of the standard library, so in a Bundler project add it to your Gemfile:
+
+```bash
+bundle add net-smtp
+```
+
+Then send a plain-text message:
+
+```ruby
+require "net/smtp"
+
+message = <<~MESSAGE
+  From: Acme <hello@mail.acme.com>
+  To: user@example.com
+  Subject: Welcome to Acme
+  MIME-Version: 1.0
+  Content-Type: text/plain; charset=UTF-8
+
+  Welcome! Thanks for signing up.
+MESSAGE
+
+Net::SMTP.start(
+  "smtp.reloop.sh", 587,
+  user: "reloop",
+  secret: ENV.fetch("RELOOP_API_KEY"),
+  authtype: :plain,
+  starttls: :always,
+) do |smtp|
+  smtp.send_message(message, "hello@mail.acme.com", "user@example.com")
+end
+```
+
+The username can be any string. The password is your API key. `starttls: :always` makes the connection fail instead of falling back to plain text if TLS is not available.
+
+### Build HTML email with the mail gem
+
+Writing MIME by hand gets messy once you need HTML, a plain-text fallback or attachments. The `mail` gem (the same one Action Mailer uses) builds the message and sends it over SMTP:
+
+```bash
+bundle add mail
+```
+
+```ruby
+require "mail"
+
+Mail.defaults do
+  delivery_method :smtp,
+    address: "smtp.reloop.sh",
+    port: 587,
+    user_name: "reloop",
+    password: ENV.fetch("RELOOP_API_KEY"),
+    authentication: :plain,
+    enable_starttls: true
+end
+
+mail = Mail.new do
+  from    "Acme <hello@mail.acme.com>"
+  to      "user@example.com"
+  subject "Welcome to Acme"
+
+  # Plain-text body first, then the HTML alternative
+  text_part do
+    body "Welcome! Thanks for signing up."
+  end
+
+  html_part do
+    content_type "text/html; charset=UTF-8"
+    body "<h1>Welcome!</h1><p>Thanks for signing up.</p>"
+  end
+end
+
+mail.deliver!
+```
+
+### When port 587 is blocked
+
+Some hosts block outbound 587. Reloop also accepts STARTTLS on port **2587** (and 2025), so only the port number changes:
+
+```ruby
+Net::SMTP.start(
+  "smtp.reloop.sh", 2587,
+  user: "reloop",
+  secret: ENV.fetch("RELOOP_API_KEY"),
+  authtype: :plain,
+  starttls: :always,
+) do |smtp|
+  smtp.send_message(message, "hello@mail.acme.com", "user@example.com")
+end
+```
+
+Reloop does not offer implicit TLS on port 465, so do not pass `tls: true` to `Net::SMTP`, or `ssl: true` / `tls: true` to the `mail` gem or Action Mailer. If the connection hangs or times out, see [SMTP ports explained](/blog/smtp-ports-explained).
+
+### Handle SMTP errors
+
+```ruby
+begin
+  Net::SMTP.start(
+    "smtp.reloop.sh", 587,
+    user: "reloop",
+    secret: ENV.fetch("RELOOP_API_KEY"),
+    authtype: :plain,
+    starttls: :always,
+  ) do |smtp|
+    smtp.send_message(message, "hello@mail.acme.com", "user@example.com")
+  end
+rescue Net::SMTPAuthenticationError
+  warn "Wrong API key"
+rescue Net::SMTPServerBusy => e
+  warn "Temporary failure, try again later: #{e.message}"
+rescue Net::SMTPFatalError, Net::SMTPSyntaxError => e
+  warn "Rejected: #{e.message}"
+rescue Net::OpenTimeout, Net::ReadTimeout, SystemCallError => e
+  warn "Network error: #{e.message}"
+end
+```
+
+SMTP codes run the other way from HTTP: `4xx` replies (`Net::SMTPServerBusy`) are temporary and worth retrying, `5xx` replies (`Net::SMTPFatalError`) are permanent.
+
+### Can I send with Gmail from Ruby?
+
+For a personal script, yes: use `smtp.gmail.com` on port 587 with an [App Password](https://support.google.com/accounts/answer/185833). For an app, no. Gmail limits personal accounts to about 500 recipients a day, every message comes from your `@gmail.com` address, and bulk sending gets the account suspended.
+
+---
+
+## Method 2: Send email with the Ruby SDK
+
+### Install
+
+```bash
+bundle add reloop
+```
+
+Or `gem install reloop` outside Bundler. The gem is `reloop` and you load it with `require "reloop"`.
+
+### Send an email
+
+```ruby
+require "reloop"
+
+reloop = Reloop::Client.new(api_key: ENV.fetch("RELOOP_API_KEY"))
+
+begin
+  result = reloop.mail.send(
+    from: "Acme <hello@mail.acme.com>",
+    to: "user@example.com",
+    subject: "Welcome to Acme",
+    html: "<h1>Welcome!</h1><p>Thanks for signing up.</p>",
+    text: "Welcome! Thanks for signing up.",
+  )
+  puts "Sent: #{result["id"]}"
+rescue Reloop::Error => e
+  warn "Failed: #{e.message}"
+rescue Faraday::Error => e
+  warn "Network error: #{e.message}"
+end
+```
+
+The SDK **raises** on failure. When the API answers with a non-`2xx` status you get a `Reloop::Error` whose message includes the status code and the error body. Connection failures and timeouts surface as `Faraday::Error`, since the SDK uses Faraday for HTTP. On success, `send` returns the parsed JSON response as a hash with string keys, so read the email ID with `result["id"]`.
+
+The SDK passes your hash to the API as JSON, so field names match the [API reference](/docs/api/mail/post-api-mail-v1send) exactly: `reply_to`, `scheduled_at`, `template`, `attachments`.
+
+### Send to several recipients
+
+```ruby
+reloop.mail.send(
+  from: "Acme <hello@mail.acme.com>",
+  to: ["ada@example.com", "grace@example.com"],
+  cc: "team@acme.com",
+  reply_to: "support@acme.com",
+  subject: "Your weekly report",
+  text: "Here is your report.",
+  tags: [{ name: "type", value: "weekly_report" }],
+)
+```
+
+Every address in `to` sees the others. For personalized mail, send one message per recipient.
+
+### Send a stored template
+
+Keep copy out of your code so non-developers can edit it. Create the template in Reloop, then send it by ID with variables:
+
+```ruby
+reloop.mail.send(
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome to Acme",
+  template: {
+    id: "tmpl_welcome",
+    variables: { first_name: "Ada", plan: "Pro" },
+  },
+)
+```
+
+See [templates](/docs/learn/templates) for variables and defaults.
+
+---
+
+## Rails
+
+Action Mailer works with any SMTP provider. Point it at Reloop and your mailers, Devise emails and [password reset emails](/blog/password-reset-email-best-practices) all go through Reloop.
+
+### Store the key in credentials
+
+```bash
+bin/rails credentials:edit
+```
+
+```yaml
+reloop:
+  api_key: rl_your_api_key
+```
+
+### Configure Action Mailer
+
+```ruby
+# config/environments/production.rb
+Rails.application.configure do
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: "smtp.reloop.sh",
+    port: 587,
+    user_name: "reloop",
+    password: Rails.application.credentials.dig(:reloop, :api_key),
+    authentication: :plain,
+    enable_starttls: true,
+  }
+  config.action_mailer.default_url_options = { host: "acme.com", protocol: "https" }
+  config.action_mailer.raise_delivery_errors = true
+end
+```
+
+Leave `ssl` and `tls` unset: Reloop uses STARTTLS, not implicit TLS. If 587 is blocked, set `port: 2587`.
+
+### Write a mailer
+
+```ruby
+# app/mailers/application_mailer.rb
+class ApplicationMailer < ActionMailer::Base
+  default from: "Acme <hello@mail.acme.com>"
+  layout "mailer"
+end
+
+# app/mailers/user_mailer.rb
+class UserMailer < ApplicationMailer
+  def welcome
+    @user = params[:user]
+    mail(to: @user.email, subject: "Welcome to Acme")
+  end
+end
+```
+
+Add both `app/views/user_mailer/welcome.html.erb` and `app/views/user_mailer/welcome.text.erb`. Action Mailer sees the two templates and sends a multipart email with HTML and a plain-text fallback.
+
+### Send it with deliver_later
+
+```ruby
+UserMailer.with(user: @user).welcome.deliver_later
+```
+
+`deliver_later` hands the email to Active Job, so the request returns without waiting on SMTP. New Rails 8 apps use Solid Queue in production, which stores jobs in your database so they survive restarts. Use `deliver_now` only in scripts and consoles.
+
+### Use the SDK from Rails
+
+When you want the API instead of SMTP, create one client in an initializer and reuse it:
+
+```ruby
+# config/initializers/reloop.rb
+RELOOP = Reloop::Client.new(
+  api_key: Rails.application.credentials.dig(:reloop, :api_key),
+)
+```
+
+```ruby
+# app/controllers/contacts_controller.rb
+class ContactsController < ApplicationController
+  def create
+    result = RELOOP.mail.send(
+      from: "Acme Website <contact@mail.acme.com>",
+      to: "support@acme.com",
+      reply_to: params.require(:email),
+      subject: "New message from #{params[:email]}",
+      text: params.require(:message),
+    )
+    render json: { id: result["id"] }
+  rescue Reloop::Error, Faraday::Error
+    render json: { error: "Could not send message" }, status: :bad_gateway
+  end
+end
+```
+
+The visitor's address goes in `reply_to`, never in `from`. You can only send from your verified domain, and putting someone else's domain in `from` fails [DMARC](/blog/gmail-yahoo-bulk-sender-requirements). Full example: [Rails guide](/docs/examples/ruby/rails).
+
+---
+
+## Sinatra
+
+```ruby
+# app.rb
+require "sinatra"
+require "json"
+require "reloop"
+
+RELOOP = Reloop::Client.new(api_key: ENV.fetch("RELOOP_API_KEY"))
+
+post "/contact" do
+  content_type :json
+  data = JSON.parse(request.body.read)
+
+  result = RELOOP.mail.send(
+    from: "Acme Website <contact@mail.acme.com>",
+    to: "support@acme.com",
+    reply_to: data["email"],
+    subject: "New contact form message",
+    text: data["message"],
+  )
+  { id: result["id"] }.to_json
+rescue Reloop::Error, Faraday::Error
+  halt 502, { error: "Could not send message" }.to_json
+end
+```
+
+Prefer SMTP? Use the `mail` gem settings from Method 1 with the same host, port and credentials.
+
+---
+
+## Attachments
+
+With the SDK, pass base64 content:
+
+```ruby
+require "base64"
+
+pdf = File.binread("invoice-1042.pdf")
+
+reloop.mail.send(
+  from: "Acme Billing <billing@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Your invoice #1042",
+  text: "Your invoice is attached.",
+  attachments: [{
+    filename: "invoice-1042.pdf",
+    content: Base64.strict_encode64(pdf),
+    content_type: "application/pdf",
+  }],
+)
+```
+
+On Ruby 3.4 and later, `base64` is a bundled gem too. Rails already depends on it; in a plain Bundler project, run `bundle add base64`.
+
+In a Rails mailer, assign to `attachments`:
+
+```ruby
+def invoice
+  attachments["invoice-1042.pdf"] = File.binread(Rails.root.join("tmp/invoice-1042.pdf"))
+  mail(to: params[:user].email, subject: "Your invoice #1042")
+end
+```
+
+With the `mail` gem, use `add_file`:
+
+```ruby
+mail.add_file(filename: "invoice-1042.pdf", content: pdf)
+```
+
+Keep attachments small. Many inboxes reject messages over 25 MB, and large files hurt deliverability. For big files, send a signed download link.
+
+---
+
+## Send in the background with Active Job
+
+Sending inside a web request adds latency and fails the request when the provider is slow. `deliver_later` already moves Action Mailer sends into a job. Active Job does not retry failed deliveries on its own (some backends, like Sidekiq, add their own retries), so tell the delivery job which errors are temporary:
+
+```ruby
+# app/jobs/retrying_mail_delivery_job.rb
+class RetryingMailDeliveryJob < ActionMailer::MailDeliveryJob
+  retry_on Net::OpenTimeout, Net::ReadTimeout, Errno::ECONNRESET,
+    Errno::ECONNREFUSED, Net::SMTPServerBusy,
+    wait: :polynomially_longer, attempts: 5
+end
+
+# app/mailers/application_mailer.rb
+class ApplicationMailer < ActionMailer::Base
+  self.delivery_job = RetryingMailDeliveryJob
+  default from: "Acme <hello@mail.acme.com>"
+  layout "mailer"
+end
+```
+
+`wait: :polynomially_longer` needs Rails 7.1 or later. `Net::SMTPFatalError` and `Net::SMTPAuthenticationError` are left out on purpose. An invalid address or a wrong key fails the same way every time.
+
+For API sends, write the job yourself. The rules are the same as for any HTTP API: **retry** network errors (no status at all), `429` and `5xx`. **Do not retry** other `4xx` errors: an invalid address or unverified domain fails the same way every time. The next section shows that job, with an idempotency key so retries are safe.
+
+---
+
+## Retries without duplicate emails
+
+A request times out and your job retries. If the first attempt actually went through, the user gets two emails. The API prevents this with an [`Idempotency-Key` header](/docs/api/idempotency): repeat a request with the same key and Reloop returns the original send instead of sending again.
+
+`Reloop::Error` does not expose the status code as a field, so this job calls the endpoint with `Net::HTTP` to decide what to retry:
+
+```ruby
+# app/jobs/send_receipt_job.rb
+require "net/http"
+require "json"
+
+class SendReceiptJob < ApplicationJob
+  class RetryableSendError < StandardError; end
+
+  SEND_URL = URI("https://reloop.sh/api/mail/v1/send")
+
+  retry_on RetryableSendError, wait: :polynomially_longer, attempts: 5
+
+  def perform(order_id, to)
+    request = Net::HTTP::Post.new(SEND_URL)
+    request["x-api-key"] = Rails.application.credentials.dig(:reloop, :api_key)
+    request["Content-Type"] = "application/json"
+    request["Idempotency-Key"] = "receipt-#{order_id}"
+    request.body = {
+      from: "Acme <orders@mail.acme.com>",
+      to: to,
+      subject: "Receipt for order #{order_id}",
+      text: "Thanks for your order.",
+    }.to_json
+
+    response = Net::HTTP.start(
+      SEND_URL.host, SEND_URL.port,
+      use_ssl: true, open_timeout: 10, read_timeout: 30,
+    ) { |http| http.request(request) }
+
+    status = response.code.to_i
+    return JSON.parse(response.body)["id"] if response.is_a?(Net::HTTPSuccess)
+
+    if status == 429 || status >= 500
+      raise RetryableSendError, "Reloop returned #{status}"
+    end
+
+    # Other 4xx: do not retry
+    raise "Send failed (#{status}): #{response.body}"
+  rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, SystemCallError => e
+    raise RetryableSendError, e.message
+  end
+end
+```
+
+```ruby
+SendReceiptJob.perform_later(order.id, order.email)
+```
+
+Base the key on the business event (`receipt-#{order_id}`), not a new UUID per attempt, so retries from any worker are safe. If an attempt failed before the email went out, a retry with the same key sends it.
+
+If you only need deduplication and not status-based retries, the SDK works too. The API also reads the key from an `idempotency_key` field in the body, and the SDK passes it through:
+
+```ruby
+reloop.mail.send(
+  from: "Acme <orders@mail.acme.com>",
+  to: order.email,
+  subject: "Receipt for order #{order.id}",
+  text: "Thanks for your order.",
+  idempotency_key: "receipt-#{order.id}",
+)
+```
+
+---
+
+## Testing without sending real email
+
+- **Rails:** the test environment uses the `:test` delivery method, which stores emails in `ActionMailer::Base.deliveries` instead of sending them. Call `deliver_now` in mailer tests, or wrap `deliver_later` in `perform_enqueued_jobs`, then assert on the array.
+- **Anything else:** stub the client in unit tests, and send to [test addresses](/docs/guides/testing-email-addresses) in staging so you do not hurt your [sender reputation](/blog/why-emails-land-in-spam-fix) with bounces.
+- **Local SMTP:** run [Mailpit](https://mailpit.axllent.org) with `docker run -p 1025:1025 -p 8025:8025 axllent/mailpit`. In `config/environments/development.rb`, set `config.action_mailer.delivery_method = :smtp` and `config.action_mailer.smtp_settings = { address: "localhost", port: 1025 }`, with no user name, password or `enable_starttls`. Open `http://localhost:8025` to see the messages.
+
+```ruby
+# test/mailers/user_mailer_test.rb
+class UserMailerTest < ActionMailer::TestCase
+  test "welcome" do
+    user = users(:ada)
+    UserMailer.with(user: user).welcome.deliver_now
+
+    email = ActionMailer::Base.deliveries.last
+    assert_equal [user.email], email.to
+    assert_equal "Welcome to Acme", email.subject
+  end
+end
+```
+
+---
+
+## Production checklist
+
+- [ ] API key in Rails credentials, an environment variable or a secrets manager
+- [ ] Sending domain verified with SPF, DKIM and DMARC
+- [ ] `from` on your verified domain; user addresses in `reply_to`
+- [ ] Both HTML and plain-text bodies (`.html.erb` and `.text.erb` views)
+- [ ] One shared client, created in an initializer
+- [ ] Sending in a job (`deliver_later`, Solid Queue, Sidekiq), not the request
+- [ ] Retries only on network errors, `429` and `5xx` (or SMTP `4xx`)
+- [ ] Idempotency keys on anything that retries
+- [ ] [Webhooks](/features/webhooks) for bounces and complaints
+- [ ] Disposable addresses blocked at signup ([how](/blog/block-disposable-emails-at-signup))
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How do I send an HTML email in Ruby?">
+    With the mail gem, add a text_part with the plain-text version and an
+    html_part with your HTML and a text/html content type. In Rails, add both
+    an .html.erb and a .text.erb view for the mailer action. With the Reloop
+    SDK, pass html and text keys to mail.send.
+  </Accordion>
+
+  <Accordion title="Why does Net::SMTP fail with cannot load such file?">
+    Since Ruby 3.1, net-smtp is a bundled gem, not part of the default
+    standard library. Under Bundler you have to list it in your Gemfile with
+    bundle add net-smtp. Rails apps get it through the mail gem.
+  </Accordion>
+
+  <Accordion title="Should I use port 587 or 465 with Action Mailer?">
+    Use 587 with enable_starttls set to true. Port 465 expects implicit TLS,
+    which needs ssl or tls set to true instead. Reloop only offers STARTTLS,
+    on ports 587, 2587 and 2025, so leave ssl and tls unset.
+  </Accordion>
+
+  <Accordion title="Why do my Ruby emails go to spam?">
+    Usually the sending domain is not authenticated, or the From domain does
+    not match the domain that signed the message. Set up SPF, DKIM and DMARC,
+    send from your own domain, and always include a plain-text body.
+  </Accordion>
+
+  <Accordion title="Can I use Reloop with Devise emails?">
+    Yes. Devise sends through Action Mailer, so the SMTP settings shown above
+    route confirmation, password reset and unlock emails through Reloop with
+    no code changes.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Send your first email from Ruby"
+  description="Ruby SDK, SMTP relay for Rails and Sinatra, and a free tier of 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

@@ -1,0 +1,677 @@
+---
+title: "How to Send Email in C#: MailKit, ASP.NET Core and API"
+description: "Send email from C# and .NET with MailKit over SMTP or with an email API. Copy-paste examples for ASP.NET Core minimal APIs, HTML email, attachments, background sending and retries without duplicates."
+keywords:
+  - send email C#
+  - C# send email
+  - MailKit example
+  - send email .NET
+  - ASP.NET Core send email
+  - C# SMTP
+  - MailKit vs SmtpClient
+  - C# email attachment
+  - .NET email API
+publishedAt: 2026-10-26
+category: Tutorials
+tags: [csharp, dotnet, aspnet-core, mailkit, smtp, sdk]
+readTime: 14 min read
+image: /blog/images/send-email-csharp.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - send-email-python
+  - send-email-nodejs
+  - send-email-java
+  - smtp-ports-explained
+  - transactional-email-best-practices
+  - spf-dkim-dmarc-setup-guide
+---
+
+**C# sends email over SMTP with [MailKit](https://github.com/jstedfast/MailKit), or over HTTPS with an email API SDK.** Skip the built-in `System.Net.Mail.SmtpClient`: Microsoft's own documentation says it is not recommended for new development because it does not support many modern protocols, and points you to MailKit instead.
+
+This guide covers MailKit, the Reloop .NET SDK and ASP.NET Core minimal APIs, then the production details: attachments, background sending with `BackgroundService` and `Channel<T>`, and safe retries.
+
+Writing another language? See [how to send email in Python](/blog/send-email-python), [Node.js](/blog/send-email-nodejs) or [Java](/blog/send-email-java).
+
+---
+
+## Which approach should you use?
+
+| | MailKit (SMTP) | Email API SDK |
+|---|----------------|---------------|
+| **Install** | `dotnet add package MailKit` | `dotnet add package Reloop` |
+| **Transport** | SMTP on port 587 (STARTTLS) | HTTPS on port 443 |
+| **Building the message** | `MimeMessage` and `BodyBuilder` | A `SendMailParams` object with `Html`, `Text`, `Attachments` |
+| **Errors** | `SmtpCommandException`, `AuthenticationException` | `ReloopApiException` with a `Status` |
+| **Safe retries** | No, a retry can send twice | Yes, with an idempotency key |
+| **Works with libraries that expect SMTP** | Yes, natively | Through SMTP settings |
+
+If a library or an existing system only speaks SMTP, use MailKit. If you are writing the send call yourself, use the API.
+
+---
+
+## Prerequisites
+
+1. **.NET 8 or later**
+2. A **verified sending domain** with [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide)
+3. An **API key** from the [Reloop dashboard](https://reloop.sh/dashboard). Keys start with `rl_`, and the same key works for the API and SMTP.
+
+```bash
+export RELOOP_API_KEY=rl_your_api_key
+```
+
+Keep the key in the environment, user secrets or a secrets manager, never in your code, `appsettings.json` or git.
+
+---
+
+## Method 1: Send email with MailKit
+
+```bash
+dotnet add package MailKit
+```
+
+MailKit builds messages with MimeKit, which it installs for you. `BodyBuilder` creates the multipart body with the plain-text and HTML versions:
+
+```csharp
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+
+var apiKey = Environment.GetEnvironmentVariable("RELOOP_API_KEY")
+    ?? throw new InvalidOperationException("RELOOP_API_KEY is not set");
+
+var message = new MimeMessage();
+message.From.Add(new MailboxAddress("Acme", "hello@mail.acme.com"));
+message.To.Add(MailboxAddress.Parse("user@example.com"));
+message.Subject = "Welcome to Acme";
+
+var body = new BodyBuilder
+{
+    TextBody = "Welcome! Thanks for signing up.",
+    HtmlBody = "<h1>Welcome!</h1><p>Thanks for signing up.</p>",
+};
+message.Body = body.ToMessageBody();
+
+using var smtp = new SmtpClient { Timeout = 30_000 };
+await smtp.ConnectAsync("smtp.reloop.sh", 587, SecureSocketOptions.StartTls);
+await smtp.AuthenticateAsync("reloop", apiKey);
+await smtp.SendAsync(message);
+await smtp.DisconnectAsync(true);
+```
+
+The username can be any string. The password is your API key. `Timeout` is in milliseconds; the default is two minutes.
+
+`SmtpClient` here is `MailKit.Net.Smtp.SmtpClient`. If a file also imports `System.Net.Mail`, the names clash, so leave that namespace out or use an alias.
+
+### When port 587 is blocked
+
+Some hosts block outbound 587. Reloop also accepts STARTTLS on port **2587** (and 2025), so only the port number changes:
+
+```csharp
+await smtp.ConnectAsync("smtp.reloop.sh", 2587, SecureSocketOptions.StartTls);
+```
+
+Reloop does not offer implicit TLS on port 465, so do not use `SecureSocketOptions.SslOnConnect`. Prefer `StartTls` over `Auto` or `StartTlsWhenAvailable`: it fails the connection if the server does not offer STARTTLS, instead of carrying on without encryption. If the connection hangs or times out, see [SMTP ports explained](/blog/smtp-ports-explained).
+
+### Handle SMTP errors
+
+```csharp
+try
+{
+    using var smtp = new SmtpClient { Timeout = 30_000 };
+    await smtp.ConnectAsync("smtp.reloop.sh", 587, SecureSocketOptions.StartTls);
+    await smtp.AuthenticateAsync("reloop", apiKey);
+    await smtp.SendAsync(message);
+    await smtp.DisconnectAsync(true);
+}
+catch (AuthenticationException)
+{
+    Console.Error.WriteLine("Wrong API key");
+}
+catch (SmtpCommandException ex) when (ex.ErrorCode == SmtpErrorCode.RecipientNotAccepted)
+{
+    Console.Error.WriteLine($"Rejected recipient: {ex.Mailbox}");
+}
+catch (SmtpCommandException ex)
+{
+    Console.Error.WriteLine($"SMTP error {(int)ex.StatusCode}: {ex.Message}");
+}
+catch (Exception ex) when (ex is SmtpProtocolException or IOException
+    or System.Net.Sockets.SocketException or TimeoutException)
+{
+    Console.Error.WriteLine($"Connection failed: {ex.Message}");
+}
+```
+
+`AuthenticationException` here is `MailKit.Security.AuthenticationException`, not the one in `System.Security.Authentication`. A refused connection throws `SocketException`, and a connection that hits `Timeout` throws `TimeoutException`.
+
+### Can I send with Gmail from C#?
+
+For a personal script, yes: use `smtp.gmail.com` on port 587 with an [App Password](https://support.google.com/accounts/answer/185833). For an app, no. Gmail limits personal accounts to about 500 recipients a day, every message comes from your `@gmail.com` address, and bulk sending gets the account suspended.
+
+---
+
+## Method 2: Send email with the .NET SDK
+
+### Install
+
+```bash
+dotnet add package Reloop
+```
+
+The package targets .NET Standard 2.0, so .NET Framework projects can reference it too.
+
+### Send an email
+
+```csharp
+using Reloop;
+using Reloop.Exceptions;
+using static Reloop.Models.MailModels;
+
+using var reloop = new ReloopClient(
+    Environment.GetEnvironmentVariable("RELOOP_API_KEY")
+        ?? throw new InvalidOperationException("RELOOP_API_KEY is not set"));
+
+try
+{
+    var result = await reloop.Mail.SendAsync(new SendMailParams
+    {
+        From = "Acme <hello@mail.acme.com>",
+        To = "user@example.com",
+        Subject = "Welcome to Acme",
+        Html = "<h1>Welcome!</h1><p>Thanks for signing up.</p>",
+        Text = "Welcome! Thanks for signing up.",
+    });
+    Console.WriteLine($"Sent: {result?.Id}");
+}
+catch (ReloopValidationException ex)
+{
+    Console.Error.WriteLine($"Invalid {ex.Field}: {ex.Message}");
+}
+catch (ReloopApiException ex)
+{
+    Console.Error.WriteLine($"Failed: {ex.Status} {ex.Message} {ex.Body.Fix}");
+}
+```
+
+The SDK **throws** on failure:
+
+- `ReloopValidationException` means a required field (`From`, `To` or `Subject`) is missing. No request is made.
+- `ReloopApiException` means the API returned a non-2xx status, or the request never got a response. Network failures come back with `Status` `0`. `Body` holds the API's `Message`, `Why`, `Fix` and `Link`.
+- A request that runs past the `HttpClient` timeout throws `TaskCanceledException`, not `ReloopApiException`. Treat it as a network error.
+
+The model classes (`SendMailParams`, `SendMailTag`, `SendMailAttachment`, `SendMailTemplate`) are nested in `Reloop.Models.MailModels`, which is why the example uses `using static`.
+
+Create the client **once** and reuse it. It wraps an `HttpClient`, and `ReloopClient` is `IDisposable`. In ASP.NET Core, register it as a singleton (shown below).
+
+### Send to several recipients
+
+```csharp
+await reloop.Mail.SendAsync(new SendMailParams
+{
+    From = "Acme <hello@mail.acme.com>",
+    To = new[] { "ada@example.com", "grace@example.com" },
+    Cc = "team@acme.com",
+    ReplyTo = "support@acme.com",
+    Subject = "Your weekly report",
+    Text = "Here is your report.",
+    Tags = new List<SendMailTag> { new("type", "weekly_report") },
+});
+```
+
+`To` takes a single string or a collection of strings. Every address in `To` sees the others. For personalized mail, send one message per recipient.
+
+### Send a stored template
+
+Keep copy out of your code so non-developers can edit it. Create the template in Reloop, then send it by ID with variables:
+
+```csharp
+await reloop.Mail.SendAsync(new SendMailParams
+{
+    From = "Acme <hello@mail.acme.com>",
+    To = "user@example.com",
+    Subject = "Welcome to Acme",
+    Template = new SendMailTemplate
+    {
+        Id = "tmpl_welcome",
+        Variables = new Dictionary<string, object>
+        {
+            ["first_name"] = "Ada",
+            ["plan"] = "Pro",
+        },
+    },
+});
+```
+
+See [templates](/docs/learn/templates) for variables and defaults.
+
+---
+
+## ASP.NET Core
+
+Put the settings in configuration and bind them to an options class. The sender address can live in `appsettings.json`:
+
+```json
+{
+  "Reloop": {
+    "From": "Acme <hello@mail.acme.com>"
+  }
+}
+```
+
+The API key does not belong there. In development, store it with user secrets:
+
+```bash
+dotnet user-secrets init
+dotnet user-secrets set "Reloop:ApiKey" "rl_your_api_key"
+```
+
+In production, set the environment variable `Reloop__ApiKey`. The double underscore maps to the `Reloop:ApiKey` configuration key.
+
+```csharp
+// ReloopOptions.cs
+using System.ComponentModel.DataAnnotations;
+
+public sealed class ReloopOptions
+{
+    public const string Section = "Reloop";
+
+    [Required]
+    public string ApiKey { get; set; } = "";
+
+    [Required]
+    public string From { get; set; } = "";
+}
+```
+
+Register the client as a singleton so the whole app shares one connection pool:
+
+```csharp
+// Program.cs
+using System.Net.Mail;
+using Microsoft.Extensions.Options;
+using Reloop;
+using Reloop.Exceptions;
+using static Reloop.Models.MailModels;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
+    .AddOptions<ReloopOptions>()
+    .Bind(builder.Configuration.GetSection(ReloopOptions.Section))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddSingleton(sp =>
+{
+    var options = sp.GetRequiredService<IOptions<ReloopOptions>>().Value;
+    var http = new HttpClient(new SocketsHttpHandler
+    {
+        PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+    })
+    {
+        Timeout = TimeSpan.FromSeconds(30),
+    };
+    return new ReloopClient(options.ApiKey, httpClient: http);
+});
+
+var app = builder.Build();
+
+app.MapPost("/contact", async (
+    ContactRequest body,
+    ReloopClient reloop,
+    IOptions<ReloopOptions> options) =>
+{
+    if (!MailAddress.TryCreate(body.Email, out _))
+    {
+        return Results.BadRequest(new { error = "Invalid email address" });
+    }
+
+    try
+    {
+        var result = await reloop.Mail.SendAsync(new SendMailParams
+        {
+            From = options.Value.From,
+            To = "support@acme.com",
+            ReplyTo = body.Email,
+            Subject = $"New message from {body.Email}",
+            Text = body.Message,
+        });
+        return Results.Ok(new { id = result?.Id });
+    }
+    catch (ReloopApiException ex)
+    {
+        app.Logger.LogError(ex, "Send failed with status {Status}", ex.Status);
+        return Results.Problem("Could not send message", statusCode: 502);
+    }
+});
+
+app.Run();
+
+record ContactRequest(string Email, string Message);
+```
+
+A few details matter here:
+
+- `ValidateOnStart` makes the app fail at startup if the key or sender is missing, instead of on the first send.
+- Passing your own `HttpClient` sets the timeout (the default is 100 seconds) and `PooledConnectionLifetime` lets a long-lived client pick up DNS changes.
+- The visitor's address goes in `ReplyTo`, never in `From`. You can only send from your verified domain, and putting someone else's domain in `From` fails [DMARC](/blog/gmail-yahoo-bulk-sender-requirements).
+
+### ASP.NET Core Identity emails
+
+Identity sends confirmation and [password reset emails](/blog/password-reset-email-best-practices) through `IEmailSender<TUser>`. Implement it with the shared client:
+
+```csharp
+using System.Net;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Reloop;
+using static Reloop.Models.MailModels;
+
+public sealed class ReloopIdentityEmailSender(
+    ReloopClient reloop,
+    IOptions<ReloopOptions> options) : IEmailSender<IdentityUser>
+{
+    public Task SendConfirmationLinkAsync(IdentityUser user, string email, string confirmationLink) =>
+        SendAsync(email, "Confirm your email",
+            $"<p><a href=\"{confirmationLink}\">Confirm your email</a></p>",
+            $"Confirm your email: {WebUtility.HtmlDecode(confirmationLink)}");
+
+    public Task SendPasswordResetLinkAsync(IdentityUser user, string email, string resetLink) =>
+        SendAsync(email, "Reset your password",
+            $"<p><a href=\"{resetLink}\">Reset your password</a></p>",
+            $"Reset your password: {WebUtility.HtmlDecode(resetLink)}");
+
+    public Task SendPasswordResetCodeAsync(IdentityUser user, string email, string resetCode) =>
+        SendAsync(email, "Your password reset code",
+            $"<p>Your code is <strong>{resetCode}</strong></p>",
+            $"Your code is {resetCode}");
+
+    private Task SendAsync(string to, string subject, string html, string text) =>
+        reloop.Mail.SendAsync(new SendMailParams
+        {
+            From = options.Value.From,
+            To = to,
+            Subject = subject,
+            Html = html,
+            Text = text,
+        });
+}
+```
+
+```csharp
+builder.Services.AddTransient<IEmailSender<IdentityUser>, ReloopIdentityEmailSender>();
+```
+
+Identity passes the links already HTML-encoded, which is right for the `href` but not for the plain-text body, hence `WebUtility.HtmlDecode`. Use your own user type in place of `IdentityUser` if you have one.
+
+---
+
+## Attachments
+
+With the SDK, pass base64 content:
+
+```csharp
+var pdf = await File.ReadAllBytesAsync("invoice-1042.pdf");
+
+await reloop.Mail.SendAsync(new SendMailParams
+{
+    From = "Acme Billing <billing@mail.acme.com>",
+    To = "user@example.com",
+    Subject = "Your invoice #1042",
+    Text = "Your invoice is attached.",
+    Attachments = new List<SendMailAttachment>
+    {
+        new()
+        {
+            Filename = "invoice-1042.pdf",
+            Content = Convert.ToBase64String(pdf),
+            ContentType = "application/pdf",
+        },
+    },
+});
+```
+
+With MailKit, add the file to the `BodyBuilder` before you call `ToMessageBody()`:
+
+```csharp
+var builder = new BodyBuilder { TextBody = "Your invoice is attached." };
+builder.Attachments.Add("invoice-1042.pdf", pdf, ContentType.Parse("application/pdf"));
+message.Body = builder.ToMessageBody();
+```
+
+Keep attachments small. Reloop caps attachment size by plan, many inboxes reject large messages, and large files hurt deliverability. For big files, send a signed download link.
+
+---
+
+## Send in the background with `BackgroundService` and `Channel<T>`
+
+Sending inside a request adds latency and fails the request when the provider is slow. A hosted service that reads from an in-memory `Channel<T>` moves the send off the request path with no extra infrastructure:
+
+```csharp
+using System.Threading.Channels;
+using Microsoft.Extensions.Options;
+using Reloop;
+using Reloop.Exceptions;
+using static Reloop.Models.MailModels;
+
+public sealed record EmailJob(string To, string Subject, string Text);
+
+public sealed class EmailQueue
+{
+    private readonly Channel<EmailJob> _channel =
+        Channel.CreateBounded<EmailJob>(new BoundedChannelOptions(1_000)
+        {
+            FullMode = BoundedChannelFullMode.Wait,
+        });
+
+    public ValueTask EnqueueAsync(EmailJob job, CancellationToken ct = default) =>
+        _channel.Writer.WriteAsync(job, ct);
+
+    public IAsyncEnumerable<EmailJob> ReadAllAsync(CancellationToken ct) =>
+        _channel.Reader.ReadAllAsync(ct);
+}
+
+public sealed class EmailWorker(
+    EmailQueue queue,
+    ReloopClient reloop,
+    IOptions<ReloopOptions> options,
+    ILogger<EmailWorker> logger) : BackgroundService
+{
+    private const int MaxAttempts = 5;
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await foreach (var job in queue.ReadAllAsync(stoppingToken))
+        {
+            try
+            {
+                await SendWithRetryAsync(job, stoppingToken);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                logger.LogError(ex, "Giving up on email to {To}", job.To);
+            }
+        }
+    }
+
+    private async Task SendWithRetryAsync(EmailJob job, CancellationToken ct)
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                await reloop.Mail.SendAsync(new SendMailParams
+                {
+                    From = options.Value.From,
+                    To = job.To,
+                    Subject = job.Subject,
+                    Text = job.Text,
+                });
+                return;
+            }
+            catch (Exception ex) when (attempt < MaxAttempts && IsRetryable(ex, ct))
+            {
+                var delay = TimeSpan.FromSeconds(Math.Pow(2, attempt));
+                logger.LogWarning(ex, "Send failed, retrying in {Delay}", delay);
+                await Task.Delay(delay, ct);
+            }
+        }
+    }
+
+    private static bool IsRetryable(Exception ex, CancellationToken ct) => ex switch
+    {
+        ReloopApiException api => api.Status is 0 or 429 or >= 500,
+        TaskCanceledException => !ct.IsCancellationRequested, // HttpClient timeout
+        _ => false,
+    };
+}
+```
+
+Register both and enqueue from your endpoint:
+
+```csharp
+builder.Services.AddSingleton<EmailQueue>();
+builder.Services.AddHostedService<EmailWorker>();
+
+app.MapPost("/signup", async (SignupRequest body, EmailQueue queue) =>
+{
+    // ... create the user ...
+    await queue.EnqueueAsync(new EmailJob(
+        To: body.Email,
+        Subject: "Welcome to Acme",
+        Text: "Thanks for signing up."));
+    return Results.Accepted();
+});
+```
+
+**Retry** network errors (status `0`), timeouts, `429` and `5xx`. **Do not retry** other `4xx` errors: an invalid address or unverified domain fails the same way every time. The worker catches every failure per job because an unhandled exception in `ExecuteAsync` stops the whole host by default (since .NET 6).
+
+Be honest about what this gives you. The channel lives in memory, so a deploy, crash or scale-down loses whatever is still queued, and `SendAsync` does not take a `CancellationToken`, so a send in flight at shutdown runs until it finishes or times out. That is fine for a welcome email. For mail that must arrive, such as receipts and password resets, use a durable queue: [Hangfire](https://www.hangfire.io) with persistent storage, a broker like RabbitMQ, Azure Service Bus or Amazon SQS, or an outbox table written in the same transaction as the order.
+
+---
+
+## Retries without duplicate emails
+
+A request times out and your worker retries. If the first attempt actually went through, the user gets two emails. The API prevents this with an [`Idempotency-Key` header](/docs/api/idempotency): repeat a request with the same key and Reloop returns the original result instead of sending again.
+
+The .NET SDK does not set this header, so call the endpoint with `HttpClient` and `System.Net.Http.Json`:
+
+```csharp
+using System.Net.Http.Json;
+using Microsoft.Extensions.Options;
+using static Reloop.Models.MailModels;
+
+public sealed class ReceiptSender(HttpClient http, IOptions<ReloopOptions> options)
+{
+    public async Task<string?> SendReceiptAsync(
+        string orderId, string to, CancellationToken ct = default)
+    {
+        using var request = new HttpRequestMessage(
+            HttpMethod.Post, "https://reloop.sh/api/mail/v1/send")
+        {
+            Content = JsonContent.Create(new
+            {
+                from = "Acme <orders@mail.acme.com>",
+                to,
+                subject = $"Receipt for order {orderId}",
+                text = "Thanks for your order.",
+            }),
+        };
+        request.Headers.Add("x-api-key", options.Value.ApiKey);
+        request.Headers.Add("Idempotency-Key", $"receipt-{orderId}");
+
+        using var response = await http.SendAsync(request, ct);
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<SendMailResponse>(cancellationToken: ct);
+        return result?.Id;
+    }
+}
+```
+
+Register it as a typed client. The API rejects requests without a `User-Agent` header, and `HttpClient` does not send one by default, so set it here:
+
+```csharp
+builder.Services.AddHttpClient<ReceiptSender>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("acme-app/1.0");
+});
+```
+
+Base the key on the business event (`receipt-{orderId}`), not a new `Guid` per attempt, so retries from any worker are safe. If a retry arrives while the first request is still running, the API answers `409` with `Retry-After: 1`; wait and retry with the same key. Reusing a key with a different body returns `422`.
+
+---
+
+## Testing without sending real email
+
+- **Unit tests:** put sending behind your own interface and fake it. `ReloopClient` also accepts an `HttpClient`, so you can pass one backed by a fake `HttpMessageHandler` that returns a canned response.
+- **Staging:** send to [test addresses](/docs/guides/testing-email-addresses) so you do not hurt your [sender reputation](/blog/why-emails-land-in-spam-fix) with bounces.
+- **Local SMTP:** run [Mailpit](https://mailpit.axllent.org) with `docker run -p 1025:1025 -p 8025:8025 axllent/mailpit` and connect MailKit to it with `ConnectAsync("localhost", 1025, SecureSocketOptions.None)`, without `AuthenticateAsync`. Open `http://localhost:8025` to see the messages.
+
+---
+
+## Production checklist
+
+- [ ] API key in user secrets, an environment variable or a secrets manager
+- [ ] Sending domain verified with SPF, DKIM and DMARC
+- [ ] `From` on your verified domain; user addresses in `ReplyTo`
+- [ ] Both HTML and plain-text bodies
+- [ ] One `ReloopClient` registered as a singleton
+- [ ] Options validated at startup with `ValidateOnStart`
+- [ ] Sending in a background worker, and a durable queue for mail that must arrive
+- [ ] Retries only on network errors, timeouts, `429` and `5xx`
+- [ ] Idempotency keys on anything that retries
+- [ ] [Webhooks](/features/webhooks) for bounces and complaints
+- [ ] Disposable addresses blocked at signup ([how](/blog/block-disposable-emails-at-signup))
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Should I use System.Net.Mail.SmtpClient or MailKit?">
+    Use MailKit. Microsoft's documentation marks System.Net.Mail.SmtpClient as
+    not recommended for new development because it does not support many
+    modern protocols, and suggests MailKit instead. MailKit is actively
+    maintained and has async methods throughout.
+  </Accordion>
+
+  <Accordion title="How do I send an HTML email in C#?">
+    With MailKit, create a BodyBuilder, set HtmlBody and TextBody, and assign
+    builder.ToMessageBody() to the message body. With the Reloop SDK, set Html
+    and Text on SendMailParams.
+  </Accordion>
+
+  <Accordion title="Which SecureSocketOptions should I use?">
+    Use StartTls for port 587, and for 2587 when 587 is blocked. Use
+    SslOnConnect only for servers that offer implicit TLS on port 465, which
+    Reloop does not. Picking the wrong one for the port makes the connection
+    hang or fail with a TLS error.
+  </Accordion>
+
+  <Accordion title="Why do my C# emails go to spam?">
+    Usually the sending domain is not authenticated, or the From domain does
+    not match the domain that signed the message. Set up SPF, DKIM and DMARC,
+    send from your own domain, and always include a plain-text body.
+  </Accordion>
+
+  <Accordion title="Does the Reloop .NET SDK work with .NET Framework?">
+    Yes. The package targets .NET Standard 2.0, so .NET Framework projects can
+    reference it as well as .NET 8 and newer. Microsoft recommends .NET
+    Framework 4.7.2 or later for .NET Standard 2.0 libraries.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Send your first email from C#"
+  description=".NET SDK, SMTP relay for MailKit, and a free tier of 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

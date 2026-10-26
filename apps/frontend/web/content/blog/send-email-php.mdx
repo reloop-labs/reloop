@@ -1,0 +1,704 @@
+---
+title: "How to Send Email in PHP: PHPMailer, Laravel and API"
+description: "Send email from PHP with PHPMailer, Laravel, Symfony Mailer or WordPress, or with an email API. Copy-paste examples for HTML email, attachments, queued sending and retries without duplicates."
+keywords:
+  - send email PHP
+  - PHP send email
+  - PHPMailer SMTP example
+  - send HTML email PHP
+  - Laravel send email
+  - Laravel SMTP settings
+  - Symfony Mailer SMTP
+  - WordPress SMTP
+  - PHP email API
+publishedAt: 2026-10-26
+category: Tutorials
+tags: [php, phpmailer, laravel, symfony, wordpress, smtp, sdk]
+readTime: 13 min read
+image: /blog/images/send-email-php.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - send-email-python
+  - send-email-nodejs
+  - send-email-ruby
+  - smtp-ports-explained
+  - transactional-email-best-practices
+  - spf-dkim-dmarc-setup-guide
+---
+
+**PHP has a built-in `mail()` function, but you should not use it for real email.** Send through a provider instead: over SMTP with [PHPMailer](https://github.com/PHPMailer/PHPMailer) or your framework's mailer, or over HTTPS with an email API SDK.
+
+This guide covers PHPMailer, the Reloop PHP SDK, Laravel, Symfony and WordPress, then the production details: attachments, queued sending and safe retries.
+
+Working in another language? See how to send email in [Python](/blog/send-email-python) or [Node.js](/blog/send-email-nodejs).
+
+---
+
+## Which approach should you use?
+
+| | PHPMailer / framework SMTP | Email API SDK |
+|---|---------------------------|---------------|
+| **Install** | `composer require phpmailer/phpmailer` | `composer require reloop/reloop-email` |
+| **Transport** | SMTP on port 587 (STARTTLS) | HTTPS on port 443 |
+| **Building the message** | `PHPMailer` properties, MIME handled for you | An array with `html`, `text`, `attachments` |
+| **Errors** | `PHPMailer\PHPMailer\Exception` with a text message | `ReloopApiException` with status and JSON body |
+| **Safe retries** | No, a retry can send twice | Yes, with an idempotency key |
+| **Works with Laravel `Mail` and WordPress `wp_mail`** | Yes, natively | Through SMTP settings |
+
+If you are wiring up Laravel's notifications, password resets or a WordPress plugin, use SMTP settings. If you are writing the send call yourself, use the API.
+
+---
+
+## Prerequisites
+
+1. **PHP 8.1 or later** and [Composer](https://getcomposer.org)
+2. A **verified sending domain** with [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide)
+3. An **API key** from the [Reloop dashboard](https://reloop.sh/dashboard). Keys start with `rl_`, and the same key works for the API and SMTP.
+
+```bash
+export RELOOP_API_KEY=rl_your_api_key
+```
+
+Keep the key in the environment or a secrets manager, never in your code or git.
+
+---
+
+## Why not PHP's mail() function?
+
+`mail()` hands the message to the local `sendmail` binary and returns `true` if that worked. It does not tell you whether the email was delivered, accepted or rejected. On most servers it also means:
+
+- **No authentication.** The message is not DKIM-signed for your domain, so Gmail and Outlook treat it as suspicious or reject it under [the 2024 sender rules](/blog/gmail-yahoo-bulk-sender-requirements).
+- **Your server's IP sends the mail.** Shared hosting and cloud IPs often have a poor reputation or sit on blocklists.
+- **You build headers by hand.** Concatenating user input into headers invites header injection.
+- **It is often disabled.** Many hosts and Docker images ship without a working `sendmail`.
+
+Use SMTP with PHPMailer or an API instead. Both authenticate to a provider that signs and delivers the message.
+
+---
+
+## Method 1: Send email with PHPMailer
+
+### Install
+
+```bash
+composer require phpmailer/phpmailer
+```
+
+### Send an email
+
+```php
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+
+$mail = new PHPMailer(true); // true: throw exceptions on errors
+
+$mail->isSMTP();
+$mail->Host = 'smtp.reloop.sh';
+$mail->Port = 587;
+$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+$mail->SMTPAuth = true;
+$mail->Username = 'reloop';
+$mail->Password = getenv('RELOOP_API_KEY');
+$mail->Timeout = 30;
+$mail->CharSet = PHPMailer::CHARSET_UTF8;
+
+$mail->setFrom('hello@mail.acme.com', 'Acme');
+$mail->addAddress('user@example.com');
+
+$mail->isHTML(true);
+$mail->Subject = 'Welcome to Acme';
+$mail->Body = '<h1>Welcome!</h1><p>Thanks for signing up.</p>';
+$mail->AltBody = 'Welcome! Thanks for signing up.';
+
+$mail->send();
+```
+
+The username can be any string. The password is your API key. `AltBody` is the plain-text version, and PHPMailer builds the multipart message for you. Set `CharSet` to UTF-8: PHPMailer defaults to ISO-8859-1, which mangles names and emoji.
+
+### When port 587 is blocked
+
+Some hosts block outbound 587. Reloop also accepts STARTTLS on port **2587** (and 2025), so only the port number changes:
+
+```php
+$mail->Port = 2587;
+$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+```
+
+Reloop does not offer implicit TLS on port 465, so do not use `PHPMailer::ENCRYPTION_SMTPS` with it. If the connection hangs or times out, see [SMTP ports explained](/blog/smtp-ports-explained).
+
+### Handle SMTP errors
+
+```php
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
+
+try {
+    $mail->send();
+} catch (Exception $e) {
+    error_log('Send failed: ' . $mail->ErrorInfo);
+}
+```
+
+PHPMailer uses one exception class for everything, so the reason is in the message: `Could not authenticate` means a wrong API key, and `Could not connect to SMTP host` means a blocked port or a TLS mismatch. To see the full SMTP conversation while debugging, set `$mail->SMTPDebug = SMTP::DEBUG_SERVER;` and turn it off again before you deploy.
+
+### Can I send with Gmail from PHP?
+
+For a personal script, yes: use `smtp.gmail.com` on port 587 with an [App Password](https://support.google.com/accounts/answer/185833). For an app, no. Gmail limits personal accounts to about 500 recipients a day, every message comes from your `@gmail.com` address, and bulk sending gets the account suspended.
+
+---
+
+## Method 2: Send email with the PHP SDK
+
+### Install
+
+```bash
+composer require reloop/reloop-email
+```
+
+The SDK needs PHP 8.1 or later and uses Guzzle 7 for HTTP.
+
+### Send an email
+
+```php
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Reloop\Exceptions\ReloopApiException;
+use Reloop\Exceptions\ReloopValidationException;
+use Reloop\Reloop;
+
+$reloop = Reloop::client(getenv('RELOOP_API_KEY'));
+
+try {
+    $result = $reloop->mail->send([
+        'from' => 'Acme <hello@mail.acme.com>',
+        'to' => 'user@example.com',
+        'subject' => 'Welcome to Acme',
+        'html' => '<h1>Welcome!</h1><p>Thanks for signing up.</p>',
+        'text' => 'Welcome! Thanks for signing up.',
+    ]);
+    echo 'Sent: ' . $result['id'] . PHP_EOL;
+} catch (ReloopValidationException $e) {
+    // Bad input, caught before any request was made
+    error_log("Invalid {$e->field}: {$e->getMessage()}");
+} catch (ReloopApiException $e) {
+    error_log("Failed: {$e->status} {$e->getMessage()}");
+}
+```
+
+`send()` returns the decoded JSON response as an array, with the email ID in `id`. The SDK **throws** on failure:
+
+- `ReloopValidationException` when a required field (`from`, `to`, `subject`) is missing. No request is sent.
+- `ReloopApiException` for any non-2xx response or network failure. `$e->status` is the HTTP status, or `0` for a network error, and `$e->body` holds the API's JSON error with `message`, `why` and `fix`.
+
+`Reloop::client()` creates a Guzzle client with a 30-second timeout. Create it **once** and reuse it, for example as a singleton in your framework's container.
+
+### Send to several recipients
+
+```php
+$reloop->mail->send([
+    'from' => 'Acme <hello@mail.acme.com>',
+    'to' => ['ada@example.com', 'grace@example.com'],
+    'cc' => 'team@acme.com',
+    'reply_to' => 'support@acme.com',
+    'subject' => 'Your weekly report',
+    'text' => 'Here is your report.',
+    'tags' => [['name' => 'type', 'value' => 'weekly_report']],
+]);
+```
+
+Every address in `to` sees the others. For personalized mail, send one message per recipient.
+
+### Send a stored template
+
+Keep copy out of your code so non-developers can edit it. Create the template in Reloop, then send it by ID with variables:
+
+```php
+$reloop->mail->send([
+    'from' => 'Acme <hello@mail.acme.com>',
+    'to' => 'user@example.com',
+    'subject' => 'Welcome to Acme',
+    'template' => [
+        'id' => 'tmpl_welcome',
+        'variables' => ['first_name' => 'Ada', 'plan' => 'Pro'],
+    ],
+]);
+```
+
+The SDK checks for `subject` before sending, so pass one even when the template has its own. See [templates](/docs/learn/templates) for variables and defaults.
+
+---
+
+## Laravel
+
+### SMTP settings
+
+Laravel's `Mail` facade works with any SMTP provider. Set these in `.env` and Mailables, notifications and [password reset emails](/blog/password-reset-email-best-practices) all go through Reloop:
+
+```bash
+# .env
+MAIL_MAILER=smtp
+MAIL_SCHEME=smtp
+MAIL_HOST=smtp.reloop.sh
+MAIL_PORT=587
+MAIL_USERNAME=reloop
+MAIL_PASSWORD=rl_your_api_key
+MAIL_FROM_ADDRESS=hello@mail.acme.com
+MAIL_FROM_NAME="Acme"
+```
+
+These map to the `smtp` mailer that ships in `config/mail.php`, so you do not need to edit that file:
+
+```php
+// config/mail.php (default, shown for reference)
+'smtp' => [
+    'transport' => 'smtp',
+    'scheme' => env('MAIL_SCHEME'),
+    'url' => env('MAIL_URL'),
+    'host' => env('MAIL_HOST', '127.0.0.1'),
+    'port' => env('MAIL_PORT', 2525),
+    'username' => env('MAIL_USERNAME'),
+    'password' => env('MAIL_PASSWORD'),
+    'timeout' => null,
+    'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+],
+```
+
+Keep the scheme as `smtp`, never `smtps`. The `smtp` scheme connects in plain text and upgrades with STARTTLS, which is what Reloop expects. If 587 is blocked, set `MAIL_PORT=2587`. On Laravel 10 and earlier, the setting is `MAIL_ENCRYPTION=tls` instead of `MAIL_SCHEME`.
+
+### Mailables
+
+Generate a Mailable with `php artisan make:mail WelcomeMail`, then define its subject and views:
+
+```php
+<?php
+
+namespace App\Mail;
+
+use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
+
+class WelcomeMail extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    public function __construct(public User $user)
+    {
+    }
+
+    public function envelope(): Envelope
+    {
+        return new Envelope(subject: 'Welcome to Acme');
+    }
+
+    public function content(): Content
+    {
+        return new Content(
+            view: 'emails.welcome',
+            text: 'emails.welcome-text',
+        );
+    }
+}
+```
+
+```php
+use App\Mail\WelcomeMail;
+use Illuminate\Support\Facades\Mail;
+
+Mail::to($user)->send(new WelcomeMail($user));
+```
+
+Public properties like `$user` are available in the Blade views. The `text` view gives you a plain-text part next to the HTML.
+
+### Queue it
+
+Sending inside the request adds a full SMTP round trip to your response time. Queue the Mailable instead:
+
+```php
+Mail::to($user)->queue(new WelcomeMail($user));
+```
+
+Or add `implements ShouldQueue` to the class so every `send()` is queued. Set `QUEUE_CONNECTION` to `database` or `redis` and run `php artisan queue:work`. With the default `sync` connection, "queued" mail still sends inside the request.
+
+A queued Mailable can set `public $tries = 3;` and a `backoff()` method. Be aware that SMTP has no idempotency key, so a retry after a timeout can send the email twice. For mail that must go out exactly once, use the API with a job (below).
+
+### Using the SDK in Laravel
+
+Add the key to `config/services.php` and bind one client in a service provider:
+
+```php
+// config/services.php
+'reloop' => [
+    'key' => env('RELOOP_API_KEY'),
+],
+```
+
+```php
+// app/Providers/AppServiceProvider.php
+use Reloop\Reloop;
+
+public function register(): void
+{
+    $this->app->singleton(
+        Reloop::class,
+        fn () => Reloop::client(config('services.reloop.key')),
+    );
+}
+```
+
+Then type-hint `Reloop` anywhere Laravel resolves dependencies, such as a controller:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Reloop\Exceptions\ReloopApiException;
+use Reloop\Reloop;
+
+class ContactController extends Controller
+{
+    public function store(Request $request, Reloop $reloop): JsonResponse
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email'],
+            'message' => ['required', 'string', 'max:5000'],
+        ]);
+
+        try {
+            $result = $reloop->mail->send([
+                'from' => 'Acme Website <contact@mail.acme.com>',
+                'to' => 'support@acme.com',
+                'reply_to' => $data['email'],
+                'subject' => "New message from {$data['email']}",
+                'text' => $data['message'],
+            ]);
+        } catch (ReloopApiException $e) {
+            report($e);
+
+            return response()->json(['error' => 'Could not send message'], 502);
+        }
+
+        return response()->json(['id' => $result['id']]);
+    }
+}
+```
+
+The visitor's address goes in `reply_to`, never in `from`. You can only send from your verified domain, and putting someone else's domain in `from` fails [DMARC](/blog/gmail-yahoo-bulk-sender-requirements).
+
+---
+
+## Symfony
+
+Symfony Mailer reads one DSN from the environment:
+
+```bash
+# .env.local
+MAILER_DSN=smtp://reloop:rl_your_api_key@smtp.reloop.sh:587
+```
+
+The `smtp://` scheme upgrades to STARTTLS automatically when the server offers it, which Reloop always does. On Symfony 7.1 or later, add `?require_tls=true` to refuse to send if TLS is not available. Do not use `smtps://`, which means implicit TLS. If 587 is blocked, change the port to 2587.
+
+```php
+<?php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Attribute\Route;
+
+class WelcomeController extends AbstractController
+{
+    #[Route('/welcome', methods: ['POST'])]
+    public function send(MailerInterface $mailer): Response
+    {
+        $email = (new Email())
+            ->from(new Address('hello@mail.acme.com', 'Acme'))
+            ->to('user@example.com')
+            ->subject('Welcome to Acme')
+            ->text('Welcome! Thanks for signing up.')
+            ->html('<h1>Welcome!</h1><p>Thanks for signing up.</p>');
+
+        $mailer->send($email);
+
+        return new Response('Sent');
+    }
+}
+```
+
+`send()` throws `TransportExceptionInterface` when the SMTP server rejects the message. If Symfony Messenger is installed, route `Symfony\Component\Mailer\Messenger\SendEmailMessage` to an async transport in `config/packages/messenger.yaml` and mail is sent by a worker instead of in the request.
+
+---
+
+## WordPress
+
+WordPress sends everything (password resets, new user emails, WooCommerce receipts) through `wp_mail()`, which uses PHP's `mail()` by default. Point it at SMTP and all of those go through Reloop.
+
+The no-code route is an SMTP plugin such as WP Mail SMTP. The [WordPress guide](/docs/integrations/wordpress) has the exact settings. If you prefer code, `wp_mail()` uses PHPMailer internally, so you can configure it with the `phpmailer_init` hook. Put the key in `wp-config.php`:
+
+```php
+// wp-config.php
+define('RELOOP_API_KEY', 'rl_your_api_key');
+```
+
+Then add a must-use plugin:
+
+```php
+<?php
+// wp-content/mu-plugins/reloop-smtp.php
+
+add_action('phpmailer_init', function ($phpmailer) {
+    $phpmailer->isSMTP();
+    $phpmailer->Host = 'smtp.reloop.sh';
+    $phpmailer->Port = 587;
+    $phpmailer->SMTPSecure = 'tls'; // STARTTLS
+    $phpmailer->SMTPAuth = true;
+    $phpmailer->Username = 'reloop';
+    $phpmailer->Password = RELOOP_API_KEY;
+});
+
+add_filter('wp_mail_from', fn () => 'hello@mail.acme.com');
+add_filter('wp_mail_from_name', fn () => 'Acme');
+```
+
+The `wp_mail_from` filter matters: WordPress defaults to `wordpress@yourdomain.com`, which must be on your verified domain to send.
+
+---
+
+## Attachments
+
+With PHPMailer, attach a file from disk or from memory:
+
+```php
+$mail->addAttachment('/path/to/invoice-1042.pdf', 'invoice-1042.pdf');
+
+// Or from a string you generated
+$mail->addStringAttachment($pdfBytes, 'invoice-1042.pdf', PHPMailer::ENCODING_BASE64, 'application/pdf');
+```
+
+Laravel Mailables return attachments from an `attachments()` method, for example `Attachment::fromPath(storage_path('invoices/1042.pdf'))`. Symfony's `Email` has `attachFromPath()` and `attach()`.
+
+With the SDK, pass a `path` that Reloop fetches when it builds the message, such as a short-lived signed URL to the file in your storage bucket:
+
+```php
+$reloop->mail->send([
+    'from' => 'Acme Billing <billing@mail.acme.com>',
+    'to' => 'user@example.com',
+    'subject' => 'Your invoice #1042',
+    'text' => 'Your invoice is attached.',
+    'attachments' => [[
+        'filename' => 'invoice-1042.pdf',
+        'path' => 'https://files.acme.com/invoices/1042.pdf?signature=...',
+        'content_type' => 'application/pdf',
+    ]],
+]);
+```
+
+The URL must be reachable from the internet. Keep attachments small: Reloop caps them by plan (1 MB on the free plan, 5 MB on paid plans, see [pricing](/pricing)), and large files hurt deliverability. For big files, send a download link instead.
+
+---
+
+## Send in the background with a Laravel job
+
+Sending inside a web request adds latency and fails the request when the provider is slow. Move it to a queued job and let the queue handle retries:
+
+```php
+<?php
+
+namespace App\Jobs;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Reloop\Exceptions\ReloopApiException;
+use Reloop\Exceptions\ReloopValidationException;
+use Reloop\Reloop;
+
+class SendWelcomeEmail implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public int $tries = 5;
+
+    public function __construct(public string $email)
+    {
+    }
+
+    /** @return array<int, int> seconds to wait before each retry */
+    public function backoff(): array
+    {
+        return [10, 30, 60, 120];
+    }
+
+    public function handle(Reloop $reloop): void
+    {
+        try {
+            $reloop->mail->send([
+                'from' => 'Acme <hello@mail.acme.com>',
+                'to' => $this->email,
+                'subject' => 'Welcome to Acme',
+                'text' => 'Thanks for signing up.',
+            ]);
+        } catch (ReloopApiException $e) {
+            if ($e->status === 0 || $e->status === 429 || $e->status >= 500) {
+                throw $e; // the queue retries with backoff
+            }
+            $this->fail($e); // 4xx: do not retry
+        } catch (ReloopValidationException $e) {
+            $this->fail($e);
+        }
+    }
+}
+```
+
+```php
+SendWelcomeEmail::dispatch($user->email);
+```
+
+**Retry** network errors (status `0`), `429` and `5xx`. **Do not retry** other `4xx` errors: an invalid address or unverified domain fails the same way every time. Outside Laravel, Symfony Messenger and plain worker scripts follow the same rule.
+
+---
+
+## Retries without duplicate emails
+
+A request times out and your job retries. If the first attempt actually went through, the user gets two emails. The API prevents this with an [`Idempotency-Key` header](/docs/api/idempotency): repeat a request with the same key and Reloop returns the original result instead of sending again.
+
+The PHP SDK does not set this header, so call the endpoint with Guzzle (already installed with the SDK):
+
+```php
+<?php
+
+use GuzzleHttp\Client;
+
+function sendReceipt(Client $http, string $orderId, string $to): array
+{
+    $response = $http->post('https://reloop.sh/api/mail/v1/send', [
+        'headers' => [
+            'x-api-key' => getenv('RELOOP_API_KEY'),
+            'Idempotency-Key' => "receipt-{$orderId}",
+        ],
+        'json' => [
+            'from' => 'Acme <orders@mail.acme.com>',
+            'to' => $to,
+            'subject' => "Receipt for order {$orderId}",
+            'text' => 'Thanks for your order.',
+        ],
+        'timeout' => 30,
+    ]);
+
+    return json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+}
+```
+
+Guzzle throws `ConnectException` on network errors and `ClientException` or `ServerException` on `4xx` and `5xx`, so the same retry rules apply. In Laravel, the HTTP client does the same in a few lines:
+
+```php
+use Illuminate\Support\Facades\Http;
+
+$response = Http::withHeaders([
+    'x-api-key' => config('services.reloop.key'),
+    'Idempotency-Key' => "receipt-{$order->id}",
+])->timeout(30)->post('https://reloop.sh/api/mail/v1/send', [
+    'from' => 'Acme <orders@mail.acme.com>',
+    'to' => $order->email,
+    'subject' => "Receipt for order {$order->id}",
+    'text' => 'Thanks for your order.',
+])->throw();
+```
+
+Base the key on the business event (`receipt-{$orderId}`), not a new UUID per attempt, so retries from any worker are safe. If a retry arrives while the first request is still running, Reloop returns `409`; retry that too, with the same key.
+
+---
+
+## Testing without sending real email
+
+- **Laravel:** call `Mail::fake()` in the test, then `Mail::assertSent(WelcomeMail::class)` or `Mail::assertQueued(...)`. For jobs that call the API through `Http`, use `Http::fake()` and `Http::assertSent()`.
+- **Symfony:** set `MAILER_DSN=null://null` in `.env.test` to discard mail, and use the mailer assertions in `KernelTestCase`.
+- **SDK unit tests:** `Reloop::client()` accepts a Guzzle client as its third argument, so you can pass one built on a Guzzle `MockHandler` (with `base_uri` set to `https://reloop.sh/`) and assert on the request without network access.
+- **Local SMTP:** run [Mailpit](https://mailpit.axllent.org) with `docker run -p 1025:1025 -p 8025:8025 axllent/mailpit`, then point PHPMailer at `localhost` port `1025` with `SMTPAuth = false` and `SMTPAutoTLS = false` (or set `MAIL_HOST=127.0.0.1` and `MAIL_PORT=1025` in Laravel). Open `http://localhost:8025` to see the messages.
+- **Staging:** send to [test addresses](/docs/guides/testing-email-addresses) so you do not hurt your [sender reputation](/blog/why-emails-land-in-spam-fix) with bounces.
+
+---
+
+## Production checklist
+
+- [ ] API key in an environment variable or secrets manager, not in `config/` or git
+- [ ] Sending domain verified with SPF, DKIM and DMARC
+- [ ] `from` on your verified domain; user addresses in `reply_to`
+- [ ] Both HTML and plain-text bodies, UTF-8 charset
+- [ ] No calls to `mail()` anywhere, including old plugins
+- [ ] One shared SDK client, bound as a singleton
+- [ ] Sending in a queue worker, not the request
+- [ ] Retries only on network errors, `429` and `5xx`
+- [ ] Idempotency keys on anything that retries
+- [ ] [Webhooks](/features/webhooks) for bounces and complaints
+- [ ] Disposable addresses blocked at signup ([how](/blog/block-disposable-emails-at-signup))
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How do I send an HTML email in PHP?">
+    With PHPMailer, call isHTML(true), put the HTML in Body and the plain-text
+    version in AltBody. With the Reloop SDK, pass html and text keys in the
+    send array. In Laravel, give the Mailable both a view and a text view.
+  </Accordion>
+
+  <Accordion title="Why shouldn't I use PHP's mail() function?">
+    mail() passes the message to the local sendmail binary without
+    authentication or DKIM signing, so it often lands in spam or is rejected.
+    It only tells you whether sendmail accepted the message, not whether it
+    was delivered. Use PHPMailer over SMTP or an email API instead.
+  </Accordion>
+
+  <Accordion title="Should PHPMailer use STARTTLS or SMTPS?">
+    STARTTLS connects in plain text and upgrades to TLS, which is what port
+    587 expects. SMTPS starts TLS immediately, which is what port 465
+    expects. Using the wrong one for the port makes the connection hang or
+    fail. Reloop uses STARTTLS on every port, so set SMTPSecure to the
+    STARTTLS constant.
+  </Accordion>
+
+  <Accordion title="Why do my PHP emails go to spam?">
+    Usually the sending domain is not authenticated, the mail comes from
+    mail() on a shared server, or the From domain does not match the domain
+    that signed the message. Send through a provider from your own verified
+    domain with SPF, DKIM and DMARC, and always include a plain-text body.
+  </Accordion>
+
+  <Accordion title="Can I use Reloop with Laravel notifications and WordPress?">
+    Yes. Set the SMTP values shown above in Laravel's .env file, or point
+    WordPress at Reloop with an SMTP plugin or a small must-use plugin, and
+    every email the framework sends goes through Reloop with no other code
+    changes.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Send your first email from PHP"
+  description="PHP SDK, SMTP relay for Laravel, Symfony and WordPress, and a free tier of 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

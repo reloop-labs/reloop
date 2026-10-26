@@ -1,0 +1,133 @@
+---
+title: "Introducing the Reloop Free Tier: 6,000 Emails a Month, Free Forever"
+description: "Reloop Cloud now has a permanent free tier: 6,000 emails a month, 200 a day, agent inboxes, webhooks, custom domains and the full API. No credit card, no trial clock."
+keywords:
+  - reloop free tier
+  - free email api
+  - free transactional email
+  - free smtp relay
+  - free email api no credit card
+  - sendgrid free plan alternative
+  - resend free tier alternative
+  - free agent inbox
+publishedAt: 2026-10-26
+category: Open Source
+tags: [announcement, pricing, free-tier, email-api, release]
+readTime: 5 min read
+image: /blog/images/reloop-free-tier.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - introducing-reloop
+  - email-provider-comparison-2026
+  - best-transactional-email-apis-2026
+  - send-email-nodejs
+  - self-hosted-email-infrastructure
+  - migrating-from-sendgrid
+---
+
+Every email provider says it's easy to get started. Then you hit a credit card form, a 60-day trial, or a free plan so small it can't cover a staging environment.
+
+Today Reloop Cloud gets a **free tier that never expires**: 6,000 emails a month, the full API, SMTP relay, agent inboxes, webhooks and custom domains. No credit card, no trial clock. [Create an account](/dashboard/signup) and send your first email in a few minutes.
+
+## What you get for $0
+
+| | Free |
+|---|---|
+| <FeatureLabel icon="mail-single">Emails</FeatureLabel> | <FeatureValue>6,000 / month</FeatureValue> |
+| <FeatureLabel icon="limit">Daily cap</FeatureLabel> | <FeatureValue>200 / day</FeatureValue> |
+| <FeatureLabel icon="contacts">Contacts</FeatureLabel> | <FeatureValue>Unlimited</FeatureValue> |
+| <FeatureLabel icon="users">Team members</FeatureLabel> | <FeatureValue>Unlimited</FeatureValue> |
+| <FeatureLabel icon="agent">Agent inboxes</FeatureLabel> | <FeatureValue>3</FeatureValue> |
+| <FeatureLabel icon="webhook">Webhooks</FeatureLabel> | <FeatureValue>3</FeatureValue> |
+| <FeatureLabel icon="globe">Custom domains</FeatureLabel> | <FeatureValue>3</FeatureValue> |
+| <FeatureLabel icon="smtp">Your own SMTP server</FeatureLabel> | <FeatureValue>1</FeatureValue> |
+| <FeatureLabel icon="paperclip">Attachments</FeatureLabel> | <FeatureValue>Up to 1 MB</FeatureValue> |
+| <FeatureLabel icon="database">Data retention</FeatureLabel> | <FeatureValue>45 days</FeatureValue> |
+| <FeatureLabel icon="support-level">Support</FeatureLabel> | <FeatureValue>Community</FeatureValue> |
+
+This is not a cut-down product. Free accounts use the same platform as paid ones:
+
+- **[Email API](/features/transaction-emails) and [SMTP relay](/features/smtp).** Send with the REST API, one of our [SDKs](/sdk), or point Nodemailer, Laravel or Django at the SMTP relay.
+- **Templates and scheduled sends.** Build templates, schedule mail for later, and send from the API with variables.
+- **[Agent inboxes](/features/ai-agents) and inbound email.** Give an AI agent its own address, receive replies, and read them in the shared human inbox.
+- **Deliverability tooling.** SPF, DKIM and DMARC setup, pristine shared IPs, spam testing and reputation monitoring.
+- **Analytics and logs.** Delivery events, opens and clicks, and event logs for 45 days.
+- **Bring your own SMTP.** Connect one of your own SMTP servers and send through it from Reloop.
+
+<Callout type="tip">
+  Contacts and team members are unlimited on every plan, including Free. Invite the whole team without thinking about seats.
+</Callout>
+
+## Why a permanent free tier
+
+Email is one of the first things a new app needs: a signup confirmation, a password reset, a magic link. You shouldn't have to talk to sales or start a countdown just to send those.
+
+We built the free tier for three kinds of projects:
+
+1. **Side projects and early products.** 6,000 emails a month covers auth emails, receipts and notifications for a real app with real users.
+2. **Staging and preview environments.** Keep a free account for staging so test mail never touches your production reputation or quota.
+3. **AI agents.** Three agent inboxes is enough to prototype an agent that sends, receives and replies to email. See [how to give an AI agent an email address](/blog/give-ai-agent-email-address).
+
+Reloop is [open source](https://github.com/reloop-labs/reloop), so you can always [self-host](/self-host) with no license fee. The free tier is for everyone who'd rather not run mail servers: same product, we run it.
+
+## How it compares
+
+Free plans across the industry have been shrinking. SendGrid no longer has a permanent free plan; new accounts get a 60-day trial. Resend's free tier is 3,000 emails a month capped at 100 a day.
+
+Reloop's free tier is **twice that**: 6,000 a month and 200 a day, with inbound email and agent inboxes included. For full side-by-side numbers, see the [2026 email provider comparison](/blog/email-provider-comparison-2026) or [compare Reloop](/compare) with any provider.
+
+## Send your first email
+
+Sign up, verify a domain, create an API key, and send:
+
+<SendEmailCodeSamples />
+
+Walkthroughs for every major stack: [Node.js](/blog/send-email-nodejs), [Python](/blog/send-email-python), [Go](/blog/send-email-go), [PHP](/blog/send-email-php), [Ruby](/blog/send-email-ruby), [Java](/blog/send-email-java), [C#](/blog/send-email-csharp), [Rust](/blog/send-email-rust) and [Elixir](/blog/send-email-elixir).
+
+## When you outgrow it
+
+The free tier has no overage. When you reach 200 emails in a day or 6,000 in a month, sending pauses until the limit resets, so you'll never get a surprise bill. When you need more, you have two options:
+
+- **Pro, $10 / month.** 50,000 emails a month with no daily cap, 5 MB attachments, more inboxes, webhooks and domains, and $0.50 per 1,000 extra emails.
+- **Pay as you go.** Keep the free allowance and buy credits at $0.50 per 1,000 emails, from 3,000 emails. Credits are valid for 6 months, and Pro limits apply while you have them.
+
+Upgrading keeps your domains, templates, contacts and API keys. Nothing to migrate. See [pricing](/pricing) for every plan.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Do I need a credit card for the free tier?">
+    No. Sign up with your email and start sending. You only add a card if you
+    upgrade to Pro or buy pay-as-you-go credits.
+  </Accordion>
+
+  <Accordion title="Does the free tier expire?">
+    No. It is a permanent plan, not a trial. You can stay on Free for as long
+    as 6,000 emails a month and 200 a day covers your needs.
+  </Accordion>
+
+  <Accordion title="What happens when I hit the limit?">
+    Sending pauses until the limit resets: the daily cap resets each day and
+    the monthly allowance each month. Free has no overage, so you are never
+    charged. Upgrade to Pro or buy credits to keep sending right away.
+  </Accordion>
+
+  <Accordion title="Can I use my own domain on the free tier?">
+    Yes. You can verify up to 3 custom domains with SPF, DKIM and DMARC, and
+    send from any address on them.
+  </Accordion>
+
+  <Accordion title="Are AI agent inboxes included?">
+    Yes. Free includes 3 agent inboxes with inbound email, so an agent can send,
+    receive and reply from its own address.
+  </Accordion>
+
+  <Accordion title="Is self-hosting still free?">
+    Yes. Reloop is open source and self-hosting has no license fee. The free
+    tier is for Reloop Cloud, where we run the infrastructure for you.
+  </Accordion>
+</AccordionGroup>

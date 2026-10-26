@@ -10,6 +10,10 @@ import {
 	TempEmailCheckerCodeSamples,
 } from "@reloop/web/components/mdx/code-samples";
 import { Cta } from "@reloop/web/components/mdx/cta";
+import {
+	FeatureLabel,
+	FeatureValue,
+} from "@reloop/web/components/mdx/feature-label";
 import { MdxImage } from "@reloop/web/components/mdx/image";
 import { InstallSdkCode } from "@reloop/web/components/mdx/install-sdk-code";
 import {
@@ -86,6 +90,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		Tabs,
 		Tab,
 		Cta,
+		FeatureLabel,
+		FeatureValue,
 		Image: MdxImage,
 		pre: (props: React.ComponentProps<"pre">) => {
 			const children = React.Children.toArray(props.children);

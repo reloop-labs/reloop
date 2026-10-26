@@ -1,0 +1,572 @@
+---
+title: "How to Send Email in Elixir: Swoosh, Phoenix and API"
+description: "Send email from Elixir with Swoosh over SMTP or with an email API. Copy-paste examples for Phoenix, HTML email, attachments, background sending with Oban and retries without duplicates."
+keywords:
+  - send email Elixir
+  - Elixir send email
+  - Swoosh SMTP example
+  - Phoenix send email
+  - Swoosh gen_smtp
+  - Elixir email attachment
+  - Oban email worker
+  - Elixir email API
+  - Phoenix mailer
+publishedAt: 2026-10-26
+category: Tutorials
+tags: [elixir, phoenix, swoosh, oban, smtp, sdk]
+readTime: 13 min read
+image: /blog/images/send-email-elixir.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - send-email-python
+  - send-email-nodejs
+  - send-email-ruby
+  - smtp-ports-explained
+  - transactional-email-best-practices
+  - spf-dkim-dmarc-setup-guide
+---
+
+**Elixir apps send email with [Swoosh](https://hexdocs.pm/swoosh), the mailer library that every new Phoenix app already includes.** For production, point Swoosh at a provider over SMTP with the `gen_smtp` adapter, or skip SMTP and call an email API over HTTPS.
+
+This guide covers Swoosh over SMTP, the Reloop Elixir SDK, Phoenix, then the production details: attachments, background sending with Oban and safe retries.
+
+Working in another language? See [how to send email in Python](/blog/send-email-python) or [Node.js](/blog/send-email-nodejs).
+
+---
+
+## Which approach should you use?
+
+| | Swoosh + SMTP | Email API |
+|---|---------------|-----------|
+| **Install** | `{:swoosh, ...}` and `{:gen_smtp, ...}` | `{:reloop, "~> 0.1.3"}` |
+| **Transport** | SMTP on port 587 (STARTTLS) | HTTPS on port 443 |
+| **Building the message** | `Swoosh.Email` pipeline | A map with `html`, `text`, `attachments` |
+| **Errors** | `{:error, {type, reason}}` from gen_smtp | `{:error, message}` with the status and body |
+| **Safe retries** | No, a retry can send twice | Yes, with an idempotency key |
+| **Works with `phx.gen.auth` emails** | Yes, natively | No, keep Swoosh for those |
+
+If you want Phoenix's generated auth emails and any library that uses your mailer to go through one provider, use SMTP. If you are writing the send call yourself, use the API.
+
+---
+
+## Prerequisites
+
+1. **Elixir 1.15 or later** on **Erlang/OTP 25 or later** (for `:public_key.cacerts_get/0`)
+2. A **verified sending domain** with [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide)
+3. An **API key** from the [Reloop dashboard](https://reloop.sh/dashboard). Keys start with `rl_`, and the same key works for the API and SMTP.
+
+```bash
+export RELOOP_API_KEY=rl_your_api_key
+```
+
+Keep the key in the environment or a secrets manager, never in your code or git.
+
+---
+
+## Method 1: Send email with Swoosh over SMTP
+
+Swoosh builds the message. The SMTP adapter hands it to `gen_smtp`, which you add yourself:
+
+```elixir
+# mix.exs
+defp deps do
+  [
+    {:swoosh, "~> 1.16"},
+    {:gen_smtp, "~> 1.2"}
+  ]
+end
+```
+
+Define a mailer:
+
+```elixir
+# lib/acme/mailer.ex
+defmodule Acme.Mailer do
+  use Swoosh.Mailer, otp_app: :acme
+end
+```
+
+Configure it in `config/runtime.exs`, so the key is read from the environment when the app boots, not baked in at compile time:
+
+```elixir
+# config/runtime.exs
+import Config
+
+config :acme, Acme.Mailer,
+  adapter: Swoosh.Adapters.SMTP,
+  relay: "smtp.reloop.sh",
+  port: 587,
+  username: "reloop",
+  password: System.get_env("RELOOP_API_KEY"),
+  ssl: false,
+  tls: :always,
+  auth: :always,
+  tls_options: [
+    versions: [:"tlsv1.2", :"tlsv1.3"],
+    verify: :verify_peer,
+    cacerts: :public_key.cacerts_get(),
+    server_name_indication: ~c"smtp.reloop.sh",
+    depth: 99,
+    customize_hostname_check: [
+      match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+    ]
+  ]
+```
+
+The username can be any string. The password is your API key. `tls: :always` upgrades the connection with STARTTLS and refuses to send if the upgrade fails.
+
+Do not skip `tls_options`. Without them, `gen_smtp` offers only TLS 1.0 to 1.2 and does not load trusted certificates, and on recent OTP versions the handshake fails with `:tls_failed`.
+
+Outside Phoenix, Swoosh also expects an HTTP client for its API adapters. The SMTP adapter does not need one, so turn it off:
+
+```elixir
+# config/config.exs
+config :swoosh, :api_client, false
+```
+
+Now build and send an email:
+
+```elixir
+import Swoosh.Email
+
+email =
+  new()
+  |> from({"Acme", "hello@mail.acme.com"})
+  |> to("user@example.com")
+  |> subject("Welcome to Acme")
+  |> text_body("Welcome! Thanks for signing up.")
+  |> html_body("<h1>Welcome!</h1><p>Thanks for signing up.</p>")
+
+{:ok, _receipt} = Acme.Mailer.deliver(email)
+```
+
+Always set both bodies. Swoosh sends them as a multipart message, and the plain-text part helps with spam filters and text-only clients.
+
+### When port 587 is blocked
+
+Some hosts block outbound 587. Reloop also accepts STARTTLS on port **2587** (and 2025), so only the port number changes:
+
+```elixir
+config :acme, Acme.Mailer,
+  adapter: Swoosh.Adapters.SMTP,
+  relay: "smtp.reloop.sh",
+  port: 2587
+  # ...plus the same username, password, tls and tls_options as above
+```
+
+Reloop does not offer implicit TLS on port 465, so keep `ssl: false`. Setting `ssl: true` makes `gen_smtp` expect TLS from the first byte, which is what port 465 does. If the connection hangs or times out, see [SMTP ports explained](/blog/smtp-ports-explained).
+
+### Handle SMTP errors
+
+`deliver/1` never raises for a failed send. It returns a tuple, and the reason comes from `gen_smtp`:
+
+```elixir
+require Logger
+
+case Acme.Mailer.deliver(email) do
+  {:ok, _receipt} ->
+    :ok
+
+  {:error, {_type, {:permanent_failure, _host, :auth_failed}}} ->
+    Logger.error("SMTP login failed: check RELOOP_API_KEY")
+
+  {:error, {_type, {_failure, _host, :tls_failed}}} ->
+    Logger.error("STARTTLS failed: check tls_options")
+
+  {:error, reason} ->
+    Logger.error("Send failed: #{inspect(reason)}")
+end
+```
+
+Use `deliver!/1` instead if you want an exception on failure.
+
+### Can I send with Gmail from Elixir?
+
+For a personal script, yes: use `smtp.gmail.com` on port 587 with an [App Password](https://support.google.com/accounts/answer/185833) and the same Swoosh settings. For an app, no. Gmail limits personal accounts to about 500 recipients a day, every message comes from your `@gmail.com` address, and bulk sending gets the account suspended.
+
+---
+
+## Method 2: Send email with the Elixir SDK
+
+### Install
+
+```elixir
+# mix.exs
+defp deps do
+  [
+    {:reloop, "~> 0.1.3"},
+    {:req, "~> 0.5", override: true}
+  ]
+end
+```
+
+Then run `mix deps.get`.
+
+The SDK uses [Req](https://hexdocs.pm/req) for HTTP, and version 0.1.3 declares `req ~> 0.3.0`. New Phoenix apps already depend on `{:req, "~> 0.5"}`, so Mix cannot resolve both until you mark your Req line with `override: true`. The SDK's send call works on current Req releases.
+
+### Send an email
+
+```elixir
+client = Reloop.client(System.fetch_env!("RELOOP_API_KEY"))
+
+case Reloop.Services.Mail.send(client, %{
+       from: "Acme <hello@mail.acme.com>",
+       to: "user@example.com",
+       subject: "Welcome to Acme",
+       html: "<h1>Welcome!</h1><p>Thanks for signing up.</p>",
+       text: "Welcome! Thanks for signing up."
+     }) do
+  {:ok, result} -> IO.puts("Sent: #{result["id"]}")
+  {:error, message} -> IO.puts("Failed: #{message}")
+end
+```
+
+The SDK **returns** errors instead of raising them. On success you get `{:ok, map}` with the decoded response, using string keys such as `"id"` and `"messageId"`. On failure you get `{:error, message}`, where `message` is a string like `"Reloop API Error: 401 ..."` for an API error or `"Reloop Network Error: ..."` when the request never got a response.
+
+The client is a plain struct holding your key and the base URL, so building it is cheap and there is no process to start or stop. `Reloop.client/1` raises `ArgumentError` if the key is `nil` or empty, which catches a missing environment variable early.
+
+### Send to several recipients
+
+```elixir
+Reloop.Services.Mail.send(client, %{
+  from: "Acme <hello@mail.acme.com>",
+  to: ["ada@example.com", "grace@example.com"],
+  cc: "team@acme.com",
+  reply_to: "support@acme.com",
+  subject: "Your weekly report",
+  text: "Here is your report.",
+  tags: [%{name: "type", value: "weekly_report"}]
+})
+```
+
+Every address in `to` sees the others. For personalized mail, send one message per recipient.
+
+### Send a stored template
+
+Keep copy out of your code so non-developers can edit it. Create the template in Reloop, then send it by ID with variables:
+
+```elixir
+Reloop.Services.Mail.send(client, %{
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome to Acme",
+  template: %{
+    id: "tmpl_welcome",
+    variables: %{first_name: "Ada", plan: "Pro"}
+  }
+})
+```
+
+See [templates](/docs/learn/templates) for variables and defaults.
+
+---
+
+## Phoenix
+
+### Swoosh over SMTP
+
+`mix phx.new` generates `Acme.Mailer`, uses `Swoosh.Adapters.Local` in development and `Swoosh.Adapters.Test` in tests. Production is left for you to configure, which is where Reloop goes.
+
+Add `{:gen_smtp, "~> 1.2"}` to your deps, then put the SMTP settings inside the `prod` block of `config/runtime.exs`, next to the commented-out mailer example the generator left there:
+
+```elixir
+# config/runtime.exs
+if config_env() == :prod do
+  # ...database and endpoint config...
+
+  config :acme, Acme.Mailer,
+    adapter: Swoosh.Adapters.SMTP,
+    relay: "smtp.reloop.sh",
+    port: 587,
+    username: "reloop",
+    password: System.fetch_env!("RELOOP_API_KEY"),
+    ssl: false,
+    tls: :always,
+    auth: :always,
+    tls_options: [
+      versions: [:"tlsv1.2", :"tlsv1.3"],
+      verify: :verify_peer,
+      cacerts: :public_key.cacerts_get(),
+      server_name_indication: ~c"smtp.reloop.sh",
+      depth: 99,
+      customize_hostname_check: [
+        match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+      ]
+    ]
+end
+```
+
+`System.fetch_env!/1` makes the release refuse to boot without a key, instead of failing on the first send. The generated `config/prod.exs` sets `config :swoosh, api_client: Swoosh.ApiClient.Req`. You can leave it: the SMTP adapter does not use it.
+
+That is all `phx.gen.auth` needs. Its `UserNotifier` builds emails with Swoosh and calls `Mailer.deliver/1`, so login links, confirmations and [password reset emails](/blog/password-reset-email-best-practices) all go through Reloop. Change its `from` to an address on your verified domain:
+
+```elixir
+# lib/acme/accounts/user_notifier.ex
+|> from({"Acme", "hello@mail.acme.com"})
+```
+
+### Call the SDK from a context
+
+For emails you write yourself, keep the API calls in a context module, so controllers and LiveViews never touch the client directly. Read the key in `config/runtime.exs`:
+
+```elixir
+# config/runtime.exs
+config :acme, :reloop_api_key, System.get_env("RELOOP_API_KEY")
+```
+
+```elixir
+# lib/acme/emails.ex
+defmodule Acme.Emails do
+  defp client do
+    Reloop.client(Application.fetch_env!(:acme, :reloop_api_key))
+  end
+
+  def send_contact_message(email, message) do
+    Reloop.Services.Mail.send(client(), %{
+      from: "Acme Website <contact@mail.acme.com>",
+      to: "support@acme.com",
+      reply_to: email,
+      subject: "New message from #{email}",
+      text: message
+    })
+  end
+end
+```
+
+```elixir
+# lib/acme_web/controllers/contact_controller.ex
+defmodule AcmeWeb.ContactController do
+  use AcmeWeb, :controller
+  require Logger
+
+  def create(conn, %{"email" => email, "message" => message}) do
+    case Acme.Emails.send_contact_message(email, message) do
+      {:ok, %{"id" => id}} ->
+        json(conn, %{id: id})
+
+      {:error, reason} ->
+        Logger.error("Contact email failed: #{reason}")
+
+        conn
+        |> put_status(:bad_gateway)
+        |> json(%{error: "Could not send message"})
+    end
+  end
+end
+```
+
+The visitor's address goes in `reply_to`, never in `from`. You can only send from your verified domain, and putting someone else's domain in `from` fails [DMARC](/blog/gmail-yahoo-bulk-sender-requirements).
+
+Sending inside the request is fine for a contact form, where the visitor wants to know it worked. For signup and order emails, send from a job instead (see below).
+
+---
+
+## Attachments
+
+With the SDK, pass base64 content:
+
+```elixir
+pdf = File.read!("invoice-1042.pdf")
+
+Reloop.Services.Mail.send(client, %{
+  from: "Acme Billing <billing@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Your invoice #1042",
+  text: "Your invoice is attached.",
+  attachments: [
+    %{
+      filename: "invoice-1042.pdf",
+      content: Base.encode64(pdf),
+      content_type: "application/pdf"
+    }
+  ]
+})
+```
+
+With Swoosh, pass a file path to `attachment/2`, or build the attachment from data you already have in memory:
+
+```elixir
+email
+|> attachment("invoice-1042.pdf")
+
+email
+|> attachment(
+  Swoosh.Attachment.new({:data, pdf},
+    filename: "invoice-1042.pdf",
+    content_type: "application/pdf"
+  )
+)
+```
+
+Keep attachments small. Many inboxes reject messages over 25 MB, and large files hurt deliverability. For big files, send a signed download link.
+
+---
+
+## Send in the background with Oban
+
+Sending inside a web request adds latency and fails the request when the provider is slow. [Oban](https://hexdocs.pm/oban) stores jobs in your database, so they survive restarts and deploys, and it retries failed jobs with exponential backoff.
+
+After following Oban's installation guide, add a queue for email:
+
+```elixir
+# config/config.exs
+config :acme, Oban,
+  repo: Acme.Repo,
+  queues: [mailers: 10]
+```
+
+To decide whether to retry, the worker needs the HTTP status. The SDK puts the status inside its error string, so the worker calls the API with Req directly, which also lets it send the idempotency key from the next section:
+
+```elixir
+# lib/acme/workers/welcome_email.ex
+defmodule Acme.Workers.WelcomeEmail do
+  use Oban.Worker, queue: :mailers, max_attempts: 5
+
+  @impl Oban.Worker
+  def perform(%Oban.Job{args: %{"user_id" => user_id, "email" => email}}) do
+    response =
+      Req.post("https://reloop.sh/api/mail/v1/send",
+        headers: [
+          {"x-api-key", Application.fetch_env!(:acme, :reloop_api_key)},
+          {"idempotency-key", "welcome-#{user_id}"}
+        ],
+        json: %{
+          from: "Acme <hello@mail.acme.com>",
+          to: email,
+          subject: "Welcome to Acme",
+          text: "Thanks for signing up."
+        },
+        receive_timeout: 30_000,
+        retry: false
+      )
+
+    case response do
+      {:ok, %Req.Response{status: status, body: body}} when status in 200..299 ->
+        {:ok, body["id"]}
+
+      {:ok, %Req.Response{status: status, body: body}}
+      when status in [409, 429] or status >= 500 ->
+        {:error, "Reloop returned #{status}: #{inspect(body)}"}
+
+      {:ok, %Req.Response{status: status, body: body}} ->
+        {:cancel, "Reloop returned #{status}: #{inspect(body)}"}
+
+      {:error, exception} ->
+        {:error, exception}
+    end
+  end
+end
+```
+
+**Retry** network errors, `429` and `5xx` by returning `{:error, reason}`: Oban schedules another attempt. **Do not retry** other `4xx` errors: an invalid address or unverified domain fails the same way every time, so return `{:cancel, reason}` and Oban stops. `409` is the one exception, covered below. `retry: false` turns off Req's own retries, so Oban is the only thing retrying.
+
+Enqueue the job in the same transaction that creates the user, so you never send a welcome email for a signup that rolled back:
+
+```elixir
+Ecto.Multi.new()
+|> Ecto.Multi.insert(:user, User.registration_changeset(%User{}, attrs))
+|> Oban.insert(:welcome_email, fn %{user: user} ->
+  Acme.Workers.WelcomeEmail.new(%{user_id: user.id, email: user.email})
+end)
+|> Repo.transaction()
+```
+
+---
+
+## Retries without duplicate emails
+
+A request times out and Oban retries the job. If the first attempt actually went through, the user gets two emails. The API prevents this with an [`Idempotency-Key` header](/docs/api/idempotency): repeat a request with the same key and Reloop returns the original result instead of sending again.
+
+The Elixir SDK does not accept extra headers, so set it with Req as in the worker above:
+
+```elixir
+headers: [
+  {"x-api-key", Application.fetch_env!(:acme, :reloop_api_key)},
+  {"idempotency-key", "welcome-#{user_id}"}
+]
+```
+
+Base the key on the business event (`welcome-#{user_id}`, `receipt-#{order_id}`), not a new UUID per attempt, so every attempt of the job sends the same key. A `409` means a request with that key is still running, so retrying it later returns the original result. Reusing a key with a different body returns `422`, which the worker cancels.
+
+---
+
+## Testing without sending real email
+
+- **Phoenix tests:** the generated `config/test.exs` already uses `Swoosh.Adapters.Test`. `import Swoosh.TestAssertions` and call `assert_email_sent(subject: "Welcome to Acme")`.
+- **Oban jobs:** run Oban with `testing: :manual` in tests and check enqueued jobs with `assert_enqueued` from `Oban.Testing`, instead of calling the API.
+- **Local preview:** in development, Phoenix uses `Swoosh.Adapters.Local`. Open `http://localhost:4000/dev/mailbox` to see every email your app sent.
+- **Local SMTP:** run [Mailpit](https://mailpit.axllent.org) with `docker run -p 1025:1025 -p 8025:8025 axllent/mailpit` and point the SMTP adapter at it with `relay: "localhost", port: 1025, ssl: false, tls: :never, auth: :never`. Open `http://localhost:8025` to see the messages.
+- **Staging:** send to [test addresses](/docs/guides/testing-email-addresses) so you do not hurt your [sender reputation](/blog/why-emails-land-in-spam-fix) with bounces.
+
+---
+
+## Production checklist
+
+- [ ] API key in an environment variable, read in `config/runtime.exs`
+- [ ] Sending domain verified with SPF, DKIM and DMARC
+- [ ] `from` on your verified domain; user addresses in `reply_to`
+- [ ] Both HTML and plain-text bodies
+- [ ] `tls: :always` with `tls_options` that verify the certificate
+- [ ] Sending in an Oban job, not the request
+- [ ] Retries only on network errors, `429` and `5xx`; `{:cancel, reason}` for other `4xx`
+- [ ] Idempotency keys on anything that retries
+- [ ] [Webhooks](/features/webhooks) for bounces and complaints
+- [ ] Disposable addresses blocked at signup ([how](/blog/block-disposable-emails-at-signup))
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How do I send an HTML email in Elixir?">
+    With Swoosh, set an HTML body and a plain-text body on the email, then
+    call deliver on your mailer. Swoosh sends both as one multipart message.
+    With the Reloop SDK, pass html and text keys in the map you give to
+    Reloop.Services.Mail.send.
+  </Accordion>
+
+  <Accordion title="What is the difference between ssl and tls in Swoosh's SMTP adapter?">
+    ssl: true starts TLS immediately, which is what port 465 expects. tls:
+    :always connects in plain text and upgrades with STARTTLS, which is what
+    port 587 expects. Reloop uses STARTTLS on every port, so set ssl: false
+    and tls: :always.
+  </Accordion>
+
+  <Accordion title="Why does Swoosh fail with tls_failed?">
+    gen_smtp's default TLS options offer TLS 1.0 to 1.2 and load no trusted
+    certificates, which recent OTP versions reject. Pass tls_options that
+    turn on peer verification, load the system CA certificates and set the
+    server name to the SMTP host, as shown in the config above.
+  </Accordion>
+
+  <Accordion title="Why does mix deps.get fail after adding the Reloop SDK?">
+    Version 0.1.3 of the SDK declares req ~> 0.3.0, and new Phoenix apps depend
+    on req ~> 0.5. Add override: true to your own Req dependency and Mix
+    resolves the newer version for both.
+  </Accordion>
+
+  <Accordion title="Can I use the Elixir SDK with self-hosted Reloop?">
+    Yes. Pass your instance's URL as the base_url option when you build the
+    client, as the second argument to Reloop.client. The default is
+    https://reloop.sh.
+  </Accordion>
+
+  <Accordion title="Why do my Elixir emails go to spam?">
+    Usually the sending domain is not authenticated, or the From domain does
+    not match the domain that signed the message. Set up SPF, DKIM and DMARC,
+    send from your own domain, and always include a plain-text body.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Send your first email from Elixir"
+  description="Elixir SDK, SMTP relay for Swoosh and Phoenix, and a free tier of 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

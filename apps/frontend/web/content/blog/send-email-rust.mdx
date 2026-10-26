@@ -1,0 +1,623 @@
+---
+title: "How to Send Email in Rust: lettre, Axum and API"
+description: "Send email from Rust with lettre over SMTP or with an email API. Copy-paste examples for Axum and Actix Web, HTML email, attachments, background sending with tokio and retries without duplicates."
+keywords:
+  - send email Rust
+  - Rust send email
+  - lettre example
+  - lettre SMTP
+  - send HTML email Rust
+  - Axum send email
+  - Actix Web send email
+  - Rust email attachment
+  - Rust email API
+publishedAt: 2026-10-26
+category: Tutorials
+tags: [rust, lettre, axum, actix, tokio, smtp, sdk]
+readTime: 13 min read
+image: /blog/images/send-email-rust.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - send-email-go
+  - send-email-python
+  - send-email-nodejs
+  - smtp-ports-explained
+  - transactional-email-best-practices
+---
+
+**Rust has no email client in the standard library. Use the `lettre` crate to send over SMTP, or call an email API over HTTPS.** For anything in production, send through a provider either way, from a domain you have verified.
+
+This guide covers `lettre` with async tokio, the Reloop Rust SDK, Axum and Actix Web, then the production details: attachments, background sending and safe retries.
+
+Working in another language? See [how to send email in Python](/blog/send-email-python) or [how to send email in Node.js](/blog/send-email-nodejs).
+
+---
+
+## Which approach should you use?
+
+| | `lettre` (SMTP) | Email API SDK |
+|---|-----------------|---------------|
+| **Install** | `cargo add lettre` | `cargo add reloop-email` |
+| **Transport** | SMTP on port 587 (STARTTLS) | HTTPS on port 443 |
+| **Building the message** | `Message::builder()`, `MultiPart` | A `serde_json::json!` value with `html`, `text`, `attachments` |
+| **Errors** | `smtp::Error` with `is_permanent()` and `is_transient()` | `Result` with a boxed error |
+| **Safe retries** | No, a retry can send twice | Yes, with an idempotency key |
+| **Async** | Yes, with the `tokio1` feature | Yes, async only |
+
+If you already have SMTP settings or need to work with a relay you do not control, use `lettre`. If you are writing the send call yourself, use the API.
+
+---
+
+## Prerequisites
+
+1. **A recent stable Rust toolchain** (`rustup update stable`) and a tokio runtime
+2. A **verified sending domain** with [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide)
+3. An **API key** from the [Reloop dashboard](https://reloop.sh/dashboard). Keys start with `rl_`, and the same key works for the API and SMTP.
+
+```bash
+export RELOOP_API_KEY=rl_your_api_key
+```
+
+Keep the key in the environment or a secrets manager, never in your code or git.
+
+---
+
+## Method 1: Send email with lettre
+
+`lettre` is the standard SMTP crate for Rust. It builds the MIME message, handles encoding and headers, and talks to the server. Enable the async tokio transport:
+
+```toml
+# Cargo.toml
+[dependencies]
+lettre = { version = "0.11", features = ["tokio1", "tokio1-native-tls"] }
+tokio = { version = "1", features = ["full"] }
+```
+
+Then build a message with a plain-text and an HTML body, and send it:
+
+```rust
+use std::time::Duration;
+
+use lettre::message::MultiPart;
+use lettre::transport::smtp::authentication::Credentials;
+use lettre::{AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let email = Message::builder()
+        .from("Acme <hello@mail.acme.com>".parse()?)
+        .to("user@example.com".parse()?)
+        .subject("Welcome to Acme")
+        // Plain-text body first, then the HTML alternative
+        .multipart(MultiPart::alternative_plain_html(
+            String::from("Welcome! Thanks for signing up."),
+            String::from("<h1>Welcome!</h1><p>Thanks for signing up.</p>"),
+        ))?;
+
+    let creds = Credentials::new("reloop".to_owned(), std::env::var("RELOOP_API_KEY")?);
+
+    // starttls_relay connects on port 587 and requires STARTTLS
+    let mailer = AsyncSmtpTransport::<Tokio1Executor>::starttls_relay("smtp.reloop.sh")?
+        .credentials(creds)
+        .timeout(Some(Duration::from_secs(30)))
+        .build();
+
+    mailer.send(email).await?;
+    Ok(())
+}
+```
+
+The username can be any string. The password is your API key.
+
+Build the transport **once** and reuse it. `AsyncSmtpTransport` keeps a connection pool and is cheap to clone. Not using async? `lettre::SmtpTransport` has the same builder and a blocking `send(&email)`.
+
+### When port 587 is blocked
+
+Some hosts block outbound 587. Reloop also accepts STARTTLS on port **2587** (and 2025), so only the port changes:
+
+```rust
+let mailer = AsyncSmtpTransport::<Tokio1Executor>::starttls_relay("smtp.reloop.sh")?
+    .port(2587)
+    .credentials(creds)
+    .timeout(Some(Duration::from_secs(30)))
+    .build();
+```
+
+Reloop does not offer implicit TLS on port 465, so do not use `relay()` with it: in `lettre`, `relay()` means implicit TLS on 465, and `starttls_relay()` means STARTTLS on 587. If the connection hangs or times out, see [SMTP ports explained](/blog/smtp-ports-explained).
+
+### Handle SMTP errors
+
+```rust
+match mailer.send(email).await {
+    Ok(response) => println!("Accepted: {:?}", response.code()),
+    // 5xx reply: bad API key, rejected sender or recipient. Do not retry.
+    Err(e) if e.is_permanent() => eprintln!("Rejected: {e}"),
+    // 4xx reply: temporary. Safe to retry later.
+    Err(e) if e.is_transient() => eprintln!("Try again later: {e}"),
+    // Timeout, TLS or connection failure
+    Err(e) => eprintln!("Send failed: {e}"),
+}
+```
+
+A bad address fails earlier, when `.parse()` returns an `AddressError`. Parse user input before you queue anything.
+
+### Can I send with Gmail from Rust?
+
+For a personal script, yes: use `starttls_relay("smtp.gmail.com")` with an [App Password](https://support.google.com/accounts/answer/185833). For an app, no. Gmail limits personal accounts to about 500 recipients a day, every message comes from your `@gmail.com` address, and bulk sending gets the account suspended.
+
+---
+
+## Method 2: Send email with the Rust SDK
+
+### Install
+
+```bash
+cargo add reloop-email serde_json
+cargo add tokio --features full
+```
+
+The crate is `reloop-email` and you import it as `reloop_email`.
+
+### Send an email
+
+```rust
+use reloop_email::ReloopClient;
+use serde_json::json;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new(std::env::var("RELOOP_API_KEY")?, None);
+
+    let sent = reloop
+        .mail()
+        .send(json!({
+            "from": "Acme <hello@mail.acme.com>",
+            "to": "user@example.com",
+            "subject": "Welcome to Acme",
+            "html": "<h1>Welcome!</h1><p>Thanks for signing up.</p>",
+            "text": "Welcome! Thanks for signing up.",
+        }))
+        .await?;
+
+    println!("Sent: {} ({})", sent.id, sent.status);
+    Ok(())
+}
+```
+
+`send` takes a `serde_json::Value`, so the field names match the [send email API](/docs/api/mail/post-api-mail-v1send) one to one. It returns `Result<SendMailResponse, Box<dyn std::error::Error>>`. On success you get `id`, `message_id` and `status`. On a non-2xx response the error message contains the API's JSON error body (`message`, `why`, `fix`), but the status code is not exposed as a field.
+
+```rust
+match reloop.mail().send(params).await {
+    Ok(sent) => println!("Sent: {}", sent.id),
+    Err(e) => eprintln!("Send failed: {e}"),
+}
+```
+
+The error type is not `Send`. You cannot hold it across an `.await` inside `tokio::spawn`, or return it from a spawned task. Log it or turn it into a `String` right away.
+
+Create the client **once** at startup and share it. It wraps a `reqwest` client with a connection pool. `ReloopClient` does not implement `Clone`, so put it in an `Arc`. The second argument to `new` is the base URL: pass `None` for Reloop Cloud, or `Some("https://mail.acme.com".to_owned())` if you [self-host Reloop](/blog/self-hosted-email-infrastructure).
+
+### Send to several recipients
+
+```rust
+reloop
+    .mail()
+    .send(json!({
+        "from": "Acme <hello@mail.acme.com>",
+        "to": ["ada@example.com", "grace@example.com"],
+        "cc": "team@acme.com",
+        "reply_to": "support@acme.com",
+        "subject": "Your weekly report",
+        "text": "Here is your report.",
+        "tags": [{ "name": "type", "value": "weekly_report" }],
+    }))
+    .await?;
+```
+
+Every address in `to` sees the others. For personalized mail, send one message per recipient.
+
+### Send a stored template
+
+Keep copy out of your code so non-developers can edit it. Create the template in Reloop, then send it by ID with variables:
+
+```rust
+reloop
+    .mail()
+    .send(json!({
+        "from": "Acme <hello@mail.acme.com>",
+        "to": "user@example.com",
+        "subject": "Welcome to Acme",
+        "template": {
+            "id": "tmpl_welcome",
+            "variables": { "first_name": "Ada", "plan": "Pro" },
+        },
+    }))
+    .await?;
+```
+
+See [templates](/docs/learn/templates) for variables and defaults.
+
+---
+
+## Axum
+
+Put the client in your router state and extract it in handlers. Axum clones the state for every request, so wrap the client in an `Arc`:
+
+```rust
+use std::sync::Arc;
+
+use axum::{Json, Router, extract::State, http::StatusCode, routing::post};
+use reloop_email::ReloopClient;
+use serde::Deserialize;
+use serde_json::{Value, json};
+
+#[derive(Clone)]
+struct AppState {
+    reloop: Arc<ReloopClient>,
+}
+
+#[derive(Deserialize)]
+struct ContactForm {
+    email: String,
+    message: String,
+}
+
+#[tokio::main]
+async fn main() {
+    let api_key = std::env::var("RELOOP_API_KEY").expect("RELOOP_API_KEY is not set");
+    let state = AppState {
+        reloop: Arc::new(ReloopClient::new(api_key, None)),
+    };
+
+    let app = Router::new()
+        .route("/contact", post(contact))
+        .with_state(state);
+
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn contact(
+    State(state): State<AppState>,
+    Json(form): Json<ContactForm>,
+) -> Result<Json<Value>, (StatusCode, &'static str)> {
+    let sent = state
+        .reloop
+        .mail()
+        .send(json!({
+            "from": "Acme Website <contact@mail.acme.com>",
+            "to": "support@acme.com",
+            "reply_to": &form.email,
+            "subject": format!("New message from {}", form.email),
+            "text": &form.message,
+        }))
+        .await
+        .map_err(|e| {
+            eprintln!("contact form send failed: {e}");
+            (StatusCode::BAD_GATEWAY, "Could not send message")
+        })?;
+
+    Ok(Json(json!({ "id": sent.id })))
+}
+```
+
+This uses Axum 0.8 (`axum::serve` with a `TcpListener`). The `map_err` turns the SDK error into a response before anything else is awaited, which keeps the handler future `Send`.
+
+The visitor's address goes in `reply_to`, never in `from`. You can only send from your verified domain, and putting someone else's domain in `from` fails [DMARC](/blog/gmail-yahoo-bulk-sender-requirements). Full example: [Axum guide](/docs/examples/rust/axum).
+
+---
+
+## Actix Web
+
+Actix Web runs on tokio, so the same client works. Share it with `web::Data`, which is already an `Arc` inside:
+
+```rust
+use actix_web::{App, HttpResponse, HttpServer, post, web};
+use reloop_email::ReloopClient;
+use serde::Deserialize;
+use serde_json::json;
+
+#[derive(Deserialize)]
+struct ContactForm {
+    email: String,
+    message: String,
+}
+
+#[post("/contact")]
+async fn contact(reloop: web::Data<ReloopClient>, form: web::Json<ContactForm>) -> HttpResponse {
+    let result = reloop
+        .mail()
+        .send(json!({
+            "from": "Acme Website <contact@mail.acme.com>",
+            "to": "support@acme.com",
+            "reply_to": &form.email,
+            "subject": format!("New message from {}", form.email),
+            "text": &form.message,
+        }))
+        .await;
+
+    match result {
+        Ok(sent) => HttpResponse::Ok().json(json!({ "id": sent.id })),
+        Err(e) => {
+            eprintln!("contact form send failed: {e}");
+            HttpResponse::BadGateway().body("Could not send message")
+        }
+    }
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    let api_key = std::env::var("RELOOP_API_KEY").expect("RELOOP_API_KEY is not set");
+    // Create the client once, outside the factory closure
+    let reloop = web::Data::new(ReloopClient::new(api_key, None));
+
+    HttpServer::new(move || App::new().app_data(reloop.clone()).service(contact))
+        .bind(("0.0.0.0", 8080))?
+        .run()
+        .await
+}
+```
+
+The closure passed to `HttpServer::new` runs once per worker thread. Build the client outside it, or every worker gets its own client and connection pool.
+
+---
+
+## Attachments
+
+With the SDK, pass base64 content. Add the `base64` crate for the encoding:
+
+```rust
+use base64::{Engine as _, engine::general_purpose::STANDARD};
+
+let pdf = tokio::fs::read("invoice-1042.pdf").await?;
+
+reloop
+    .mail()
+    .send(json!({
+        "from": "Acme Billing <billing@mail.acme.com>",
+        "to": "user@example.com",
+        "subject": "Your invoice #1042",
+        "text": "Your invoice is attached.",
+        "attachments": [{
+            "filename": "invoice-1042.pdf",
+            "content": STANDARD.encode(&pdf),
+            "content_type": "application/pdf",
+        }],
+    }))
+    .await?;
+```
+
+With `lettre`, wrap the body and the file in a `mixed` multipart:
+
+```rust
+use lettre::message::{Attachment, MultiPart, header::ContentType};
+
+let email = Message::builder()
+    .from("Acme Billing <billing@mail.acme.com>".parse()?)
+    .to("user@example.com".parse()?)
+    .subject("Your invoice #1042")
+    .multipart(
+        MultiPart::mixed()
+            .multipart(MultiPart::alternative_plain_html(
+                String::from("Your invoice is attached."),
+                String::from("<p>Your invoice is attached.</p>"),
+            ))
+            .singlepart(
+                Attachment::new(String::from("invoice-1042.pdf"))
+                    .body(pdf, ContentType::parse("application/pdf")?),
+            ),
+    )?;
+```
+
+Keep attachments small. Many inboxes reject messages over 25 MB, and large files hurt deliverability. For big files, send a signed download link.
+
+---
+
+## Retries without duplicate emails
+
+A request times out and your code retries. If the first attempt actually went through, the user gets two emails. The API prevents this with an [`Idempotency-Key` header](/docs/api/idempotency): repeat a request with the same key and Reloop returns the original result instead of sending again.
+
+The Rust SDK does not set this header, and its errors do not carry the HTTP status you need to decide whether to retry. For sends that retry, call the endpoint directly with `reqwest`:
+
+```toml
+reqwest = { version = "0.13", features = ["json"] }
+```
+
+```rust
+use std::time::Duration;
+
+use serde_json::Value;
+
+#[derive(Debug)]
+struct SendError {
+    status: u16, // 0 means the request never got a response
+    message: String,
+}
+
+impl SendError {
+    fn is_retryable(&self) -> bool {
+        self.status == 0 || self.status == 429 || self.status >= 500
+    }
+}
+
+async fn send_email(
+    http: &reqwest::Client,
+    api_key: &str,
+    idempotency_key: &str,
+    body: &Value,
+) -> Result<Value, SendError> {
+    let res = http
+        .post("https://reloop.sh/api/mail/v1/send")
+        .header("x-api-key", api_key)
+        .header("Idempotency-Key", idempotency_key)
+        // reqwest sends no User-Agent by default, and the API rejects requests without one
+        .header("User-Agent", "acme-app/1.0")
+        .json(body)
+        .timeout(Duration::from_secs(30))
+        .send()
+        .await
+        .map_err(|e| SendError { status: 0, message: e.to_string() })?;
+
+    let status = res.status();
+    if status.is_success() {
+        return res
+            .json()
+            .await
+            .map_err(|e| SendError { status: 0, message: e.to_string() });
+    }
+
+    Err(SendError {
+        status: status.as_u16(),
+        message: res.text().await.unwrap_or_default(),
+    })
+}
+```
+
+Base the key on the business event (`receipt-{order_id}`, `welcome-{user_id}`), not a new UUID per attempt, so a retry from any task or process is safe. Failed requests do not store the key, so you can fix the problem and retry with the same one.
+
+---
+
+## Send in the background with a tokio task
+
+Sending inside a request handler adds latency and fails the request when the provider is slow. A simple option is a channel and a worker task that owns the retries:
+
+```rust
+use tokio::sync::mpsc;
+
+struct WelcomeEmail {
+    user_id: String,
+    to: String,
+}
+
+fn spawn_email_worker(api_key: String) -> mpsc::Sender<WelcomeEmail> {
+    let (tx, mut rx) = mpsc::channel::<WelcomeEmail>(1_000);
+    let http = reqwest::Client::new();
+
+    tokio::spawn(async move {
+        while let Some(job) = rx.recv().await {
+            let body = serde_json::json!({
+                "from": "Acme <hello@mail.acme.com>",
+                "to": job.to,
+                "subject": "Welcome to Acme",
+                "text": "Thanks for signing up.",
+            });
+            // Same key on every attempt, based on the event
+            let key = format!("welcome-{}", job.user_id);
+            let mut delay = Duration::from_secs(1);
+
+            for attempt in 1..=5 {
+                match send_email(&http, &api_key, &key, &body).await {
+                    Ok(_) => break,
+                    Err(e) if e.is_retryable() && attempt < 5 => {
+                        eprintln!("attempt {attempt} failed ({}), retrying", e.status);
+                        tokio::time::sleep(delay).await;
+                        delay *= 2;
+                    }
+                    Err(e) => {
+                        // Other 4xx, or out of attempts: log it and move on
+                        eprintln!("giving up on {key}: {} {}", e.status, e.message);
+                        break;
+                    }
+                }
+            }
+        }
+    });
+
+    tx
+}
+```
+
+Store the `Sender` in your Axum state and enqueue from the handler with `try_send`, which fails fast instead of waiting when the channel is full:
+
+```rust
+if let Err(e) = state.emails.try_send(WelcomeEmail { user_id, to: form.email }) {
+    eprintln!("email queue full or closed: {e}");
+}
+```
+
+**Retry** network errors (status `0`), `429` and `5xx`. **Do not retry** other `4xx` errors: an invalid address or unverified domain fails the same way every time.
+
+Be honest about what this queue is. The channel lives in memory, so a deploy, crash or OOM kill loses every job still in it. That is fine for a "someone commented" notification. For email that must arrive, such as receipts and password resets, write the job to your database in the same transaction as the change that caused it (an outbox table), and have the worker read from that table and mark rows as sent. The idempotency key makes it safe for the worker to pick up a row twice.
+
+---
+
+## Testing without sending real email
+
+- **Unit tests:** put sending behind a small trait of your own (for example `trait Mailer { async fn send(...) }`) and use a fake that records messages in tests.
+- **Staging:** send to [test addresses](/docs/guides/testing-email-addresses) so you do not hurt your [sender reputation](/blog/why-emails-land-in-spam-fix) with bounces.
+- **Local SMTP:** run [Mailpit](https://mailpit.axllent.org) with `docker run -p 1025:1025 -p 8025:8025 axllent/mailpit` and point `lettre` at it without TLS or credentials. Open `http://localhost:8025` to see the messages.
+
+```rust
+let mailer: AsyncSmtpTransport<Tokio1Executor> =
+    AsyncSmtpTransport::<Tokio1Executor>::builder_dangerous("localhost")
+        .port(1025)
+        .build();
+```
+
+`builder_dangerous` skips TLS, which is what Mailpit expects. Only use it for local testing.
+
+---
+
+## Production checklist
+
+- [ ] API key in an environment variable or secrets manager
+- [ ] Sending domain verified with SPF, DKIM and DMARC
+- [ ] `from` on your verified domain; user addresses in `reply_to`
+- [ ] Both HTML and plain-text bodies
+- [ ] One shared client or transport, created at startup and held in state
+- [ ] Sending in a worker task, not the request handler
+- [ ] A durable queue or outbox table for email that must arrive
+- [ ] Retries only on network errors, `429` and `5xx`
+- [ ] Idempotency keys on anything that retries
+- [ ] [Webhooks](/features/webhooks) for bounces and complaints
+- [ ] Disposable addresses blocked at signup ([how](/blog/block-disposable-emails-at-signup))
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How do I send an HTML email in Rust?">
+    With lettre, give the message builder a multipart body that holds a
+    plain-text part and an HTML part, as in the example above. With the Reloop
+    SDK, put html and text keys in the json! value you pass to send.
+  </Accordion>
+
+  <Accordion title="What is the difference between relay and starttls_relay in lettre?">
+    relay connects with implicit TLS on port 465. starttls_relay connects on
+    port 587 and upgrades the connection with STARTTLS. Reloop only offers
+    STARTTLS, so use starttls_relay, and add .port(2587) if 587 is blocked.
+  </Accordion>
+
+  <Accordion title="Is there a blocking Rust SDK?">
+    The Reloop Rust SDK is async and needs a tokio runtime. In synchronous code,
+    use lettre's blocking SmtpTransport, or build a tokio runtime and call
+    block_on around the send.
+  </Accordion>
+
+  <Accordion title="Why do I get 'future cannot be sent between threads safely'?">
+    The SDK returns a boxed std::error::Error that is not Send. If you keep it
+    alive across an .await inside tokio::spawn or an Axum handler, the future
+    is no longer Send. Convert the error to a String or log it before the next
+    await.
+  </Accordion>
+
+  <Accordion title="Why do my Rust emails go to spam?">
+    Usually the sending domain is not authenticated, or the From domain does
+    not match the domain that signed the message. Set up SPF, DKIM and DMARC,
+    send from your own domain, and always include a plain-text body.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Send your first email from Rust"
+  description="Async Rust SDK, SMTP relay for lettre, and a free tier of 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

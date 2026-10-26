@@ -1,0 +1,712 @@
+---
+title: "How to Send Email in Java: Jakarta Mail, Spring Boot and API"
+description: "Send email from Java with Jakarta Mail, Spring Boot's JavaMailSender, or an email API. Copy-paste examples for HTML email, attachments, background sending and retries without duplicates."
+keywords:
+  - send email Java
+  - Java send email
+  - Jakarta Mail example
+  - JavaMail SMTP example
+  - send HTML email Java
+  - Spring Boot send email
+  - JavaMailSender example
+  - Java email attachment
+  - Java email API
+publishedAt: 2026-10-26
+category: Tutorials
+tags: [java, jakarta-mail, spring-boot, smtp, sdk]
+readTime: 13 min read
+image: /blog/images/send-email-java.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - send-email-python
+  - send-email-nodejs
+  - send-email-csharp
+  - send-email-go
+  - smtp-ports-explained
+  - transactional-email-best-practices
+  - spf-dkim-dmarc-setup-guide
+---
+
+**Java sends email over SMTP with Jakarta Mail, the library formerly known as JavaMail.** Spring Boot wraps it as `JavaMailSender`. For anything in production, send through a provider: either over SMTP with Jakarta Mail or Spring's `spring.mail.*` settings, or over HTTPS with an email API SDK.
+
+This guide covers plain Jakarta Mail, the Reloop Java SDK and Spring Boot, then the production details: attachments, background sending and safe retries.
+
+Working in another language? See [how to send email in Node.js](/blog/send-email-nodejs) or [in Python](/blog/send-email-python).
+
+---
+
+## Which approach should you use?
+
+| | Jakarta Mail / Spring `JavaMailSender` | Email API SDK |
+|---|---------------------------------------|---------------|
+| **Install** | `angus-mail`, or `spring-boot-starter-mail` | `sh.reloop:reloop-java` |
+| **Transport** | SMTP on port 587 (STARTTLS) | HTTPS on port 443 |
+| **Building the message** | `MimeMessage`, `MimeMultipart`, `MimeMessageHelper` | A `SendMailParams` object with `html`, `text`, `attachments` |
+| **Errors** | `MessagingException` or Spring's `MailException` | `ReloopApiException` with an HTTP status |
+| **Safe retries** | No, a retry can send twice | Yes, with an idempotency key |
+| **Works with libraries that need `JavaMailSender`** | Yes, natively | Through SMTP settings |
+
+If a framework or library already sends mail through `JavaMailSender`, use SMTP settings. If you are writing the send call yourself, use the API.
+
+---
+
+## Prerequisites
+
+1. **Java 17 or later** (Spring Boot 3 requires it)
+2. A **verified sending domain** with [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide)
+3. An **API key** from the [Reloop dashboard](https://reloop.sh/dashboard). Keys start with `rl_`, and the same key works for the API and SMTP.
+
+```bash
+export RELOOP_API_KEY=rl_your_api_key
+```
+
+Keep the key in the environment or a secrets manager, never in your code or git.
+
+---
+
+## Method 1: Send email with Jakarta Mail
+
+JavaMail was renamed Jakarta Mail when it moved to the Eclipse Foundation. Version 2.0 changed the package from `javax.mail` to `jakarta.mail`, so old tutorials that import `javax.mail.*` will not compile against current libraries or Spring Boot 3. The implementation is now called Angus Mail:
+
+```xml
+<dependency>
+  <groupId>org.eclipse.angus</groupId>
+  <artifactId>angus-mail</artifactId>
+  <version>2.0.5</version>
+</dependency>
+```
+
+It pulls in the `jakarta.mail-api` package. Then build a `MimeMessage` with a plain-text part and an HTML part:
+
+```java
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import java.util.Properties;
+
+public class SendWelcome {
+    public static void main(String[] args) throws MessagingException {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.reloop.sh");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.starttls.required", "true");
+        props.put("mail.smtp.connectiontimeout", "10000");
+        props.put("mail.smtp.timeout", "30000");
+        props.put("mail.smtp.writetimeout", "30000");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("reloop", System.getenv("RELOOP_API_KEY"));
+            }
+        });
+
+        MimeMessage message = new MimeMessage(session);
+        message.setFrom(new InternetAddress("Acme <hello@mail.acme.com>"));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("user@example.com"));
+        message.setSubject("Welcome to Acme", "UTF-8");
+
+        // Plain-text part first, then the HTML alternative
+        MimeBodyPart text = new MimeBodyPart();
+        text.setText("Welcome! Thanks for signing up.", "UTF-8");
+
+        MimeBodyPart html = new MimeBodyPart();
+        html.setContent("<h1>Welcome!</h1><p>Thanks for signing up.</p>", "text/html; charset=UTF-8");
+
+        MimeMultipart body = new MimeMultipart("alternative");
+        body.addBodyPart(text);
+        body.addBodyPart(html);
+        message.setContent(body);
+
+        Transport.send(message);
+    }
+}
+```
+
+The username can be any string. The password is your API key.
+
+`starttls.enable` upgrades the connection to TLS, and `starttls.required` makes the send fail instead of falling back to plain text if the upgrade does not happen. Set the timeouts too: Jakarta Mail waits forever by default, which can hang a thread when the network misbehaves.
+
+### When port 587 is blocked
+
+Some hosts block outbound 587. Reloop also accepts STARTTLS on port **2587** (and 2025), so only the port number changes:
+
+```java
+props.put("mail.smtp.port", "2587");
+```
+
+Reloop does not offer implicit TLS on port 465, so do not set `mail.smtp.ssl.enable` or use the `smtps` protocol with it. If the connection hangs or times out, see [SMTP ports explained](/blog/smtp-ports-explained).
+
+### Handle SMTP errors
+
+```java
+try {
+    Transport.send(message);
+} catch (AuthenticationFailedException e) {
+    System.err.println("Wrong API key");
+} catch (SendFailedException e) {
+    System.err.println("Rejected recipients: " + Arrays.toString(e.getInvalidAddresses()));
+} catch (MessagingException e) {
+    System.err.println("Send failed: " + e.getMessage());
+}
+```
+
+Both `AuthenticationFailedException` and `SendFailedException` extend `MessagingException`, so catch them first.
+
+### Can I send with Gmail from Java?
+
+For a personal script, yes: use `smtp.gmail.com` on port 587 with an [App Password](https://support.google.com/accounts/answer/185833). For an app, no. Gmail limits personal accounts to about 500 recipients a day, every message comes from your `@gmail.com` address, and bulk sending gets the account suspended.
+
+---
+
+## Method 2: Send email with the Java SDK
+
+### Install
+
+Maven:
+
+```xml
+<dependency>
+  <groupId>sh.reloop</groupId>
+  <artifactId>reloop-java</artifactId>
+  <version>2.0.0</version>
+</dependency>
+```
+
+Gradle:
+
+```kotlin
+implementation("sh.reloop:reloop-java:2.0.0")
+```
+
+The SDK uses the JDK's built-in `java.net.http.HttpClient` and Jackson, so it adds no HTTP library to your build.
+
+### Send an email
+
+```java
+import sh.reloop.ReloopClient;
+import sh.reloop.exceptions.ReloopApiException;
+import sh.reloop.models.MailModels.SendMailParams;
+import sh.reloop.models.MailModels.SendMailResponse;
+
+public class SendWelcome {
+    public static void main(String[] args) {
+        ReloopClient reloop = new ReloopClient(System.getenv("RELOOP_API_KEY"));
+
+        SendMailParams params = new SendMailParams();
+        params.from = "Acme <hello@mail.acme.com>";
+        params.to = "user@example.com";
+        params.subject = "Welcome to Acme";
+        params.html = "<h1>Welcome!</h1><p>Thanks for signing up.</p>";
+        params.text = "Welcome! Thanks for signing up.";
+
+        try {
+            SendMailResponse result = reloop.mail.send(params);
+            System.out.println("Sent: " + result.id);
+        } catch (ReloopApiException e) {
+            System.err.println("Failed: " + e.getStatus() + " " + e.getMessage());
+        }
+    }
+}
+```
+
+The SDK **throws** unchecked exceptions:
+
+- `ReloopApiException` for any non-2xx response or network failure. `getStatus()` returns the HTTP status, or `0` when the request never got a response. `getBody()` holds the API's `message` and `why`.
+- `ReloopValidationException` when `from`, `to` or `subject` is missing. It is thrown before any HTTP call.
+
+Create the client **once** and reuse it. It wraps a single `HttpClient`, which is safe to share between threads, and there is nothing to close. Requests time out after 30 seconds.
+
+### Send to several recipients
+
+`to`, `cc`, `bcc` and `replyTo` take either one address or a list:
+
+```java
+import java.util.List;
+import sh.reloop.models.MailModels.SendMailTag;
+
+SendMailParams params = new SendMailParams();
+params.from = "Acme <hello@mail.acme.com>";
+params.to = List.of("ada@example.com", "grace@example.com");
+params.cc = "team@acme.com";
+params.replyTo = "support@acme.com";
+params.subject = "Your weekly report";
+params.text = "Here is your report.";
+params.tags = List.of(new SendMailTag("type", "weekly_report"));
+
+reloop.mail.send(params);
+```
+
+Every address in `to` sees the others. For personalized mail, send one message per recipient.
+
+### Send a stored template
+
+Keep copy out of your code so non-developers can edit it. Create the template in Reloop, then send it by ID with variables:
+
+```java
+import java.util.Map;
+import sh.reloop.models.MailModels.SendMailTemplate;
+
+SendMailTemplate template = new SendMailTemplate();
+template.id = "tmpl_welcome";
+template.variables = Map.of("first_name", "Ada", "plan", "Pro");
+
+SendMailParams params = new SendMailParams();
+params.from = "Acme <hello@mail.acme.com>";
+params.to = "user@example.com";
+params.subject = "Welcome to Acme";
+params.template = template;
+
+reloop.mail.send(params);
+```
+
+See [templates](/docs/learn/templates) for variables and defaults.
+
+---
+
+## Spring Boot
+
+### SMTP with `spring-boot-starter-mail`
+
+Add the starter. It brings in Angus Mail and auto-configures a `JavaMailSender` bean from `spring.mail.*` properties:
+
+```xml
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+```
+
+```properties
+# application.properties
+spring.mail.host=smtp.reloop.sh
+spring.mail.port=587
+spring.mail.username=reloop
+spring.mail.password=${RELOOP_API_KEY}
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.starttls.required=true
+spring.mail.properties.mail.smtp.connectiontimeout=10000
+spring.mail.properties.mail.smtp.timeout=30000
+spring.mail.properties.mail.smtp.writetimeout=30000
+```
+
+Everything under `spring.mail.properties` is passed straight to Jakarta Mail, so these are the same settings as Method 1. Keep `mail.smtp.ssl.enable` off: Reloop uses STARTTLS, not implicit TLS. If 587 is blocked, set `spring.mail.port=2587`.
+
+Use `MimeMessageHelper` to build a message with both bodies:
+
+```java
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+
+@Service
+public class WelcomeMailer {
+    private final JavaMailSender mailSender;
+
+    public WelcomeMailer(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    public void sendWelcome(String to) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        // true = multipart, needed for text + HTML and for attachments
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setFrom("Acme <hello@mail.acme.com>");
+        helper.setTo(to);
+        helper.setSubject("Welcome to Acme");
+        helper.setText(
+                "Welcome! Thanks for signing up.",
+                "<h1>Welcome!</h1><p>Thanks for signing up.</p>");
+        mailSender.send(message);
+    }
+}
+```
+
+`setText(plain, html)` only works when the helper is in multipart mode. `mailSender.send` throws Spring's unchecked `MailException`: `MailAuthenticationException` for a wrong key and `MailSendException` for connection or recipient failures.
+
+### The SDK as a Spring bean
+
+Register one `ReloopClient` for the whole application:
+
+```java
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import sh.reloop.ReloopClient;
+
+@Configuration
+public class ReloopConfig {
+    @Bean
+    public ReloopClient reloopClient(@Value("${reloop.api-key}") String apiKey) {
+        return new ReloopClient(apiKey);
+    }
+}
+```
+
+```properties
+# application.properties
+reloop.api-key=${RELOOP_API_KEY}
+```
+
+Then inject it into a `@Service`:
+
+```java
+import org.springframework.stereotype.Service;
+import sh.reloop.ReloopClient;
+import sh.reloop.models.MailModels.SendMailParams;
+
+@Service
+public class ContactMailer {
+    private final ReloopClient reloop;
+
+    public ContactMailer(ReloopClient reloop) {
+        this.reloop = reloop;
+    }
+
+    public String forward(String visitorEmail, String message) {
+        SendMailParams params = new SendMailParams();
+        params.from = "Acme Website <contact@mail.acme.com>";
+        params.to = "support@acme.com";
+        params.replyTo = visitorEmail;
+        params.subject = "New message from " + visitorEmail;
+        params.text = message;
+        return reloop.mail.send(params).id;
+    }
+}
+```
+
+And call it from a controller:
+
+```java
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import sh.reloop.exceptions.ReloopApiException;
+
+@RestController
+public class ContactController {
+    private final ContactMailer contactMailer;
+
+    public ContactController(ContactMailer contactMailer) {
+        this.contactMailer = contactMailer;
+    }
+
+    public record ContactRequest(@Email @NotBlank String email, @NotBlank String message) {}
+
+    @PostMapping("/contact")
+    public Map<String, String> contact(@Valid @RequestBody ContactRequest body) {
+        try {
+            return Map.of("id", contactMailer.forward(body.email(), body.message()));
+        } catch (ReloopApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Could not send message", e);
+        }
+    }
+}
+```
+
+The validation annotations need `spring-boot-starter-validation`. The visitor's address goes in `replyTo`, never in `from`. You can only send from your verified domain, and putting someone else's domain in `from` fails [DMARC](/blog/gmail-yahoo-bulk-sender-requirements).
+
+### Quarkus
+
+Quarkus has its own mailer extension, `quarkus-mailer`, configured the same way:
+
+```properties
+quarkus.mailer.from=Acme <hello@mail.acme.com>
+quarkus.mailer.host=smtp.reloop.sh
+quarkus.mailer.port=587
+quarkus.mailer.start-tls=REQUIRED
+quarkus.mailer.username=reloop
+quarkus.mailer.password=${RELOOP_API_KEY}
+```
+
+Inject `io.quarkus.mailer.Mailer` and call `mailer.send(Mail.withHtml(to, subject, html))`. In dev and test mode the mailer is mocked by default and does not send anything. The Java SDK also works in Quarkus: produce a `ReloopClient` from a CDI producer method, just like the Spring `@Bean` above.
+
+---
+
+## Attachments
+
+With the SDK, pass base64 content:
+
+```java
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Base64;
+import java.util.List;
+import sh.reloop.models.MailModels.SendMailAttachment;
+
+byte[] pdf = Files.readAllBytes(Path.of("invoice-1042.pdf"));
+
+SendMailAttachment invoice = new SendMailAttachment();
+invoice.filename = "invoice-1042.pdf";
+invoice.content = Base64.getEncoder().encodeToString(pdf);
+invoice.contentType = "application/pdf";
+
+SendMailParams params = new SendMailParams();
+params.from = "Acme Billing <billing@mail.acme.com>";
+params.to = "user@example.com";
+params.subject = "Your invoice #1042";
+params.text = "Your invoice is attached.";
+params.attachments = List.of(invoice);
+
+reloop.mail.send(params);
+```
+
+With Spring's `MimeMessageHelper` in multipart mode, call `addAttachment`:
+
+```java
+helper.addAttachment("invoice-1042.pdf", new FileSystemResource("invoice-1042.pdf"));
+```
+
+With plain Jakarta Mail, wrap the text and HTML in a `mixed` multipart next to the file:
+
+```java
+MimeBodyPart content = new MimeBodyPart();
+content.setContent(body); // the "alternative" multipart from Method 1
+
+MimeBodyPart pdf = new MimeBodyPart();
+pdf.attachFile(new File("invoice-1042.pdf"), "application/pdf", null);
+
+MimeMultipart mixed = new MimeMultipart("mixed");
+mixed.addBodyPart(content);
+mixed.addBodyPart(pdf);
+message.setContent(mixed);
+```
+
+Keep attachments small. Many inboxes reject messages over 25 MB, and large files hurt deliverability. For big files, send a signed download link.
+
+---
+
+## Send in the background with @Async
+
+Sending inside a web request adds latency and fails the request when the provider is slow. In Spring Boot, the quickest fix is `@Async`. Turn it on once:
+
+```java
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
+
+@SpringBootApplication
+@EnableAsync
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+
+Then mark the send method `@Async` and retry only the errors that can succeed on a second try:
+
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import sh.reloop.ReloopClient;
+import sh.reloop.exceptions.ReloopApiException;
+import sh.reloop.models.MailModels.SendMailParams;
+
+@Service
+public class SignupMailer {
+    private static final Logger log = LoggerFactory.getLogger(SignupMailer.class);
+    private static final int MAX_ATTEMPTS = 5;
+
+    private final ReloopClient reloop;
+
+    public SignupMailer(ReloopClient reloop) {
+        this.reloop = reloop;
+    }
+
+    @Async
+    public void sendWelcome(String email) throws InterruptedException {
+        SendMailParams params = new SendMailParams();
+        params.from = "Acme <hello@mail.acme.com>";
+        params.to = email;
+        params.subject = "Welcome to Acme";
+        params.text = "Thanks for signing up.";
+
+        for (int attempt = 1; ; attempt++) {
+            try {
+                reloop.mail.send(params);
+                return;
+            } catch (ReloopApiException e) {
+                if (!isRetryable(e) || attempt == MAX_ATTEMPTS) {
+                    log.error("Welcome email to {} failed: {} {}", email, e.getStatus(), e.getMessage());
+                    throw e;
+                }
+                Thread.sleep(1000L * (1L << attempt)); // 2s, 4s, 8s, 16s
+            }
+        }
+    }
+
+    private static boolean isRetryable(ReloopApiException e) {
+        int status = e.getStatus();
+        return status == 0 || status == 429 || status >= 500;
+    }
+}
+```
+
+**Retry** network errors (status `0`), `429` and `5xx`. **Do not retry** other `4xx` errors: an invalid address or unverified domain fails the same way every time.
+
+Call `sendWelcome` from another bean, such as your controller, and it returns immediately. Calling it from inside `SignupMailer` itself skips the proxy and runs synchronously.
+
+`@Async` runs on an in-memory thread pool, so pending emails are lost if the process restarts. For emails that must arrive, write a row to an outbox table in the same transaction as the business change and have a scheduled worker send pending rows, or hand the job to a persistent queue such as RabbitMQ, SQS or a job library like JobRunr.
+
+---
+
+## Retries without duplicate emails
+
+A request times out and your code retries. If the first attempt actually went through, the user gets two emails. The API prevents this with an [`Idempotency-Key` header](/docs/api/idempotency): repeat a request with the same key and Reloop returns the original result instead of sending again.
+
+The Java SDK does not set this header yet, so call the endpoint with `java.net.http.HttpClient`. Jackson is already on your classpath through the SDK:
+
+```java
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.Map;
+
+public class ReceiptSender {
+    private static final HttpClient HTTP = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+    private static final ObjectMapper JSON = new ObjectMapper();
+
+    public static String sendReceipt(String orderId, String to)
+            throws IOException, InterruptedException {
+        String body = JSON.writeValueAsString(Map.of(
+                "from", "Acme <orders@mail.acme.com>",
+                "to", to,
+                "subject", "Receipt for order " + orderId,
+                "text", "Thanks for your order."));
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://reloop.sh/api/mail/v1/send"))
+                .timeout(Duration.ofSeconds(30))
+                .header("x-api-key", System.getenv("RELOOP_API_KEY"))
+                .header("Content-Type", "application/json")
+                .header("Idempotency-Key", "receipt-" + orderId)
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+        HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() >= 400) {
+            throw new IOException("Send failed: " + response.statusCode() + " " + response.body());
+        }
+        return JSON.readTree(response.body()).get("id").asText();
+    }
+}
+```
+
+Base the key on the business event (`receipt-` plus the order ID), not a new UUID per attempt, so retries from any thread or server are safe. A `409` means a request with that key is still running: wait a second and retry with the same key.
+
+---
+
+## Testing without sending real email
+
+- **Unit tests:** put the SDK behind your own small interface (for example `Mailer`) and mock that. `ReloopClient.mail` is a final field, so mocking the client directly is awkward.
+- **Integration tests:** [GreenMail](https://greenmail-mail-test.github.io/greenmail/) runs an in-memory SMTP server inside JUnit 5. Register `GreenMailExtension` with `ServerSetupTest.SMTP`, point a `JavaMailSenderImpl` at `localhost:3025`, and assert on `greenMail.getReceivedMessages()`.
+- **Local SMTP:** run [Mailpit](https://mailpit.axllent.org) with `docker run -p 1025:1025 -p 8025:8025 axllent/mailpit` and point a dev profile at it. Open `http://localhost:8025` to see the messages.
+
+```properties
+# application-dev.properties
+spring.mail.host=localhost
+spring.mail.port=1025
+spring.mail.username=
+spring.mail.password=
+spring.mail.properties.mail.smtp.auth=false
+spring.mail.properties.mail.smtp.starttls.enable=false
+spring.mail.properties.mail.smtp.starttls.required=false
+```
+
+In staging, send to [test addresses](/docs/guides/testing-email-addresses) so you do not hurt your [sender reputation](/blog/why-emails-land-in-spam-fix) with bounces.
+
+---
+
+## Production checklist
+
+- [ ] API key in an environment variable or secrets manager
+- [ ] Sending domain verified with SPF, DKIM and DMARC
+- [ ] `from` on your verified domain; user addresses in `replyTo`
+- [ ] Both HTML and plain-text bodies
+- [ ] One shared `ReloopClient` bean, created at startup
+- [ ] SMTP timeouts set (`connectiontimeout`, `timeout`, `writetimeout`)
+- [ ] Sending off the request thread (`@Async`, an outbox or a queue)
+- [ ] Retries only on network errors, `429` and `5xx`
+- [ ] Idempotency keys on anything that retries
+- [ ] [Webhooks](/features/webhooks) for bounces and complaints
+- [ ] Disposable addresses blocked at signup ([how](/blog/block-disposable-emails-at-signup))
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How do I send an HTML email in Java?">
+    With Jakarta Mail, build a MimeMultipart of type alternative with a
+    plain-text MimeBodyPart and an HTML MimeBodyPart set to text/html. With
+    Spring, create a MimeMessageHelper in multipart mode and call setText with
+    both bodies. With the Reloop SDK, set html and text on SendMailParams.
+  </Accordion>
+
+  <Accordion title="What is the difference between javax.mail and jakarta.mail?">
+    They are the same library under two names. Jakarta Mail 2.0 moved the
+    package from javax.mail to jakarta.mail. Spring Boot 3 and current
+    application servers use jakarta.mail, so replace the javax.mail imports
+    and the old com.sun.mail dependency with Angus Mail.
+  </Accordion>
+
+  <Accordion title="Should I use port 587 or 465 with Jakarta Mail?">
+    Use 587 with mail.smtp.starttls.enable and mail.smtp.starttls.required set
+    to true. Port 465 expects implicit TLS through mail.smtp.ssl.enable, which
+    Reloop does not offer. If 587 is blocked, use 2587 with the same STARTTLS
+    settings.
+  </Accordion>
+
+  <Accordion title="Is the Reloop Java SDK thread-safe?">
+    The client holds no per-request state and sends through a single
+    java.net.http.HttpClient, which is safe to share between threads. Create
+    one ReloopClient at startup, for example as a Spring bean, and use it
+    everywhere.
+  </Accordion>
+
+  <Accordion title="Why do my Java emails go to spam?">
+    Usually the sending domain is not authenticated, or the From domain does
+    not match the domain that signed the message. Set up SPF, DKIM and DMARC,
+    send from your own domain, and always include a plain-text body.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Send your first email from Java"
+  description="Java SDK, SMTP relay for Spring Boot and Jakarta Mail, and a free tier of 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>
