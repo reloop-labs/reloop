@@ -8,6 +8,10 @@ import type { ReactNode } from "react";
 
 const REPO = "reloop-labs/reloop";
 
+const freeEmails =
+	pricingPlans.find((plan) => plan.id === "free")?.comparison.monthlyEmails ??
+	"6,000";
+
 const cheapestPaidPlan = Math.min(
 	...pricingPlans.flatMap((plan) =>
 		plan.monthlyPrice ? [plan.monthlyPrice] : [],
@@ -126,14 +130,15 @@ export function CompareOpenSourceSection({
 							className="h-10 rounded-xl px-4 font-medium text-[14.5px]"
 						>
 							<a href={hostedSignupHref}>
-								Get started
+								Start for free
 								<Icon name="arrow-right" className="size-4" />
 							</a>
 						</FancyButton.Root>
 					}
 				>
-					We run it: sending, IPs, deliverability and updates, with dedicated
-					support on paid plans. Start on the free plan.
+					We run it: sending, IPs, deliverability and updates. Start free with{" "}
+					{freeEmails} emails a month, no credit card required. Paid plans add
+					dedicated support.
 				</OptionCard>
 			</div>
 		</section>

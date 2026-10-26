@@ -66,16 +66,10 @@ export function CompareMigrateBanner({
 						) : null}
 						{competitorName}
 					</span>
-					<span className="flex items-center text-text-sub-600 dark:text-white/40">
-						{[0, 1, 2].map((index) => (
-							<Icon
-								key={index}
-								name="chevron-right"
-								className="-mx-1 size-5 sm:size-6"
-								style={{ opacity: 0.35 + index * 0.3 }}
-							/>
-						))}
-					</span>
+					<Icon
+						name="arrow-right"
+						className="size-6 shrink-0 text-text-sub-600 sm:size-7 dark:text-white/40"
+					/>
 					<span className="flex items-center gap-3 font-semibold text-[1.75rem] text-text-strong-950 tracking-tight sm:text-[2rem] dark:text-white">
 						<span className="flex size-10 items-center justify-center overflow-hidden sm:size-11">
 							<Logo className="size-14 shrink-0 sm:size-16" />
