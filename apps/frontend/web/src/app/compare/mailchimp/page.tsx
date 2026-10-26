@@ -1,21 +1,16 @@
-import { FaqSection } from "@reloop/web/components/faq-section";
-import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
-import {
-	getComparePage,
-	mailchimpFeatures,
-} from "@reloop/web/lib/compare-content";
-import {
-	freeDailyEmails,
-	freeMonthlyEmails,
-} from "@reloop/web/lib/pricing-facts";
+import { mailchimpFeatures } from "@reloop/web/lib/compare-content";
+import { getMigrationGuide } from "@reloop/web/lib/migration-guides";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { SectionSeparator } from "../../(home)/components/section-separator";
+import {
+	costsCheckedAt,
+	formatUsd,
+	getCostSpotlight,
+} from "../compare-hero-costs";
 import { CompareFeatureGrid } from "../components/compare-feature-grid";
 import { CompareFeaturesHeading } from "../components/compare-features-heading";
 import { ComparePageJsonLd } from "../components/compare-json-ld";
-import { CompareOtherLinks } from "../components/compare-other-links";
+import { CompareOtherPills } from "../components/compare-other-pills";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -23,6 +18,12 @@ import { ComparisonPageShell } from "../components/comparison-page-shell";
 export const instant = false;
 
 const pagePath = "/compare/mailchimp";
+
+/** Prices come from the same quotes as the hero card, so the copy never disagrees with it. */
+const spotlight = getCostSpotlight("mailchimp");
+const heroDescription = spotlight
+	? `Mailchimp is a hosted marketing email platform, priced by contacts. Reloop is open source, and costs ${formatUsd(spotlight.reloop.usd)} a month at ${spotlight.volumeLabel.replace(" a month", "")}, Mailchimp ${formatUsd(spotlight.competitor.usd)}.`
+	: "Mailchimp is a hosted marketing email platform, priced by contacts. Reloop is open source, with its own mail servers.";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 
 export const metadata: Metadata = {
@@ -54,126 +55,41 @@ export const metadata: Metadata = {
 };
 
 const MailchimpComparisonPage = () => {
-	const compare = getComparePage("mailchimp");
+	const hasGuide = Boolean(getMigrationGuide("mailchimp"));
 	return (
 		<>
-			<ComparePageJsonLd slug="mailchimp" />
+			<ComparePageJsonLd slug="mailchimp" withFaq={false} />
 			<ComparisonPageShell
 				pagePath={pagePath}
 				titleLines={["Reloop vs Mailchimp"]}
-				description="Learn how Reloop compares to Mailchimp and why Reloop is the best Mailchimp alternative for all your product and marketing email needs."
+				description={heroDescription}
+				updatedAt="October 27, 2026"
+				primaryCta={{
+					label: "Get Started ",
+					href: "/dashboard/signup",
+				}}
+				secondaryCta={
+					hasGuide
+						? { label: "Migrate from Mailchimp", href: "/migrate/mailchimp" }
+						: undefined
+				}
+				openSourceNote="Mailchimp isn't open source: you can't run it on your own server."
+				afterHero={
+					<section className="border-stroke-soft-100 border-b dark:border-white/10">
+						<CompareFeaturesHeading competitorName="Mailchimp" />
+						<CompareFeatureGrid
+							competitorName="Mailchimp"
+							features={mailchimpFeatures}
+						/>
+					</section>
+				}
 			>
-				<PageSection flushTop narrow>
-					<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-						<p>
-							Mailchimp prices by how many contacts you store, not how many
-							emails you actually send. That model works for newsletters with
-							huge lists and infrequent sends. It punishes API-driven products
-							that email active users often but don&apos;t need to pay for
-							dormant contacts.
-						</p>
-						<p>
-							Transactional email (Mandrill) was historically a separate
-							product, and still feels bolted on. Reloop charges by{" "}
-							<strong className="text-text-strong-950 dark:text-white">
-								send volume
-							</strong>
-							, exposes everything via API, and includes campaigns without a
-							separate SKU.
-						</p>
-					</div>
-				</PageSection>
-
-				<PageSection>
-					<SectionHeading
-						title="Audience pricing vs send pricing"
-						description="Why developer-led products feel Mailchimp bills."
-						compact
-					/>
-					<div className="grid gap-6 sm:grid-cols-2">
-						<div className="rounded-2xl border border-stroke-soft-200 p-6 dark:border-white/10">
-							<h3 className="font-semibold text-text-strong-950 dark:text-white">
-								Mailchimp model
-							</h3>
-							<p className="mt-3 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								10,000 contacts on a free or starter tier (even if only 500
-								receive monthly mail) can force an upgrade.
-								Engineering-triggered sends often require Mandrill or a third
-								integration.
-							</p>
-						</div>
-						<div className="rounded-2xl border border-primary-base/30 bg-primary-base/5 p-6">
-							<h3 className="font-semibold text-text-strong-950 dark:text-white">
-								Reloop model
-							</h3>
-							<p className="mt-3 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/60">
-								{freeMonthlyEmails} emails free ({freeDailyEmails}/day), then
-								Pro $10/mo (50,000), Growth $20/mo (100,000), Enterprise custom.
-								Store contacts for segmentation without audience-based
-								surcharges. See{" "}
-								<Link
-									href="/pricing"
-									className="font-semibold text-primary-base"
-								>
-									pricing details
-								</Link>
-								.
-							</p>
-						</div>
-					</div>
-				</PageSection>
-
-				<section className="border-stroke-soft-100 border-b dark:border-white/10">
-					<CompareFeaturesHeading competitorName="Mailchimp" />
-					<CompareFeatureGrid
-						competitorName="Mailchimp"
-						features={mailchimpFeatures}
-					/>
-				</section>
-				<SectionSeparator hideTop className="h-24 sm:h-24" />
-
-				<PageSection narrow>
-					<SectionHeading
-						title="Leaving Mailchimp for a product stack"
-						description="What marketing + engineering teams do together."
-						compact
-					/>
-					<ol className="mx-auto max-w-2xl list-none space-y-3 text-[15px] text-text-sub-600 dark:text-white/60">
-						<li>
-							<strong className="text-text-strong-950 dark:text-white">
-								Marketing:
-							</strong>{" "}
-							Export templates and audiences; rebuild segments from your CRM or
-							product DB in Reloop.
-						</li>
-						<li>
-							<strong className="text-text-strong-950 dark:text-white">
-								Engineering:
-							</strong>{" "}
-							Replace Mandrill or SMTP plugins with Reloop API sends for auth
-							and billing events.
-						</li>
-						<li>
-							<strong className="text-text-strong-950 dark:text-white">
-								Ops:
-							</strong>{" "}
-							Consolidate DNS to one provider; monitor one webhook stream for
-							campaign and transactional events.
-						</li>
-					</ol>
-				</PageSection>
-
-				<FaqSection
-					id="compare-mailchimp-faq"
-					title="Mailchimp vs Reloop FAQ"
-					items={compare?.faqs ?? []}
-					compact
-					flush
+				<CompareOtherPills
+					currentHref={pagePath}
+					competitorName="Mailchimp"
+					sourceHost="mailchimp.com"
+					checkedOn={costsCheckedAt}
 				/>
-
-				<PageSection>
-					<CompareOtherLinks currentHref={pagePath} />
-				</PageSection>
 			</ComparisonPageShell>
 		</>
 	);

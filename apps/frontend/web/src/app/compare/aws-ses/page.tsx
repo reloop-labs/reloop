@@ -1,17 +1,16 @@
-import { FaqSection } from "@reloop/web/components/faq-section";
-import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
-import {
-	awsSesFeatures,
-	getComparePage,
-} from "@reloop/web/lib/compare-content";
+import { awsSesFeatures } from "@reloop/web/lib/compare-content";
+import { getMigrationGuide } from "@reloop/web/lib/migration-guides";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { SectionSeparator } from "../../(home)/components/section-separator";
+import {
+	costsCheckedAt,
+	formatUsd,
+	getCostSpotlight,
+} from "../compare-hero-costs";
 import { CompareFeatureGrid } from "../components/compare-feature-grid";
 import { CompareFeaturesHeading } from "../components/compare-features-heading";
 import { ComparePageJsonLd } from "../components/compare-json-ld";
-import { CompareOtherLinks } from "../components/compare-other-links";
+import { CompareOtherPills } from "../components/compare-other-pills";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -19,6 +18,12 @@ import { ComparisonPageShell } from "../components/comparison-page-shell";
 export const instant = false;
 
 const pagePath = "/compare/aws-ses";
+
+/** Prices come from the same quotes as the hero card, so the copy never disagrees with it. */
+const spotlight = getCostSpotlight("aws-ses");
+const heroDescription = spotlight
+	? `Amazon SES is AWS's pay-per-email sending API, with no dashboard, templates or inbox on top. Reloop is open source, and costs ${formatUsd(spotlight.reloop.usd)} a month at ${spotlight.volumeLabel.replace(" a month", "")}, AWS SES ${formatUsd(spotlight.competitor.usd)}.`
+	: "Amazon SES is AWS's pay-per-email sending API, with no dashboard, templates or inbox on top. Reloop is open source, with its own mail servers.";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 
 export const metadata: Metadata = {
@@ -50,108 +55,41 @@ export const metadata: Metadata = {
 };
 
 const AwsSesComparisonPage = () => {
-	const compare = getComparePage("aws-ses");
+	const hasGuide = Boolean(getMigrationGuide("aws-ses"));
 	return (
 		<>
-			<ComparePageJsonLd slug="aws-ses" />
+			<ComparePageJsonLd slug="aws-ses" withFaq={false} />
 			<ComparisonPageShell
 				pagePath={pagePath}
 				titleLines={["Reloop vs AWS SES"]}
-				description="Learn how Reloop compares to Amazon SES and why Reloop is the best SES alternative for all your email delivery and platform needs."
+				description={heroDescription}
+				updatedAt="October 27, 2026"
+				primaryCta={{
+					label: "Get Started ",
+					href: "/dashboard/signup",
+				}}
+				secondaryCta={
+					hasGuide
+						? { label: "Migrate from AWS SES", href: "/migrate/aws-ses" }
+						: undefined
+				}
+				openSourceNote="AWS SES isn't open source: it only runs inside AWS."
+				afterHero={
+					<section className="border-stroke-soft-100 border-b dark:border-white/10">
+						<CompareFeaturesHeading competitorName="AWS SES" />
+						<CompareFeatureGrid
+							competitorName="AWS SES"
+							features={awsSesFeatures}
+						/>
+					</section>
+				}
 			>
-				<PageSection flushTop narrow>
-					<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-						<p>
-							SES wins spreadsheet comparisons at millions of messages per
-							month. What spreadsheets miss is everything around SES: SNS wiring
-							for bounces, CloudWatch dashboards, template storage, campaign UI,
-							support contacts, and the engineering time to glue it together.
-						</p>
-						<p>
-							Reloop is the opposite trade: a{" "}
-							<strong className="text-text-strong-950 dark:text-white">
-								complete email product
-							</strong>{" "}
-							with APIs, campaigns, analytics, and webhooks, hosted by Reloop
-							Labs or self-hosted on your AWS account if you want SES-adjacent
-							control without assembling fifteen services.
-						</p>
-					</div>
-				</PageSection>
-
-				<PageSection>
-					<SectionHeading
-						title="Total cost of ownership"
-						description="SES line item vs platform line item."
-						compact
-					/>
-					<div className="grid gap-6 lg:grid-cols-2">
-						<div className="rounded-3xl border border-stroke-soft-200 p-6 dark:border-white/10">
-							<h3 className="font-semibold text-lg text-text-strong-950 dark:text-white">
-								AWS SES stack (typical)
-							</h3>
-							<ul className="mt-4 space-y-2 text-[14px] text-text-sub-600 dark:text-white/50">
-								<li>SES send charges + data transfer</li>
-								<li>SNS topics + Lambda consumers for events</li>
-								<li>S3 for template assets or logs</li>
-								<li>Custom admin UI or spreadsheet ops</li>
-								<li>Separate tool for marketing campaigns</li>
-								<li>Engineering maintenance ongoing</li>
-							</ul>
-						</div>
-						<div className="rounded-3xl border border-primary-base/30 bg-primary-base/5 p-6">
-							<h3 className="font-semibold text-lg text-text-strong-950 dark:text-white">
-								Reloop stack
-							</h3>
-							<ul className="mt-4 space-y-2 text-[14px] text-text-sub-600 dark:text-white/60">
-								<li>Tiered platform pricing or self-host infra only</li>
-								<li>Built-in webhooks and delivery analytics</li>
-								<li>Template editor and campaign builder included</li>
-								<li>Agent inbox for support and AI workflows</li>
-								<li>Single dashboard for ops and developers</li>
-								<li>Open-source: extend instead of fork-lifting glue code</li>
-							</ul>
-						</div>
-					</div>
-				</PageSection>
-
-				<section className="border-stroke-soft-100 border-b dark:border-white/10">
-					<CompareFeaturesHeading competitorName="AWS SES" />
-					<CompareFeatureGrid
-						competitorName="AWS SES"
-						features={awsSesFeatures}
-					/>
-				</section>
-				<SectionSeparator hideTop className="h-24 sm:h-24" />
-
-				<PageSection narrow>
-					<SectionHeading
-						title="Running Reloop on AWS"
-						description="Keep data in your account without building the product yourself."
-						compact
-					/>
-					<p className="mx-auto max-w-2xl text-center text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
-						Many SES teams already run on AWS. Reloop deploys via Docker
-						Compose, EKS, or ECS. See our{" "}
-						<Link href="/self-host" className="font-semibold text-primary-base">
-							self-hosting guide
-						</Link>{" "}
-						for wiring Postgres, Redis, and outbound SMTP alongside your
-						existing VPC patterns.
-					</p>
-				</PageSection>
-
-				<FaqSection
-					id="compare-aws-ses-faq"
-					title="AWS SES vs Reloop FAQ"
-					items={compare?.faqs ?? []}
-					compact
-					flush
+				<CompareOtherPills
+					currentHref={pagePath}
+					competitorName="AWS SES"
+					sourceHost="aws.amazon.com"
+					checkedOn={costsCheckedAt}
 				/>
-
-				<PageSection>
-					<CompareOtherLinks currentHref={pagePath} />
-				</PageSection>
 			</ComparisonPageShell>
 		</>
 	);

@@ -161,7 +161,7 @@ export function GridRow({
 }) {
 	return (
 		<div className="group/row col-span-full grid grid-cols-subgrid">
-			<div className="col-span-full flex items-center px-4 pt-4 pb-3 font-medium text-[14px] text-text-strong-950 group-hover/row:bg-bg-weak-50/70 sm:col-span-1 sm:min-h-[60px] sm:border-stroke-soft-100 sm:border-b sm:px-7 sm:py-4 sm:font-normal lg:px-9 dark:text-white sm:dark:border-white/[0.07] dark:group-hover/row:bg-white/[0.03]">
+			<div className="col-span-full flex items-end px-4 pt-7 pb-2.5 font-medium text-[14px] text-text-strong-950 group-hover/row:bg-bg-weak-50/70 sm:col-span-1 sm:min-h-[60px] sm:items-center sm:border-stroke-soft-100 sm:border-b sm:px-7 sm:py-4 sm:font-normal lg:px-9 dark:text-white sm:dark:border-white/[0.07] dark:group-hover/row:bg-white/[0.03]">
 				{label}
 			</div>
 			<div className="flex items-start border-stroke-soft-100 border-t border-b px-4 py-3.5 group-hover/row:bg-bg-weak-50/70 sm:min-h-[60px] sm:items-center sm:border-t-0 sm:border-l sm:px-8 sm:py-4 dark:border-white/[0.07] dark:group-hover/row:bg-white/[0.03]">

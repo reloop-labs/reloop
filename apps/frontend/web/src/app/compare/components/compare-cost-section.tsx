@@ -241,7 +241,7 @@ export function CompareCostSection({
 							<GridRow
 								key={row.volume}
 								label={
-									<span className="font-medium tabular-nums">
+									<span className="font-semibold text-[18px] tabular-nums tracking-tight">
 										{volumeLabel(mode, row.volume)}
 									</span>
 								}

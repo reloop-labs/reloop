@@ -1,25 +1,29 @@
-import { FaqSection } from "@reloop/web/components/faq-section";
-import { getComparePage } from "@reloop/web/lib/compare-content";
+import { getMigrationGuide } from "@reloop/web/lib/migration-guides";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import { SectionSeparator } from "../../(home)/components/section-separator";
-import { competitorBrands } from "../competitor-brands";
+import {
+	costsCheckedAt,
+	formatUsd,
+	getCostSpotlight,
+} from "../compare-hero-costs";
 import { CompareFeatureGrid } from "../components/compare-feature-grid";
 import { CompareFeaturesHeading } from "../components/compare-features-heading";
-import { CompareHeroStatStrip } from "../components/compare-hero-stat-strip";
 import { ComparePageJsonLd } from "../components/compare-json-ld";
-import { CompareMigrate } from "../components/compare-migrate";
-import { CompareOtherLinks } from "../components/compare-other-links";
-import { CompareSection } from "../components/compare-section";
+import { CompareOtherPills } from "../components/compare-other-pills";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { loopsComparisonCategories } from "./comparison-data";
-import { LoopsCostCalculator } from "./loops-cost-calculator";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
 const pagePath = "/compare/loops";
+
+/** Prices come from the same quotes as the hero card, so the copy never disagrees with it. */
+const spotlight = getCostSpotlight("loops");
+const heroDescription = spotlight
+	? `Loops is hosted email for SaaS onboarding and marketing. Reloop is open source, and costs ${formatUsd(spotlight.reloop.usd)} a month at ${spotlight.volumeLabel.replace(" a month", "")}, Loops ${formatUsd(spotlight.competitor.usd)}.`
+	: "Loops is hosted email for SaaS onboarding and marketing. Reloop is open source, with its own mail servers.";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 
 export const metadata: Metadata = {
@@ -51,161 +55,42 @@ export const metadata: Metadata = {
 	alternates: { canonical: pageUrl },
 };
 
-const loopsStats = [
-	{
-		label: "Pricing Model",
-		value: "Per Send",
-		detail: "Reloop charges per send; Loops penalizes growing contact lists",
-	},
-	{
-		label: "Unified Stack",
-		value: "1 API",
-		detail: "Transactional sends + Marketing loops + Inbound AI agents",
-	},
-	{
-		label: "Open Source Engine",
-		value: "100%",
-		detail: "KumoMTA core engine with zero vendor lock-in",
-	},
-	{
-		label: "Self-Hosting",
-		value: "Free",
-		detail: "Deploy on your own Docker/K8s with $0 license fee",
-	},
-];
-
 const LoopsComparisonPage = () => {
-	const loopsBrand = competitorBrands.find((b) => b.name === "Loops");
-	const compare = getComparePage("loops");
-
+	const hasGuide = Boolean(getMigrationGuide("loops"));
 	return (
 		<>
-			<ComparePageJsonLd slug="loops" />
+			<ComparePageJsonLd slug="loops" withFaq={false} />
 			<ComparisonPageShell
 				pagePath={pagePath}
 				titleLines={["Reloop vs Loops"]}
-				description="Loops is great for simple onboarding loops, until engineering needs password resets, billing receipts, and raw API sends. Reloop unifies product email and transactional infrastructure into one open-source platform."
+				description={heroDescription}
+				updatedAt="October 27, 2026"
 				primaryCta={{
 					label: "Get Started ",
 					href: "/dashboard/signup",
 				}}
-				secondaryCta={{
-					label: "Migrate from Loops",
-					href: "/compare/loops#migrate",
-				}}
-			>
-				{/* Metric Stat Strip */}
-				<CompareSection flushTop maxWidth="full">
-					<CompareHeroStatStrip stats={loopsStats} />
-				</CompareSection>
-
-				{/* The Two-Vendor Problem Section */}
-				<CompareSection maxWidth="full">
-					<div className="mx-auto max-w-3xl space-y-6 text-center">
-						<span className="font-bold text-[12px] text-text-sub-600 uppercase tracking-widest dark:text-white/50">
-							The Two-Vendor Problem
-						</span>
-						<h2 className="font-serif text-[2rem] text-text-strong-950 leading-tight tracking-tight sm:text-[2.5rem] dark:text-white">
-							Stop managing split email services
-						</h2>
-						<p className="text-[16px] text-text-sub-600 leading-relaxed dark:text-white/60">
-							Many SaaS teams start with Loops for product onboarding loops,
-							then quickly realize they still need Resend or Postmark for auth
-							emails, invoices, and transactional webhooks. Reloop unifies both
-							under one API key.
-						</p>
-
-						{/* Visual Stack Comparison */}
-						<div className="mt-8 grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
-							<div className="rounded-2xl border border-stroke-soft-200/80 bg-bg-weak-50/50 p-6 dark:border-white/10 dark:bg-white/[0.02]">
-								<span className="font-bold text-[12px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-									Fragmented Stack (Loops + 2nd API)
-								</span>
-								<ul className="mt-3 space-y-2 font-mono text-[13px] text-text-sub-600 dark:text-white/60">
-									<li className="flex items-center gap-2">
-										<span className="text-red-500">✕</span> Loops → Onboarding
-										&amp; Newsletters
-									</li>
-									<li className="flex items-center gap-2">
-										<span className="text-red-500">✕</span> Resend / Postmark →
-										Auth &amp; Receipts
-									</li>
-									<li className="flex items-center gap-2">
-										<span className="text-red-500">✕</span> 2 Domain Reputation
-										Pools
-									</li>
-									<li className="flex items-center gap-2">
-										<span className="text-red-500">✕</span> 2 Separate Monthly
-										Bills
-									</li>
-								</ul>
-							</div>
-
-							<div className="rounded-2xl border border-stroke-soft-200/80 bg-bg-white-0 p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-								<span className="font-bold text-[12px] text-primary-base uppercase tracking-wider">
-									Unified Stack (Reloop)
-								</span>
-								<ul className="mt-3 space-y-2 font-mono text-[13px] text-text-strong-950 dark:text-white">
-									<li className="flex items-center gap-2">
-										<span className="text-emerald-500">✓</span> Reloop →
-										Onboarding &amp; Newsletters
-									</li>
-									<li className="flex items-center gap-2">
-										<span className="text-emerald-500">✓</span> Reloop → Auth,
-										Billing &amp; Receipts
-									</li>
-									<li className="flex items-center gap-2">
-										<span className="text-emerald-500">✓</span> Reloop → Inbound
-										AI Agent Inbox
-									</li>
-									<li className="flex items-center gap-2">
-										<span className="text-emerald-500">✓</span> 1 Domain
-										Reputation Pool
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-				</CompareSection>
-
-				{/* Interactive Contact Calculator */}
-				<CompareSection maxWidth="full">
-					<LoopsCostCalculator />
-				</CompareSection>
-
-				{/* Feature Comparison Matrix */}
-				<section className="border-stroke-soft-100 border-b dark:border-white/10">
-					<CompareFeaturesHeading competitorName="Loops" />
-					<CompareFeatureGrid
-						competitorName="Loops"
-						categories={loopsComparisonCategories}
-					/>
-				</section>
-				<SectionSeparator hideTop className="h-24 sm:h-24" />
-
-				{/* Migration Section */}
-				<CompareSection maxWidth="full">
-					{loopsBrand ? (
-						<CompareMigrate
+				secondaryCta={
+					hasGuide
+						? { label: "Migrate from Loops", href: "/migrate/loops" }
+						: undefined
+				}
+				openSourceNote="Loops isn't open source: you can't run it on your own server."
+				afterHero={
+					<section className="border-stroke-soft-100 border-b dark:border-white/10">
+						<CompareFeaturesHeading competitorName="Loops" />
+						<CompareFeatureGrid
 							competitorName="Loops"
-							competitorIcon={loopsBrand.icon}
-							primaryHref="/dashboard/signup"
-							guideHref="/docs"
+							categories={loopsComparisonCategories}
 						/>
-					) : null}
-				</CompareSection>
-
-				<FaqSection
-					id="compare-loops-faq"
-					title="Loops vs Reloop FAQ"
-					items={compare?.faqs ?? []}
-					compact
-					flush
+					</section>
+				}
+			>
+				<CompareOtherPills
+					currentHref={pagePath}
+					competitorName="Loops"
+					sourceHost="loops.so"
+					checkedOn={costsCheckedAt}
 				/>
-
-				<CompareSection maxWidth="full" noDivider>
-					<CompareOtherLinks currentHref={pagePath} />
-				</CompareSection>
 			</ComparisonPageShell>
 		</>
 	);

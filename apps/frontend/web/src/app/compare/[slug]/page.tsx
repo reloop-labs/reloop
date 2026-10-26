@@ -1,21 +1,15 @@
-import { Icon } from "@reloop/ui/icon";
-import { FaqSection } from "@reloop/web/components/faq-section";
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { PageSection } from "@reloop/web/components/page-shell";
 import {
-	type CompareEdgePoint,
 	getBlogComparePage,
 	listBlogComparePages,
 } from "@reloop/web/lib/blog-compare-pages";
-import { breadcrumbJsonLd, faqPageJsonLd } from "@reloop/web/lib/schema";
+import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SectionSeparator } from "../../(home)/components/section-separator";
 import { CompareFeatureGrid } from "../components/compare-feature-grid";
 import { CompareFeaturesHeading } from "../components/compare-features-heading";
-import { CompareOtherLinks } from "../components/compare-other-links";
+import { CompareOtherPills } from "../components/compare-other-pills";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -65,42 +59,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	};
 }
 
-function EdgeList({
-	label,
-	title,
-	points,
-}: {
-	label: string;
-	title: string;
-	points: CompareEdgePoint[];
-}) {
-	return (
-		<div className="lg:w-1/2">
-			<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-				{label}
-			</p>
-			<h2 className="mt-3 font-semibold text-[1.6rem] text-text-strong-950 tracking-tight sm:text-[1.9rem] dark:text-white">
-				{title}
-			</h2>
-			<ul className="mt-5 space-y-3">
-				{points.map((point) => (
-					<li
-						key={`${point.lead}${point.detail}`}
-						className="text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60"
-					>
-						{point.lead ? (
-							<strong className="font-medium text-text-strong-950 dark:text-white">
-								{point.lead}
-							</strong>
-						) : null}{" "}
-						{point.detail}
-					</li>
-				))}
-			</ul>
-		</div>
-	);
-}
-
 export default async function BlogComparePage({ params }: Props) {
 	const { slug } = await params;
 	const page = getBlogComparePage(slug);
@@ -116,7 +74,6 @@ export default async function BlogComparePage({ params }: Props) {
 						{ name: "Compare", path: "/compare" },
 						{ name: page.title, path: pagePath },
 					]),
-					...(page.faqs.length > 0 ? [faqPageJsonLd(page.faqs)] : []),
 				]}
 			/>
 			<ComparisonPageShell
@@ -125,65 +82,25 @@ export default async function BlogComparePage({ params }: Props) {
 				titleLines={[page.title]}
 				description={page.description}
 				updatedAt={page.publishedAt}
+				openSourceNote={`${page.competitor} isn't open source: you can't run it on your own server.`}
+				afterHero={
+					<section className="border-stroke-soft-100 border-b dark:border-white/10">
+						<CompareFeaturesHeading
+							competitorName={page.competitor}
+							checkedOn={page.publishedAt}
+						/>
+						<CompareFeatureGrid
+							competitorName={page.competitor}
+							features={page.features}
+						/>
+					</section>
+				}
 			>
-				{page.competitorEdge.length > 0 || page.reloopEdge.length > 0 ? (
-					<PageSection>
-						<div className="flex flex-col gap-10 lg:flex-row lg:items-start">
-							<EdgeList
-								label={`${page.competitor}'s edge`}
-								title={`Where ${page.competitor} is the better choice`}
-								points={page.competitorEdge}
-							/>
-							<EdgeList
-								label="Reloop's edge"
-								title="Where Reloop is the better choice"
-								points={page.reloopEdge}
-							/>
-						</div>
-					</PageSection>
-				) : null}
-
-				<section className="border-stroke-soft-100 border-b dark:border-white/10">
-					<CompareFeaturesHeading
-						competitorName={page.competitor}
-						checkedOn={page.publishedAt}
-					/>
-					<CompareFeatureGrid
-						competitorName={page.competitor}
-						features={page.features}
-					/>
-				</section>
-				<SectionSeparator hideTop className="h-24 sm:h-24" />
-
-				<PageSection narrow>
-					<div className="flex justify-center">
-						<Link
-							href={`/blog/${page.postSlug}`}
-							className="group inline-flex items-center gap-1.5 font-medium text-[15px] text-text-strong-950 dark:text-white"
-						>
-							Read the full {page.competitor} comparison and migration steps
-							<Icon
-								name="arrow-right"
-								className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
-								aria-hidden="true"
-							/>
-						</Link>
-					</div>
-				</PageSection>
-
-				{page.faqs.length > 0 ? (
-					<FaqSection
-						id={`compare-${page.slug}-faq`}
-						title={`${page.competitor} vs Reloop FAQ`}
-						items={page.faqs}
-						compact
-						flush
-					/>
-				) : null}
-
-				<PageSection>
-					<CompareOtherLinks currentHref={pagePath} />
-				</PageSection>
+				<CompareOtherPills
+					currentHref={pagePath}
+					competitorName={page.competitor}
+					checkedOn={page.publishedAt}
+				/>
 			</ComparisonPageShell>
 		</>
 	);

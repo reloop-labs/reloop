@@ -62,34 +62,34 @@ export function ComparisonPageShell({
 			{afterHero ? (
 				<>
 					{afterHero}
-					<SectionSeparator hideTop className="h-24 sm:h-24" />
+					<SectionSeparator hideTop className="h-12 sm:h-24" />
 				</>
 			) : null}
 			{name && spotlight ? (
 				<>
 					<CompareCostSection providerId={slug} competitorName={name} />
-					<SectionSeparator hideTop className="h-24 sm:h-24" />
+					<SectionSeparator hideTop className="h-12 sm:h-24" />
 				</>
 			) : null}
 			{/* "03" only reads right after 01 · Features and 02 · Price, i.e. when features sit under the hero. */}
 			{afterHero ? (
 				<>
 					<CompareAgentsSection />
-					<SectionSeparator hideTop className="h-24 sm:h-24" />
+					<SectionSeparator hideTop className="h-12 sm:h-24" />
 					<CompareOpenSourceSection competitorNote={openSourceNote} />
 					{/* Bands on both sides of the grey migration banner. */}
 					{name && getMigrationGuide(slug) ? (
 						<>
-							<SectionSeparator hideTop className="h-24 sm:h-24" />
+							<SectionSeparator hideTop className="h-12 sm:h-24" />
 							<CompareMigrateBanner
 								competitorName={name}
 								icon={brand?.icon}
 								guideHref={`/migrate/${slug}`}
 							/>
-							<SectionSeparator hideTop className="h-24 sm:h-24" />
+							<SectionSeparator hideTop className="h-12 sm:h-24" />
 						</>
 					) : (
-						<SectionSeparator hideTop className="h-24 sm:h-24" />
+						<SectionSeparator hideTop className="h-12 sm:h-24" />
 					)}
 				</>
 			) : null}
