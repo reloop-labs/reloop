@@ -25,7 +25,8 @@
 		"./webhook-events": "./src/webhook-events.ts",
 		"./api-key-scope": "./src/api-key-scope.ts",
 		"./utils": "./src/utils/*",
-		"./pagination": "./src/pagination.ts"
+		"./pagination": "./src/pagination.ts",
+		"./org-plan-change": "./src/org-plan-change.ts"
 	},
 	"scripts": {
 		"build": "tsc --build",
@@ -47,6 +48,7 @@
 	},
 	"dependencies": {
 		"@reloop/dns": "workspace:*",
+		"@reloop/pricing": "workspace:*",
 		"@reloop/webhook-events": "workspace:*",
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",

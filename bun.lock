@@ -1092,6 +1092,7 @@
       "dependencies": {
         "@paralleldrive/cuid2": "catalog:backend",
         "@reloop/dns": "workspace:*",
+        "@reloop/pricing": "workspace:*",
         "@reloop/webhook-events": "workspace:*",
         "drizzle-orm": "catalog:db",
         "drizzle-typebox": "catalog:db",

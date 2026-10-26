@@ -14,7 +14,12 @@ import {
 } from "@fe/console/components/ui/page-frame";
 import { SectionCard } from "@fe/console/components/ui/section-card";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
-import { adminGet, adminPatch, adminPost } from "@fe/console/lib/admin-api";
+import {
+	adminErrorMessage,
+	adminGet,
+	adminPatch,
+	adminPost,
+} from "@fe/console/lib/admin-api";
 import {
 	formatDateTime,
 	formatNumber,
@@ -25,6 +30,7 @@ import {
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import axios from "axios";
 import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -235,6 +241,8 @@ export default function OrganizationDetailPage() {
 	const [convertOpen, setConvertOpen] = useState(false);
 	const [convertMode, setConvertMode] = useState<"comped" | "paid">("comped");
 	const [convertReason, setConvertReason] = useState("");
+	const [downgradeOpen, setDowngradeOpen] = useState(false);
+	const [downgradeReason, setDowngradeReason] = useState("");
 	const [verifyingDomainId, setVerifyingDomainId] = useState<string | null>(
 		null,
 	);
@@ -362,10 +370,14 @@ export default function OrganizationDetailPage() {
 								data.plan?.planId === "startup" ||
 								data.plan?.planId === "enterprise";
 							return isPro ? (
-								<StatusPill
-									status={planLabel(data.plan?.planId)}
-									tone="green"
-								/>
+								<Button.Root
+									variant="neutral"
+									mode="stroke"
+									size="small"
+									onClick={() => setDowngradeOpen(true)}
+								>
+									Downgrade to Free
+								</Button.Root>
 							) : (
 								<Button.Root
 									variant="neutral"
@@ -644,6 +656,46 @@ export default function OrganizationDetailPage() {
 								: `New quota: 50,000/month; credits will be topped to ${Math.max(0, 50000 - (data.credits?.creditsUsed ?? 0)).toLocaleString()} remaining.`}
 						</p>
 					</div>
+				</InlineActionPanel>
+			) : null}
+
+			{downgradeOpen ? (
+				<InlineActionPanel
+					title={`Downgrade ${data.name} to Free?`}
+					description="Closes the current billing period, resets monthly emails to the Free allowance and pauses inboxes over the Free limit (re-enabled on upgrade). Moves to Pay as you go instead while prepaid credits are unexpired. Audit-logged. Paying customers: cancel in Polar instead."
+					confirmLabel="Downgrade to Free"
+					destructive
+					onCancel={() => setDowngradeOpen(false)}
+					onConfirm={async () => {
+						try {
+							const result = await adminPost<{ planId: string }>(
+								`/organizations/${data.id}/downgrade-plan`,
+								{ reason: downgradeReason || undefined },
+							);
+							toast.success(`Downgraded to ${planLabel(result.planId)}`);
+							setDowngradeOpen(false);
+							setDowngradeReason("");
+							mutate();
+						} catch (error) {
+							const fix = axios.isAxiosError(error)
+								? (error.response?.data as { fix?: string } | undefined)?.fix
+								: undefined;
+							toast.error(adminErrorMessage(error), { description: fix });
+						}
+					}}
+				>
+					<Input.Root>
+						<Input.Wrapper>
+							<Input.Input
+								value={downgradeReason}
+								onChange={(e) => setDowngradeReason(e.target.value)}
+								placeholder="Reason (optional) – e.g. comp ended"
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+					<p className="text-[12px] text-text-sub-600">
+						Current: {planLabel(data.plan?.planId)} → Free.
+					</p>
 				</InlineActionPanel>
 			) : null}
 

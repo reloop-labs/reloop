@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/admin/middleware/auth-middleware";
 import { AdminModel } from "@reloop/admin/model/admin.model";
 import { Elysia, t } from "elysia";
 import { convertOrganizationPlanController } from "./convert-plan.controllers";
+import { downgradeOrganizationPlanController } from "./downgrade-plan.controllers";
 import {
 	getOrganizationController,
 	listOrganizationsController,
@@ -120,6 +121,30 @@ export const organizationsRoute = new Elysia()
 				summary: "Convert organization to Pro (or higher)",
 				description:
 					"Admin action to grant Pro/individual plan. Supports comped (free grant) vs paid (external payment). Blocks if already Pro+.",
+			},
+		},
+	)
+	.post(
+		"/organizations/:organizationId/downgrade-plan",
+		async ({ params, body, userId }) =>
+			downgradeOrganizationPlanController({
+				organizationId: params.organizationId,
+				reason: body.reason,
+				actorUserId: userId,
+			}),
+		{
+			authAdmin: true,
+			params: t.Object({ organizationId: t.String() }),
+			body: AdminModel.downgradePlanBody,
+			response: {
+				200: AdminModel.downgradePlanResponse,
+				401: AdminModel.unauthorized,
+			},
+			detail: {
+				tags: ["Admin"],
+				summary: "Downgrade organization to Free",
+				description:
+					"Admin action to move a Pro (or higher) organization back to Free, or Pay as you go while it holds unexpired prepaid credits. Closes the current billing period, resets monthly credits and pauses inboxes over the Free cap. Refuses while a Polar subscription is still billing; cancel it in Polar instead.",
 			},
 		},
 	)

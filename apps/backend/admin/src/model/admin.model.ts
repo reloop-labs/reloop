@@ -904,6 +904,16 @@ export namespace AdminModel {
 		mode: t.String(),
 	});
 
+	export const downgradePlanBody = t.Object({
+		reason: t.Optional(t.String()),
+	});
+
+	export const downgradePlanResponse = t.Object({
+		organizationId: t.String(),
+		previousPlanId: t.String(),
+		planId: t.String(),
+	});
+
 	export const suspectSeverity = t.Union([
 		t.Literal("low"),
 		t.Literal("medium"),
