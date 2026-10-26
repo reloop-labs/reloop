@@ -552,6 +552,12 @@ export const EmailDetail = ({
 					icon: "bulb" as const,
 					shortcut: "3",
 				},
+				{
+					title: "Timeline",
+					value: "timeline",
+					icon: "activity" as const,
+					shortcut: "4",
+				},
 			];
 		}
 		return [
@@ -584,6 +590,12 @@ export const EmailDetail = ({
 				value: "insights",
 				icon: "bulb" as const,
 				shortcut: "5",
+			},
+			{
+				title: "Timeline",
+				value: "timeline",
+				icon: "activity" as const,
+				shortcut: "6",
 			},
 		];
 	}, [email]);
@@ -637,6 +649,17 @@ export const EmailDetail = ({
 		(e) => {
 			e.preventDefault();
 			const target = tabItems[4]?.value;
+			if (target) setActiveTab(target);
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+		[tabItems],
+	);
+
+	useHotkeys(
+		"6",
+		(e) => {
+			e.preventDefault();
+			const target = tabItems[5]?.value;
 			if (target) setActiveTab(target);
 		},
 		{ enableOnFormTags: false, preventDefault: true },
@@ -800,10 +823,6 @@ export const EmailDetail = ({
 				/>
 			</section>
 
-			{!isLoading && email?.events ? (
-				<EmailActivity events={email.events} />
-			) : null}
-
 			{!isLoading && email?.errorMessage && (
 				<ErrorDetailsPanel
 					errorMessage={email.errorMessage}
@@ -959,6 +978,17 @@ export const EmailDetail = ({
 
 								<TabMenu.Content value="insights">
 									{email && <EmailInsightsPanel email={email} />}
+								</TabMenu.Content>
+
+								<TabMenu.Content value="timeline">
+									{email ? (
+										<EmailActivity
+											events={email.events ?? []}
+											sentAt={email.sentAt || email.createdAt}
+											deliveredAt={email.deliveredAt}
+											failedAt={email.failedAt}
+										/>
+									) : null}
 								</TabMenu.Content>
 							</>
 						)}

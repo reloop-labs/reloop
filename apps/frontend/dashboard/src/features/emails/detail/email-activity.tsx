@@ -1,6 +1,24 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import { Fragment, type ReactNode, useMemo, useState } from "react";
+import {
+	dayKey,
+	formatDayHeader,
+	formatTimeAmPm,
+	TimelineItemWrapper,
+	TimelineMeta,
+	timelineCardClass,
+} from "#/components/timeline/timeline-parts";
 import type { EmailEvent } from "./timeline/types";
+import {
+	BrowserIcon,
+	ClientIcon,
+	CountryFlag,
+	DeviceIcon,
+	OsIcon,
+} from "./timeline-icons";
 
 type ActivityMeta = {
 	url?: string;
@@ -14,6 +32,47 @@ type ActivityMeta = {
 	machine?: boolean;
 	machineReason?: "apple_privacy" | "security_scanner" | null;
 	inferred?: "click";
+};
+
+type ActivityEvent = EmailEvent & {
+	requestHeaders?: Record<string, string> | null;
+	clientIp?: string | null;
+};
+
+/**
+ * Node icon (a name from the @reloop/ui icon sprite) and colour, matching
+ * the Sent → Delivered → Opened → Clicked steps at the top of the page.
+ */
+type Kind = { label: string; icon: string; color: string };
+
+const COLOR = {
+	blue: "text-information-base",
+	green: "text-success-base",
+	orange: "text-orange-600 dark:text-orange-400",
+	purple: "text-purple-600 dark:text-purple-400",
+	red: "text-error-base",
+	gray: "text-text-soft-400",
+};
+
+const SENT: Kind = { label: "Sent", icon: "send-1", color: COLOR.blue };
+
+const KINDS: Record<string, Kind> = {
+	sent: SENT,
+	delivered: { label: "Delivered", icon: "check-circle", color: COLOR.green },
+	deferred: { label: "Delivery delayed", icon: "clock", color: COLOR.gray },
+	bounced: { label: "Bounced", icon: "cross-circle", color: COLOR.red },
+	failed: { label: "Failed", icon: "cross-circle", color: COLOR.red },
+	complaint: {
+		label: "Marked as spam",
+		icon: "alert-triangle",
+		color: COLOR.red,
+	},
+	opened: { label: "Opened", icon: "eye-outline", color: COLOR.orange },
+	clicked: {
+		label: "Clicked a link",
+		icon: "cursor-click",
+		color: COLOR.purple,
+	},
 };
 
 const regionNames =
@@ -33,124 +92,361 @@ function capitalize(value: string): string {
 	return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-/** Why a row isn't a plain human open/click, or null when it is. */
-function noteFor(meta: ActivityMeta): string | null {
+function metaOf(event: ActivityEvent): ActivityMeta {
+	return (event.metadata ?? {}) as ActivityMeta;
+}
+
+function plural(count: number, word: string): string {
+	return `${count} ${word}${count === 1 ? "" : "s"}`;
+}
+
+function titleFor(event: ActivityEvent): string {
+	const meta = metaOf(event);
+	const base = KINDS[event.type]?.label ?? capitalize(event.type);
+	if (event.type === "opened" && meta.client)
+		return `${base} in ${meta.client}`;
+	return base;
+}
+
+/** Icon followed by text, for inline values like "[logo] Gmail". */
+function WithIcon({
+	icon,
+	children,
+}: {
+	icon: ReactNode;
+	children: ReactNode;
+}) {
+	return (
+		<span className="inline-flex min-w-0 items-center gap-1.5">
+			{icon}
+			<span className="truncate">{children}</span>
+		</span>
+	);
+}
+
+/** Title with the email client's logo, e.g. "Opened in [Gmail logo] Gmail". */
+function TitleNode({ event }: { event: ActivityEvent }) {
+	const meta = metaOf(event);
+	if (event.type === "opened" && meta.client) {
+		return (
+			<span className="inline-flex flex-wrap items-center gap-x-1.5">
+				Opened in
+				<WithIcon icon={<ClientIcon name={meta.client} />}>
+					{meta.client}
+				</WithIcon>
+			</span>
+		);
+	}
+	return <>{titleFor(event)}</>;
+}
+
+/** Badge chips like the contact history's Sent / Failed badges. */
+function Chip({ icon, children }: { icon: ReactNode; children: ReactNode }) {
+	return (
+		<span className="inline-flex items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-text-sub-600 text-xs [&_svg]:size-3.5">
+			{icon}
+			<span>{children}</span>
+		</span>
+	);
+}
+
+/** Location, device, OS and browser as chips, in that order. */
+function chipsFor(meta: ActivityMeta): ReactNode[] {
+	const chips: ReactNode[] = [];
+	if (meta.country) {
+		chips.push(
+			<Chip
+				key="location"
+				icon={<CountryFlag code={meta.country} className="h-2.5 w-[15px]" />}
+			>
+				{[meta.city, countryName(meta.country)].filter(Boolean).join(", ")}
+			</Chip>,
+		);
+	}
+	if (meta.device) {
+		chips.push(
+			<Chip key="device" icon={<DeviceIcon type={meta.device} />}>
+				{capitalize(meta.device)}
+			</Chip>,
+		);
+	}
+	if (meta.os) {
+		chips.push(
+			<Chip key="os" icon={<OsIcon name={meta.os} />}>
+				{meta.os}
+			</Chip>,
+		);
+	}
+	if (meta.browser) {
+		chips.push(
+			<Chip key="browser" icon={<BrowserIcon name={meta.browser} />}>
+				{meta.browser}
+			</Chip>,
+		);
+	}
+	return chips;
+}
+
+/** Muted second line: the clicked link, or why device and place are missing. */
+function subtitleFor(event: ActivityEvent): ReactNode {
+	const meta = metaOf(event);
+	if (event.type === "clicked" && meta.url) {
+		return (
+			<span className="min-w-0 truncate">
+				to{" "}
+				<a
+					href={meta.url}
+					target="_blank"
+					rel="noreferrer"
+					title={meta.url}
+					className="font-mono text-text-sub-600 underline-offset-2 hover:underline"
+				>
+					{meta.url.replace(/^https?:\/\//, "")}
+				</a>
+			</span>
+		);
+	}
 	if (meta.machineReason === "apple_privacy") {
 		return "Apple Mail Privacy Protection loaded images automatically";
 	}
 	if (meta.machineReason === "security_scanner") {
-		return "Security scanner, not a person";
+		return "A security scanner checked the link, not a person";
 	}
-	if (meta.inferred === "click") return "Counted as opened because of a click";
-	if (meta.proxied) return "Loaded through the provider's image proxy";
+	if (meta.inferred === "click")
+		return "Counted as opened because a link was clicked";
+	if (meta.proxied) {
+		return `Through ${meta.client ?? "the provider"}'s image proxy, so device and location are hidden`;
+	}
 	return null;
 }
 
-function Cell({ value }: { value: string | null }) {
-	return value ? (
-		<span className="whitespace-nowrap text-text-strong-950">{value}</span>
-	) : (
-		<span className="text-text-soft-400">—</span>
+/** The raw request behind an open or click: IP and headers, always shown. */
+function RequestDetails({ event }: { event: ActivityEvent }) {
+	const entries = Object.entries(event.requestHeaders ?? {});
+	if (entries.length === 0 && !event.clientIp) return null;
+
+	return (
+		<dl className="mt-2.5 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 rounded-xl bg-bg-weak-50 p-3 font-mono text-[12px] text-text-strong-950 leading-5">
+			{event.clientIp ? (
+				<>
+					<dt className="text-text-soft-400">ip</dt>
+					<dd className="min-w-0 break-all">{event.clientIp}</dd>
+				</>
+			) : null}
+			{entries.map(([name, value]) => (
+				<Fragment key={name}>
+					<dt className="text-text-soft-400">{name}</dt>
+					<dd className="min-w-0 break-all">{value}</dd>
+				</Fragment>
+			))}
+		</dl>
 	);
 }
 
-/** Every open and click with the reader's client, device and location. */
-export function EmailActivity({ events }: { events: EmailEvent[] }) {
-	const rows = events.filter(
-		(e) => e.type === "opened" || e.type === "clicked",
-	);
-	if (rows.length === 0) return null;
+function EventCard({
+	event,
+	isLast,
+}: {
+	event: ActivityEvent;
+	isLast: boolean;
+}) {
+	const meta = metaOf(event);
+	const kind = KINDS[event.type] ?? SENT;
+	const isMachine = meta.machine === true;
+	const subtitle = subtitleFor(event);
+	const chips = isMachine ? [] : chipsFor(meta);
+	const isRequest = event.type === "opened" || event.type === "clicked";
 
 	return (
-		<section>
-			<h2 className="mb-3 font-semibold text-label-sm text-text-strong-950">
-				Activity
-			</h2>
-			<div className="overflow-x-auto rounded-xl border border-stroke-soft-200 dark:border-stroke-soft-100/40">
-				<table className="w-full min-w-[720px] text-sm">
-					<thead className="bg-bg-weak-50 text-left text-text-sub-600 text-xs">
-						<tr>
-							<th className="px-4 py-2 font-medium">Event</th>
-							<th className="px-4 py-2 font-medium">Time</th>
-							<th className="px-4 py-2 font-medium">Email client</th>
-							<th className="px-4 py-2 font-medium">Device</th>
-							<th className="px-4 py-2 font-medium">Browser</th>
-							<th className="px-4 py-2 font-medium">Location</th>
-						</tr>
-					</thead>
-					<tbody>
-						{rows.map((event) => {
-							const meta = (event.metadata ?? {}) as ActivityMeta;
-							const note = noteFor(meta);
-							const device = [
-								meta.device ? capitalize(meta.device) : null,
-								meta.os,
-							]
-								.filter(Boolean)
-								.join(" · ");
-							const location = meta.country
-								? [meta.city, countryName(meta.country)]
-										.filter(Boolean)
-										.join(", ")
-								: null;
-							return (
-								<tr
-									key={event.id}
-									className="border-stroke-soft-200 border-t align-top dark:border-stroke-soft-100/40"
-								>
-									<td className="px-4 py-2.5">
-										<span
-											className={
-												meta.machine
-													? "text-text-soft-400"
-													: "font-medium text-text-strong-950"
-											}
-										>
-											{event.type === "opened" ? "Opened" : "Clicked"}
-										</span>
-										{event.type === "clicked" && meta.url ? (
-											<a
-												href={meta.url}
-												target="_blank"
-												rel="noreferrer"
-												title={meta.url}
-												className="mt-0.5 block max-w-[220px] truncate text-text-sub-600 text-xs hover:underline"
-											>
-												{meta.url.replace(/^https?:\/\//, "")}
-											</a>
-										) : null}
-										{note ? (
-											<span className="mt-0.5 block text-text-soft-400 text-xs">
-												{note}
-											</span>
-										) : null}
-									</td>
-									<td className="whitespace-nowrap px-4 py-2.5 text-text-sub-600 tabular-nums">
-										{new Date(event.createdAt).toLocaleString([], {
-											month: "short",
-											day: "numeric",
-											hour: "numeric",
-											minute: "2-digit",
-										})}
-									</td>
-									<td className="px-4 py-2.5">
-										<Cell value={meta.client ?? null} />
-									</td>
-									<td className="px-4 py-2.5">
-										<Cell value={device || null} />
-									</td>
-									<td className="px-4 py-2.5">
-										<Cell value={meta.browser ?? null} />
-									</td>
-									<td className="px-4 py-2.5">
-										<Cell value={location} />
-									</td>
-								</tr>
+		<TimelineItemWrapper
+			isLast={isLast}
+			node={
+				<Icon
+					name={isMachine ? "robot" : kind.icon}
+					className={cn(
+						"size-3.5",
+						isMachine ? "text-text-soft-400" : kind.color,
+					)}
+				/>
+			}
+		>
+			<div className={timelineCardClass}>
+				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+					<span
+						className={cn(
+							"min-w-0 font-medium text-paragraph-sm",
+							isMachine ? "text-text-sub-600" : "text-text-strong-950",
+						)}
+					>
+						<TitleNode event={event} />
+					</span>
+					<TimelineMeta createdAt={event.createdAt} />
+				</div>
+				{subtitle ? (
+					<div className="mt-1 flex text-paragraph-xs text-text-soft-400">
+						{subtitle}
+					</div>
+				) : null}
+				{chips.length > 0 ? (
+					<div className="mt-2 flex flex-wrap items-center gap-1.5">
+						{chips}
+					</div>
+				) : null}
+				{isRequest && !isMachine ? <RequestDetails event={event} /> : null}
+			</div>
+		</TimelineItemWrapper>
+	);
+}
+
+/** A day's automatic opens and scanner clicks, folded into one row. */
+function AutomaticEventsCard({
+	events,
+	isLast,
+}: {
+	events: ActivityEvent[];
+	isLast: boolean;
+}) {
+	const [open, setOpen] = useState(false);
+	return (
+		<TimelineItemWrapper
+			isLast={isLast}
+			node={<Icon name="robot" className="size-3.5 text-text-soft-400" />}
+		>
+			<div className={timelineCardClass}>
+				<button
+					type="button"
+					onClick={() => setOpen((v) => !v)}
+					aria-expanded={open}
+					className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-sub-600 hover:text-text-strong-950"
+				>
+					{plural(events.length, "automatic event")}
+					<Icon
+						name="chevron-right"
+						className={cn("size-3.5 transition-transform", open && "rotate-90")}
+					/>
+				</button>
+				{open ? (
+					<ul className="mt-2 space-y-1.5">
+						{events.map((event) => (
+							<li
+								key={event.id}
+								className="flex flex-wrap items-center justify-between gap-x-3 text-paragraph-xs text-text-soft-400"
+							>
+								<span>
+									<span className="text-text-sub-600">{titleFor(event)}</span>
+									{" · "}
+									{subtitleFor(event)}
+								</span>
+								<span className="tabular-nums">
+									{formatTimeAmPm(event.createdAt)}
+								</span>
+							</li>
+						))}
+					</ul>
+				) : null}
+			</div>
+		</TimelineItemWrapper>
+	);
+}
+
+type Item =
+	| { kind: "event"; event: ActivityEvent }
+	| { kind: "automatic"; events: ActivityEvent[] };
+
+/**
+ * Everything that happened to this email, grouped by day, newest first:
+ * each open and click with the reader's location, device, OS and browser
+ * and the raw request, then delivery. A day's automatic opens and link
+ * scanners fold into one row.
+ */
+export function EmailActivity({
+	events,
+	sentAt,
+	deliveredAt,
+	failedAt,
+}: {
+	events: ActivityEvent[];
+	sentAt?: string | null;
+	deliveredAt?: string | null;
+	failedAt?: string | null;
+}) {
+	const days = useMemo(() => {
+		const items: ActivityEvent[] = [...events];
+		const has = (type: string) => items.some((e) => e.type === type);
+		if (sentAt && !has("sent")) {
+			items.push({
+				id: "synthetic-sent",
+				type: "sent",
+				metadata: {},
+				createdAt: sentAt,
+			});
+		}
+		if (deliveredAt && !has("delivered")) {
+			items.push({
+				id: "synthetic-delivered",
+				type: "delivered",
+				metadata: {},
+				createdAt: deliveredAt,
+			});
+		}
+		if (failedAt && !has("failed") && !has("bounced")) {
+			items.push({
+				id: "synthetic-failed",
+				type: "failed",
+				metadata: {},
+				createdAt: failedAt,
+			});
+		}
+		const sorted = items
+			.filter((e) => KINDS[e.type])
+			.sort(
+				(a, b) =>
+					new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+			);
+
+		const grouped = new Map<string, { date: string; items: Item[] }>();
+		for (const event of sorted) {
+			const key = dayKey(event.createdAt);
+			const day = grouped.get(key) ?? { date: event.createdAt, items: [] };
+			if (metaOf(event).machine === true) {
+				const last = day.items.at(-1);
+				if (last?.kind === "automatic") last.events.push(event);
+				else day.items.push({ kind: "automatic", events: [event] });
+			} else {
+				day.items.push({ kind: "event", event });
+			}
+			grouped.set(key, day);
+		}
+		return [...grouped.values()];
+	}, [events, sentAt, deliveredAt, failedAt]);
+
+	return (
+		<div className="space-y-6 p-6 max-sm:px-4">
+			{days.map((day) => (
+				<section key={dayKey(day.date)}>
+					<h4 className="mb-2.5 font-semibold text-subheading-2xs text-text-sub-600 uppercase tracking-wider">
+						{formatDayHeader(day.date)}
+					</h4>
+					<div className="space-y-1.5">
+						{day.items.map((item, index) => {
+							const isLast = index === day.items.length - 1;
+							return item.kind === "event" ? (
+								<EventCard
+									key={item.event.id}
+									event={item.event}
+									isLast={isLast}
+								/>
+							) : (
+								<AutomaticEventsCard
+									key={item.events[0]?.id}
+									events={item.events}
+									isLast={isLast}
+								/>
 							);
 						})}
-					</tbody>
-				</table>
-			</div>
-		</section>
+					</div>
+				</section>
+			))}
+		</div>
 	);
 }

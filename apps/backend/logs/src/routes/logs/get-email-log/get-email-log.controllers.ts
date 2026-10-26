@@ -51,6 +51,8 @@ export async function getEmailLogController({
 				id: event.id,
 				type: event.type as string,
 				metadata: event.metadata ?? null,
+				requestHeaders: event.requestHeaders ?? null,
+				clientIp: event.clientIp ?? null,
 				createdAt: event.createdAt.toISOString(),
 			})),
 			source: send.source,

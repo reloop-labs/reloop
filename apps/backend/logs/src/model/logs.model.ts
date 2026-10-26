@@ -277,6 +277,17 @@ export namespace LogsModel {
 		id: t.String(),
 		type: t.String(),
 		metadata: t.Union([t.Any(), t.Null()]),
+		requestHeaders: t.Optional(
+			t.Union([t.Record(t.String(), t.String()), t.Null()], {
+				description:
+					"Raw headers of the open-pixel or click request (credentials removed)",
+			}),
+		),
+		clientIp: t.Optional(
+			t.Union([t.String(), t.Null()], {
+				description: "Address the open or click request came from",
+			}),
+		),
 		createdAt: t.String(),
 	});
 	export type EmailEventLine = typeof emailEventLine.static;
