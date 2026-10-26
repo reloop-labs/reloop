@@ -7,6 +7,15 @@ import { Fragment, useMemo } from "react";
 import { formatTimelineDate } from "./timeline-flow-node";
 import type { EmailEvent } from "./types";
 
+type TimelineStep = {
+	id: string;
+	stepType: string;
+	label: string;
+	icon: string;
+	onClick?: () => void;
+	isInteractive?: boolean;
+};
+
 export function EmailTimeline({
 	events,
 	sentAt,
@@ -14,7 +23,10 @@ export function EmailTimeline({
 	failedAt,
 	errorMessage,
 	isLoading = false,
+	onSentClick,
 	onDeliveredClick,
+	onOpenedClick,
+	onClickedClick,
 }: {
 	events: EmailEvent[];
 	sentAt?: string | null;
@@ -22,8 +34,14 @@ export function EmailTimeline({
 	failedAt?: string | null;
 	errorMessage?: string | null;
 	isLoading?: boolean;
+	/** Open the reception (SMTP) details when the Sent step is clicked */
+	onSentClick?: () => void;
 	/** Open delivered details sidebar when the completed Delivered step is clicked */
 	onDeliveredClick?: () => void;
+	/** Open the opens drawer when the completed Opened step is clicked */
+	onOpenedClick?: () => void;
+	/** Open the clicks drawer when the completed Clicked step is clicked */
+	onClickedClick?: () => void;
 }) {
 	const isFailed = useMemo(() => {
 		return (
@@ -81,7 +99,7 @@ export function EmailTimeline({
 		return list;
 	}, [events, sentAt, isFailed, failedAt, deliveredAt]);
 
-	const steps = useMemo(() => {
+	const steps = useMemo<TimelineStep[]>(() => {
 		if (isFailed) {
 			return [
 				{
@@ -89,6 +107,8 @@ export function EmailTimeline({
 					stepType: "sent",
 					label: "Sent",
 					icon: "send-1",
+					onClick: onSentClick,
+					isInteractive: !!onSentClick,
 				},
 				{
 					id: "failed",
@@ -104,6 +124,8 @@ export function EmailTimeline({
 				stepType: "sent",
 				label: "Sent",
 				icon: "send-1",
+				onClick: onSentClick,
+				isInteractive: !!onSentClick,
 			},
 			{
 				id: "delivered",
@@ -117,16 +139,20 @@ export function EmailTimeline({
 				id: "opened",
 				stepType: "opened",
 				label: "Opened",
-				icon: "eye-outline",
+				icon: "mail-open",
+				onClick: onOpenedClick,
+				isInteractive: !!onOpenedClick,
 			},
 			{
 				id: "clicked",
 				stepType: "clicked",
 				label: "Clicked",
 				icon: "cursor-click",
+				onClick: onClickedClick,
+				isInteractive: !!onClickedClick,
 			},
 		];
-	}, [isFailed, onDeliveredClick]);
+	}, [isFailed, onSentClick, onDeliveredClick, onOpenedClick, onClickedClick]);
 
 	const rows = steps.map((step) => {
 		// Apple Mail Privacy Protection and link scanners aren't a person
@@ -196,7 +222,7 @@ export function EmailTimeline({
 								<button
 									type="button"
 									onClick={row.onClick}
-									className="group flex w-full items-center gap-3 rounded-xl text-left outline-none focus-visible:ring-2 focus-visible:ring-success-base/40"
+									className="group flex w-full cursor-pointer items-center gap-3 rounded-xl text-left outline-none focus-visible:ring-2 focus-visible:ring-text-strong-950/30"
 									aria-label={`View ${row.label} details`}
 								>
 									{rowBody}
@@ -277,7 +303,7 @@ export function EmailTimeline({
 									<button
 										type="button"
 										onClick={row.onClick}
-										className="group flex flex-col items-center rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-success-base/40"
+										className="group flex cursor-pointer flex-col items-center rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-text-strong-950/30"
 										aria-label={`View ${row.label} details`}
 									>
 										{nodeBody}
@@ -299,6 +325,19 @@ export function EmailTimeline({
 	);
 }
 
+/** Per-step hover: stronger border, soft ring and a 1px lift, in the step's colour. */
+const HOVER_ICON: Record<string, string> = {
+	sent: "group-hover:border-information-base/40 group-hover:shadow-[0_0_0_3px_rgba(51,92,255,0.12)]",
+	delivered:
+		"group-hover:border-success-base/40 group-hover:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]",
+	opened:
+		"group-hover:border-orange-500/40 group-hover:shadow-[0_0_0_3px_rgba(234,88,12,0.12)]",
+	clicked:
+		"group-hover:border-purple-500/40 group-hover:shadow-[0_0_0_3px_rgba(147,51,234,0.12)]",
+	failed:
+		"group-hover:border-error-base/40 group-hover:shadow-[0_0_0_3px_rgba(239,68,68,0.12)]",
+};
+
 function getIconStyles(
 	stepType: string,
 	isCompleted: boolean,
@@ -307,25 +346,39 @@ function getIconStyles(
 	if (!isCompleted) {
 		return "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400";
 	}
+	const hover = isInteractive
+		? cn(HOVER_ICON[stepType] ?? HOVER_ICON.sent, "group-hover:-translate-y-px")
+		: undefined;
 	switch (stepType) {
 		case "sent":
-			return "border-information-base/20 bg-information-lighter/50 text-information-base";
+			return cn(
+				"border-information-base/20 bg-information-lighter/50 text-information-base",
+				hover,
+			);
 		case "failed":
 		case "bounced":
 		case "complaint":
-			return "border-error-light bg-error-lighter text-error-base";
+			return cn("border-error-light bg-error-lighter text-error-base", hover);
 		case "delivered":
 			return cn(
 				"border-success-base/20 bg-success-lighter/50 text-success-base",
-				isInteractive &&
-					"group-hover:border-success-base/40 group-hover:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]",
+				hover,
 			);
 		case "opened":
-			return "border-orange-500/20 bg-orange-50/50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400";
+			return cn(
+				"border-orange-500/20 bg-orange-50/50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400",
+				hover,
+			);
 		case "clicked":
-			return "border-purple-500/20 bg-purple-50/50 text-purple-600 dark:bg-purple-950/30 dark:text-purple-400";
+			return cn(
+				"border-purple-500/20 bg-purple-50/50 text-purple-600 dark:bg-purple-950/30 dark:text-purple-400",
+				hover,
+			);
 		default:
-			return "border-information-base/20 bg-information-lighter/50 text-information-base";
+			return cn(
+				"border-information-base/20 bg-information-lighter/50 text-information-base",
+				hover,
+			);
 	}
 }
 
@@ -337,23 +390,27 @@ function getBadgeStyles(
 	if (!isCompleted) {
 		return "bg-bg-weak-50 text-text-sub-600 dark:bg-neutral-900 dark:text-neutral-400";
 	}
+	const hover = isInteractive && "group-hover:underline underline-offset-2";
 	switch (stepType) {
 		case "sent":
-			return "bg-information-lighter text-information-base";
+			return cn("bg-information-lighter text-information-base", hover);
 		case "failed":
 		case "bounced":
 		case "complaint":
-			return "bg-error-lighter text-error-base";
+			return cn("bg-error-lighter text-error-base", hover);
 		case "delivered":
-			return cn(
-				"bg-success-lighter text-success-base",
-				isInteractive && "group-hover:underline",
-			);
+			return cn("bg-success-lighter text-success-base", hover);
 		case "opened":
-			return "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400";
+			return cn(
+				"bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400",
+				hover,
+			);
 		case "clicked":
-			return "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400";
+			return cn(
+				"bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400",
+				hover,
+			);
 		default:
-			return "bg-information-lighter text-information-base";
+			return cn("bg-information-lighter text-information-base", hover);
 	}
 }

@@ -18,7 +18,7 @@ export const OpenedStep = ({ event }: { event: EmailEvent | undefined }) => {
 							: "border-stroke-soft-200 bg-bg-weak-50",
 					)}
 				>
-					<Icon name="eye-outline" className="h-5 w-5" />
+					<Icon name="mail-open" className="h-5 w-5" />
 				</div>
 
 				<div className="flex flex-col items-center text-center">

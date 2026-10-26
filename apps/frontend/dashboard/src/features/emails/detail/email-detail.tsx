@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { MessageAttachments } from "#/features/agent-inbox/components/thread-detail/message-attachments";
@@ -18,6 +18,7 @@ import { useSmtpProviders } from "#/features/smtp/own-smtp/use-smtp-providers";
 import { EmailActivity } from "./email-activity";
 import { EmailHtmlPreview } from "./email-html-preview";
 import { EmailInsightsPanel } from "./email-insights-panel";
+import { EngagementDrawer, type EngagementKind } from "./engagement-drawer";
 import { formatHtml } from "./format-html";
 import { type SmtpDetailRow, SmtpResponseDrawer } from "./smtp-response-drawer";
 import { EmailTimeline } from "./timeline";
@@ -322,6 +323,16 @@ function buildSmtpRows(
 
 /** Synthetic row id used when an email is delivered but has no SMTP event. */
 const DELIVERED_SUMMARY_ROW_ID = "delivered-summary";
+const SENT_SUMMARY_ROW_ID = "sent-summary";
+
+/** Prefer the Reception/sent row (our server accepting the message) for the Sent step. */
+function pickSentSmtpRow(rows: SmtpDetailRow[]): SmtpDetailRow | null {
+	return (
+		rows.find((r) => r.kumoType.toLowerCase() === "reception") ??
+		rows.find((r) => r.type === "sent") ??
+		null
+	);
+}
 
 /** Prefer Delivery/delivered rows for the timeline Delivered step. */
 function pickDeliveredSmtpRow(rows: SmtpDetailRow[]): SmtpDetailRow | null {
@@ -470,7 +481,8 @@ export const EmailDetail = ({
 	onResend,
 	isResending,
 }: EmailDetailProps) => {
-	const [activeTab, setActiveTab] = useState<string>("preview");
+	// Active tab lives in ?tab= so a refresh or shared link lands on it.
+	const [tabParam, setTabParam] = useQueryState("tab", { history: "replace" });
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	// ?modal=smtp-response&id=<event id | delivered-summary>
@@ -494,10 +506,30 @@ export const EmailDetail = ({
 		[email?.deliveredAt],
 	);
 
+	const sentAt = email?.sentAt || email?.createdAt;
+	const sentSummaryRow = useMemo<SmtpDetailRow | null>(
+		() =>
+			sentAt
+				? {
+						id: SENT_SUMMARY_ROW_ID,
+						type: "sent",
+						kumoType: "Reception",
+						content: null,
+						code: 250,
+						createdAt: sentAt,
+					}
+				: null,
+		[sentAt],
+	);
+
 	const activeSmtpRow =
 		modal === "smtp-response" && smtpRowId
 			? (smtpRows.find((r) => r.id === smtpRowId) ??
-				(smtpRowId === DELIVERED_SUMMARY_ROW_ID ? deliveredSummaryRow : null))
+				(smtpRowId === DELIVERED_SUMMARY_ROW_ID
+					? deliveredSummaryRow
+					: smtpRowId === SENT_SUMMARY_ROW_ID
+						? sentSummaryRow
+						: null))
 			: null;
 	// Keep the last row so the drawer content stays put while it animates closed.
 	const lastSmtpRowRef = useRef<SmtpDetailRow | null>(null);
@@ -520,16 +552,25 @@ export const EmailDetail = ({
 		}
 	};
 
+	// Opened / Clicked step drawers; open state lives in ?modal= so reload keeps it.
+	const engagementKind: EngagementKind | null =
+		modal === "opens" ? "opened" : modal === "clicks" ? "clicked" : null;
+	const lastEngagementKind = useRef<EngagementKind | null>(null);
+	if (engagementKind) lastEngagementKind.current = engagementKind;
+	const hasEvent = (type: string) =>
+		(email?.events ?? []).some((e) => e.type === type);
+	const openOpens = useCallback(() => void setModal("opens"), [setModal]);
+	const openClicks = useCallback(() => void setModal("clicks"), [setModal]);
+
+	const openSentDetail = useCallback(() => {
+		const row = pickSentSmtpRow(smtpRows) ?? sentSummaryRow;
+		if (row) openSmtpDetail(row);
+	}, [sentSummaryRow, openSmtpDetail, smtpRows]);
+
 	const openDeliveredDetail = useCallback(() => {
 		const row = pickDeliveredSmtpRow(smtpRows) ?? deliveredSummaryRow;
 		if (row) openSmtpDetail(row);
 	}, [deliveredSummaryRow, openSmtpDetail, smtpRows]);
-
-	useEffect(() => {
-		if (email) {
-			setActiveTab(email.htmlBody ? "preview" : "plain");
-		}
-	}, [email]);
 
 	const tabItems = useMemo(() => {
 		if (email && !email.htmlBody) {
@@ -599,6 +640,17 @@ export const EmailDetail = ({
 			},
 		];
 	}, [email]);
+
+	const defaultTab = email && !email.htmlBody ? "plain" : "preview";
+	const activeTab =
+		tabParam && tabItems.some((item) => item.value === tabParam)
+			? tabParam
+			: defaultTab;
+	// The default tab keeps the URL clean; any other tab is written to ?tab=.
+	const setActiveTab = useCallback(
+		(value: string) => void setTabParam(value === defaultTab ? null : value),
+		[defaultTab, setTabParam],
+	);
 
 	useHotkeys(
 		"1",
@@ -817,8 +869,15 @@ export const EmailDetail = ({
 					failedAt={email?.failedAt}
 					errorMessage={email?.errorMessage}
 					isLoading={isLoading}
+					onSentClick={!isLoading && sentAt ? openSentDetail : undefined}
 					onDeliveredClick={
 						!isLoading && email?.deliveredAt ? openDeliveredDetail : undefined
+					}
+					onOpenedClick={
+						!isLoading && hasEvent("opened") ? openOpens : undefined
+					}
+					onClickedClick={
+						!isLoading && hasEvent("clicked") ? openClicks : undefined
 					}
 				/>
 			</section>
@@ -837,6 +896,15 @@ export const EmailDetail = ({
 				row={smtpDetail}
 				open={smtpDrawerOpen}
 				onOpenChange={handleSmtpDrawerOpenChange}
+			/>
+
+			<EngagementDrawer
+				kind={engagementKind ?? lastEngagementKind.current}
+				events={email?.events ?? []}
+				open={!!engagementKind && !isLoading}
+				onOpenChange={(open) => {
+					if (!open) void setModal(null);
+				}}
 			/>
 
 			{/* Content Preview Tabs */}

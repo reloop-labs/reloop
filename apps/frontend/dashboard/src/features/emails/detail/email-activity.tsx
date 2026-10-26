@@ -67,7 +67,7 @@ const KINDS: Record<string, Kind> = {
 		icon: "alert-triangle",
 		color: COLOR.red,
 	},
-	opened: { label: "Opened", icon: "eye-outline", color: COLOR.orange },
+	opened: { label: "Opened", icon: "mail-open", color: COLOR.orange },
 	clicked: {
 		label: "Clicked a link",
 		icon: "cursor-click",
@@ -220,7 +220,7 @@ function subtitleFor(event: ActivityEvent): ReactNode {
 	return null;
 }
 
-/** The raw request behind an open or click: IP and headers, always shown. */
+/** The raw request behind an open or click: IP and headers. */
 function RequestDetails({ event }: { event: ActivityEvent }) {
 	const entries = Object.entries(event.requestHeaders ?? {});
 	if (entries.length === 0 && !event.clientIp) return null;
@@ -255,7 +255,32 @@ function EventCard({
 	const isMachine = meta.machine === true;
 	const subtitle = subtitleFor(event);
 	const chips = isMachine ? [] : chipsFor(meta);
-	const isRequest = event.type === "opened" || event.type === "clicked";
+	const hasRequest =
+		(event.type === "opened" || event.type === "clicked") &&
+		!isMachine &&
+		(Object.keys(event.requestHeaders ?? {}).length > 0 || !!event.clientIp);
+	const [showRequest, setShowRequest] = useState(false);
+
+	// Chevron at the end of the chip row (or the subtitle when there are no
+	// chips) that reveals the raw request.
+	const toggle = hasRequest ? (
+		<button
+			type="button"
+			onClick={() => setShowRequest((v) => !v)}
+			aria-expanded={showRequest}
+			aria-label={showRequest ? "Hide request details" : "Show request details"}
+			title={showRequest ? "Hide request details" : "Show request details"}
+			className="inline-flex size-6 shrink-0 items-center justify-center rounded-md text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
+		>
+			<Icon
+				name="chevron-down"
+				className={cn(
+					"size-3.5 transition-transform",
+					showRequest && "rotate-180",
+				)}
+			/>
+		</button>
+	) : null;
 
 	return (
 		<TimelineItemWrapper
@@ -283,16 +308,21 @@ function EventCard({
 					<TimelineMeta createdAt={event.createdAt} />
 				</div>
 				{subtitle ? (
-					<div className="mt-1 flex text-paragraph-xs text-text-soft-400">
+					<div className="mt-1 flex items-center gap-1 text-paragraph-xs text-text-soft-400">
 						{subtitle}
+						{chips.length === 0 ? toggle : null}
 					</div>
 				) : null}
 				{chips.length > 0 ? (
 					<div className="mt-2 flex flex-wrap items-center gap-1.5">
 						{chips}
+						{toggle}
 					</div>
 				) : null}
-				{isRequest && !isMachine ? <RequestDetails event={event} /> : null}
+				{!subtitle && chips.length === 0 && toggle ? (
+					<div className="mt-1">{toggle}</div>
+				) : null}
+				{showRequest ? <RequestDetails event={event} /> : null}
 			</div>
 		</TimelineItemWrapper>
 	);
@@ -353,6 +383,30 @@ type Item =
 	| { kind: "event"; event: ActivityEvent }
 	| { kind: "automatic"; events: ActivityEvent[] };
 
+/** Newest first, by day; a run of automatic events folds into one row. */
+function groupByDay(items: ActivityEvent[]): { date: string; items: Item[] }[] {
+	const sorted = items
+		.filter((e) => KINDS[e.type])
+		.sort(
+			(a, b) =>
+				new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+		);
+	const grouped = new Map<string, { date: string; items: Item[] }>();
+	for (const event of sorted) {
+		const key = dayKey(event.createdAt);
+		const day = grouped.get(key) ?? { date: event.createdAt, items: [] };
+		if (metaOf(event).machine === true) {
+			const last = day.items.at(-1);
+			if (last?.kind === "automatic") last.events.push(event);
+			else day.items.push({ kind: "automatic", events: [event] });
+		} else {
+			day.items.push({ kind: "event", event });
+		}
+		grouped.set(key, day);
+	}
+	return [...grouped.values()];
+}
+
 /**
  * Everything that happened to this email, grouped by day, newest first:
  * each open and click with the reader's location, device, OS and browser
@@ -364,13 +418,19 @@ export function EmailActivity({
 	sentAt,
 	deliveredAt,
 	failedAt,
+	only,
 }: {
 	events: ActivityEvent[];
 	sentAt?: string | null;
 	deliveredAt?: string | null;
 	failedAt?: string | null;
+	/** Show just opens or just clicks (the step drawers), without delivery. */
+	only?: "opened" | "clicked";
 }) {
 	const days = useMemo(() => {
+		if (only) {
+			return groupByDay(events.filter((e) => e.type === only));
+		}
 		const items: ActivityEvent[] = [...events];
 		const has = (type: string) => items.some((e) => e.type === type);
 		if (sentAt && !has("sent")) {
@@ -397,31 +457,11 @@ export function EmailActivity({
 				createdAt: failedAt,
 			});
 		}
-		const sorted = items
-			.filter((e) => KINDS[e.type])
-			.sort(
-				(a, b) =>
-					new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-			);
-
-		const grouped = new Map<string, { date: string; items: Item[] }>();
-		for (const event of sorted) {
-			const key = dayKey(event.createdAt);
-			const day = grouped.get(key) ?? { date: event.createdAt, items: [] };
-			if (metaOf(event).machine === true) {
-				const last = day.items.at(-1);
-				if (last?.kind === "automatic") last.events.push(event);
-				else day.items.push({ kind: "automatic", events: [event] });
-			} else {
-				day.items.push({ kind: "event", event });
-			}
-			grouped.set(key, day);
-		}
-		return [...grouped.values()];
-	}, [events, sentAt, deliveredAt, failedAt]);
+		return groupByDay(items);
+	}, [events, sentAt, deliveredAt, failedAt, only]);
 
 	return (
-		<div className="space-y-6 p-6 max-sm:px-4">
+		<div className="space-y-6">
 			{days.map((day) => (
 				<section key={dayKey(day.date)}>
 					<h4 className="mb-2.5 font-semibold text-subheading-2xs text-text-sub-600 uppercase tracking-wider">

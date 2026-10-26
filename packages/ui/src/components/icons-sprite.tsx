@@ -2473,6 +2473,16 @@ export const IconsSprite = () => (
 					strokeLinecap="round"
 				/>
 			</symbol>
+			{/* mail-single with the flap folded open: same body, stroke and caps. */}
+			<symbol id="mail-open" fill="none" viewBox="0 0 24 24">
+				<path
+					d="M2 10.5V13C2 15.8003 2 17.2004 2.54497 18.27C3.02433 19.2108 3.78924 19.9757 4.73005 20.455C5.79961 21 7.19974 21 10 21H14C16.8003 21 18.2004 21 19.27 20.455C20.2108 19.9757 20.9757 19.2108 21.455 18.27C22 17.2004 22 15.8003 22 13V10.5M2 10.5C2 9.70508 2.35377 8.95141 2.96515 8.44335L9.9 3.58C11.1505 2.70254 12.8495 2.70254 14.1 3.58L21.0349 8.44335C21.6462 8.95141 22 9.70508 22 10.5M2 10.5L9.5624 15.5416C11.0381 16.5254 12.9619 16.5254 14.4376 15.5416L22 10.5"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="mail-send" fill="none" viewBox="0 0 24 24">
 				<defs>
 					<mask id="mail-send-mask">
