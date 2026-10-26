@@ -8,7 +8,7 @@ keywords:
   - sveltekit transactional email
   - sveltekit contact form email
   - svelte 5 send email
-publishedAt: 2026-09-01
+publishedAt: 2026-02-24
 category: Tutorials
 tags: [sveltekit, svelte, nodejs, sdk, form-actions]
 readTime: 10 min read
@@ -292,7 +292,7 @@ await reloop.mail.send({
   reply_to: "support@acme.com",
   cc: "ops@acme.com",
   bcc: "archive@acme.com",
-  scheduled_at: "2026-09-02T09:00:00Z", // send later (ISO 8601)
+  scheduled_at: "2026-02-25T09:00:00Z", // send later (ISO 8601)
   tags: [{ name: "type", value: "shipping" }],
   attachments: [{ filename: "invoice.pdf", content: base64Pdf }],
 });

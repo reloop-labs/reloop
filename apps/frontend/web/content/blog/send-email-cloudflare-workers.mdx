@@ -8,7 +8,7 @@ keywords:
   - edge runtime email
   - cloudflare workers transactional email
   - wrangler send email
-publishedAt: 2026-09-05
+publishedAt: 2026-04-21
 category: Tutorials
 tags: [cloudflare, edge, workers, http-api, tutorial]
 readTime: 9 min read
@@ -186,7 +186,7 @@ A successful send returns the email's ID and the SMTP message ID:
   "id": "em_…",
   "messageId": "<…@mail.acme.com>",
   "status": "sent",
-  "timestamp": "2026-09-05T10:00:00.000Z"
+  "timestamp": "2026-04-21T10:00:00.000Z"
 }
 ```
 
@@ -218,7 +218,7 @@ Enable the flag in `wrangler.jsonc`:
 {
   "name": "acme-mailer",
   "main": "src/index.ts",
-  "compatibility_date": "2026-09-01",
+  "compatibility_date": "2026-04-15",
   "compatibility_flags": ["nodejs_compat"]
 }
 ```
