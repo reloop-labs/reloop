@@ -24,9 +24,6 @@ import { CompareTitleIcon } from "./compare-title-icon";
 const GRID_COLS =
 	"grid-cols-2 sm:grid-cols-[minmax(200px,1.45fr)_repeat(2,minmax(150px,1fr))]";
 
-/** Reloop is the highlighted column, like the recommended plan on /pricing. */
-const RELOOP_TINT = "bg-bg-weak-50/40 dark:bg-white/[0.02]";
-
 const DASH = "—";
 
 /** Plain values that describe something missing or do-it-yourself, shown with a cross. */
@@ -120,12 +117,7 @@ export function GridSpacerRow() {
 	return (
 		<>
 			<div className="col-span-full h-10 border-stroke-soft-100 border-b sm:col-span-1 sm:h-14 dark:border-white/10" />
-			<div
-				className={cn(
-					"hidden h-14 border-stroke-soft-100 border-b border-l sm:block dark:border-white/10",
-					RELOOP_TINT,
-				)}
-			/>
+			<div className="hidden h-14 border-stroke-soft-100 border-b border-l sm:block dark:border-white/10" />
 			<div className="hidden h-14 border-stroke-soft-100 border-b border-l sm:block dark:border-white/10" />
 		</>
 	);
@@ -151,12 +143,7 @@ export function GridSectionTitle({
 					{label}
 				</span>
 			</div>
-			<div
-				className={cn(
-					"hidden border-stroke-soft-100 border-b border-l py-5 sm:block dark:border-white/[0.07]",
-					RELOOP_TINT,
-				)}
-			/>
+			<div className="hidden border-stroke-soft-100 border-b border-l py-5 sm:block dark:border-white/[0.07]" />
 			<div className="hidden border-stroke-soft-100 border-b border-l py-5 sm:block dark:border-white/[0.07]" />
 		</>
 	);
@@ -177,12 +164,7 @@ export function GridRow({
 			<div className="col-span-full flex items-center px-4 pt-4 pb-3 font-medium text-[14px] text-text-strong-950 group-hover/row:bg-bg-weak-50/70 sm:col-span-1 sm:min-h-[60px] sm:border-stroke-soft-100 sm:border-b sm:px-7 sm:py-4 sm:font-normal lg:px-9 dark:text-white sm:dark:border-white/[0.07] dark:group-hover/row:bg-white/[0.03]">
 				{label}
 			</div>
-			<div
-				className={cn(
-					"flex items-start border-stroke-soft-100 border-t border-b px-4 py-3.5 group-hover/row:bg-bg-weak-50/90 sm:min-h-[60px] sm:items-center sm:border-t-0 sm:border-l sm:px-8 sm:py-4 dark:border-white/[0.07] dark:group-hover/row:bg-white/[0.05]",
-					RELOOP_TINT,
-				)}
-			>
+			<div className="flex items-start border-stroke-soft-100 border-t border-b px-4 py-3.5 group-hover/row:bg-bg-weak-50/70 sm:min-h-[60px] sm:items-center sm:border-t-0 sm:border-l sm:px-8 sm:py-4 dark:border-white/[0.07] dark:group-hover/row:bg-white/[0.03]">
 				{reloop}
 			</div>
 			<div className="flex items-start border-stroke-soft-100 border-t border-b border-l px-4 py-3.5 group-hover/row:bg-bg-weak-50/70 sm:min-h-[60px] sm:items-center sm:border-t-0 sm:px-8 sm:py-4 dark:border-white/[0.07] dark:group-hover/row:bg-white/[0.03]">
@@ -211,7 +193,7 @@ export function ComparisonGridFrame({
 	children: ReactNode;
 }) {
 	return (
-		<div className="-mb-px overflow-x-auto lg:overflow-visible">
+		<div className="-mb-px sm:overflow-x-auto lg:overflow-visible">
 			<div
 				className={cn(
 					"grid w-full border-stroke-soft-100 border-t sm:min-w-[560px] dark:border-white/10",
@@ -226,7 +208,7 @@ export function ComparisonGridFrame({
 						{title}
 					</h3>
 				</div>
-				<div className="z-30 flex flex-col justify-center border-stroke-soft-100 border-b bg-bg-weak-50/95 px-4 py-5 backdrop-blur-md sm:border-l sm:px-8 sm:py-7 lg:sticky lg:top-16 dark:border-white/10 dark:bg-white/[0.05]">
+				<div className="z-30 flex flex-col justify-center border-stroke-soft-100 border-b bg-bg-white-0/95 px-4 py-5 backdrop-blur-md max-sm:sticky max-sm:top-14 sm:border-l sm:px-8 sm:py-7 lg:sticky lg:top-16 dark:border-white/10 dark:bg-black/95">
 					<span className="flex items-center gap-2 font-semibold text-[16px] text-text-strong-950 leading-none tracking-tight sm:gap-2.5 sm:text-[18px] dark:text-white">
 						<span className="flex size-7 items-center justify-center overflow-hidden">
 							<Logo className="size-10 shrink-0" />
@@ -234,7 +216,7 @@ export function ComparisonGridFrame({
 						Reloop
 					</span>
 				</div>
-				<div className="z-30 flex flex-col justify-center border-stroke-soft-100 border-b border-l bg-bg-white-0/95 px-4 py-5 backdrop-blur-md sm:px-8 sm:py-7 lg:sticky lg:top-16 dark:border-white/10 dark:bg-black/95">
+				<div className="z-30 flex flex-col justify-center border-stroke-soft-100 border-b border-l bg-bg-white-0/95 px-4 py-5 backdrop-blur-md max-sm:sticky max-sm:top-14 sm:px-8 sm:py-7 lg:sticky lg:top-16 dark:border-white/10 dark:bg-black/95">
 					<span className="flex items-center gap-2 font-semibold text-[16px] text-text-strong-950 leading-none tracking-tight sm:gap-2.5 sm:text-[18px] dark:text-white">
 						{icon ? (
 							<BrandIcon

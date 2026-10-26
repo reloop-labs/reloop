@@ -1,7 +1,7 @@
 "use client";
 
 import { HoverCard } from "radix-ui";
-import type { ReactNode } from "react";
+import { type ReactNode, useRef, useState } from "react";
 
 /** Hover card body: icon + feature name, then a one-line explanation. */
 export function FeatureHintCard({
@@ -28,7 +28,10 @@ export function FeatureHintCard({
 	);
 }
 
-/** Row label with the wavy underline that opens a FeatureHintCard on hover (pricing and compare tables). */
+/**
+ * Row label with the wavy underline that opens a FeatureHintCard on hover (pricing and compare tables).
+ * Touch screens have no hover, so a tap toggles the card; tapping outside closes it.
+ */
 export function FeatureHintLabel({
 	label,
 	children,
@@ -37,10 +40,30 @@ export function FeatureHintLabel({
 	/** Card content, usually a FeatureHintCard. */
 	children: ReactNode;
 }) {
+	const [open, setOpen] = useState(false);
+	const triggerRef = useRef<HTMLSpanElement>(null);
+	// Radix ignores touch for hover cards; remember how the last press started so a mouse click doesn't fight the hover.
+	const pointerTypeRef = useRef("");
+
 	return (
-		<HoverCard.Root openDelay={100} closeDelay={150}>
+		<HoverCard.Root
+			open={open}
+			onOpenChange={setOpen}
+			openDelay={100}
+			closeDelay={150}
+		>
 			<HoverCard.Trigger asChild>
-				<span className="relative cursor-pointer text-body-default text-text-strong-950 underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-text-strong-950 dark:text-white dark:hover:decoration-white">
+				<span
+					ref={triggerRef}
+					onPointerDown={(event) => {
+						pointerTypeRef.current = event.pointerType;
+					}}
+					onClick={() => {
+						if (pointerTypeRef.current === "mouse") return;
+						setOpen((current) => !current);
+					}}
+					className="relative cursor-pointer text-body-default text-text-strong-950 underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-text-strong-950 dark:text-white dark:hover:decoration-white"
+				>
 					{label}
 				</span>
 			</HoverCard.Trigger>
@@ -50,6 +73,12 @@ export function FeatureHintLabel({
 					align="start"
 					sideOffset={10}
 					collisionPadding={16}
+					// The trigger toggles on its own, so a tap on it must not also count as "outside".
+					onPointerDownOutside={(event) => {
+						if (triggerRef.current?.contains(event.target as Node)) {
+							event.preventDefault();
+						}
+					}}
 					className="fade-in-0 zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 z-50 animate-in outline-none duration-150 data-[state=closed]:animate-out"
 				>
 					{children}
