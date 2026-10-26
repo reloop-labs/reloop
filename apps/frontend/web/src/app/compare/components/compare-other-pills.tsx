@@ -28,8 +28,8 @@ export function CompareOtherPills({
 	].filter((link) => link.href !== currentHref);
 
 	return (
-		<section>
-			<h2 className="px-4 pt-16 pb-6 font-medium text-[15px] text-text-strong-950 sm:px-8 sm:pt-20 lg:px-12 dark:text-white">
+		<section className="border-stroke-soft-100 border-b dark:border-white/10">
+			<h2 className="px-4 py-6 font-medium text-[15px] text-text-strong-950 sm:px-8 lg:px-12 dark:text-white">
 				Other comparisons
 			</h2>
 			{/* Bordered cells like the price table; the last column drops its right edge into the frame. */}
