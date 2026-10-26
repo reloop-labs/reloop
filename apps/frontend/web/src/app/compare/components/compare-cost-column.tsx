@@ -71,6 +71,9 @@ function ProviderMark({ id }: { id: string }) {
 const formatCount = (value: number) =>
 	new Intl.NumberFormat("en-US").format(value);
 
+/** Each block pads itself so the slider's dividers run edge to edge of the column. */
+const BLOCK_INSET = "px-6 sm:px-10 lg:px-12";
+
 export function CompareCostColumn({ mode }: { mode: CostMode }) {
 	const config = costModes[mode];
 	const labelId = useId();
@@ -81,7 +84,7 @@ export function CompareCostColumn({ mode }: { mode: CostMode }) {
 
 	return (
 		<div className="flex h-full flex-col">
-			<div>
+			<div className={BLOCK_INSET}>
 				<h3 className="font-semibold text-[18px] text-text-strong-950 tracking-tight sm:text-[19px] dark:text-white">
 					{config.title}
 				</h3>
@@ -90,7 +93,12 @@ export function CompareCostColumn({ mode }: { mode: CostMode }) {
 				</p>
 			</div>
 
-			<div className="mt-6 space-y-4">
+			<div
+				className={cn(
+					BLOCK_INSET,
+					"mt-8 space-y-4 border-stroke-soft-100 border-y py-8 dark:border-white/10",
+				)}
+			>
 				<div className="flex items-center justify-between gap-3">
 					<span
 						id={labelId}
@@ -117,7 +125,7 @@ export function CompareCostColumn({ mode }: { mode: CostMode }) {
 			</div>
 
 			<ul
-				className="mt-6 flex flex-col"
+				className={cn(BLOCK_INSET, "mt-6 flex flex-col")}
 				style={{ minHeight: `${MAX_ROWS * 2.25}rem` }}
 				aria-live="polite"
 			>
