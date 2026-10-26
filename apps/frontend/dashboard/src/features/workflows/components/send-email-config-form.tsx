@@ -15,6 +15,11 @@ import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
+import {
+	canSendFrom,
+	getFromDomainError,
+	NoSendingDomainNotice,
+} from "#/features/domain/sending-readiness";
 import { TemplateFieldRow } from "#/features/templates/editor/components/send-details/template-field-row";
 import {
 	createTemplate,
@@ -477,12 +482,7 @@ const WorkflowSenderSection = ({
 
 	const verifiedSendingDomains = useMemo(() => {
 		const list = domainsQuery.data?.domains || [];
-		return list.filter((d) => {
-			const isVerified =
-				d.status === "active" || d.systemVerified || d.userVerifiedDomain;
-			const isSending = d.isSendingEmailEnabled !== false;
-			return isVerified && isSending;
-		});
+		return list.filter(canSendFrom);
 	}, [domainsQuery.data?.domains]);
 
 	const verifiedDomainNames = useMemo(
@@ -782,13 +782,10 @@ const WorkflowSenderSection = ({
 					"Please enter a valid email address (e.g., sender@example.com).",
 			};
 		} else if (!isFromDomainVerified && !domainsQuery.isLoading) {
-			fromError = {
-				title: "Domain Verification Required",
-				description:
-					"You cannot send from unverified domains. Please verify this domain to use it.",
-				actionText: "Configure Domain Settings",
-				actionLink: "/domain",
-			};
+			fromError = getFromDomainError(
+				domainsQuery.data?.domains ?? [],
+				fromDomain,
+			);
 		}
 	}
 
@@ -908,28 +905,9 @@ const WorkflowSenderSection = ({
 										<span>Fetching verified sending domains...</span>
 									</div>
 								) : verifiedSendingDomains.length === 0 ? (
-									<div className="flex flex-col gap-2 p-3 text-left">
-										<div className="flex items-center gap-2 text-text-sub-600">
-											<Icon
-												name="alert-circle"
-												className="h-4 w-4 text-warning-base"
-											/>
-											<span className="font-medium text-label-xs text-text-strong-950">
-												No Sending Domains Found
-											</span>
-										</div>
-										<p className="text-paragraph-xs text-text-sub-600">
-											You must have at least one verified domain with sending
-											enabled to send emails.
-										</p>
-										<Link
-											href="/domain"
-											className="inline-flex items-center gap-1 font-semibold text-paragraph-xs text-primary-base transition-colors hover:text-primary-hover hover:underline"
-										>
-											Configure Domain Settings
-											<Icon name="arrow-right" className="h-3 w-3" />
-										</Link>
-									</div>
+									<NoSendingDomainNotice
+										domains={domainsQuery.data?.domains ?? []}
+									/>
 								) : (
 									<div>
 										{suggestions.map((item, idx) => {

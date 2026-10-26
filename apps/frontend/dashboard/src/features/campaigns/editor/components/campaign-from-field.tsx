@@ -10,6 +10,11 @@ import type React from "react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
+import {
+	canSendFrom,
+	getFromDomainError,
+	NoSendingDomainNotice,
+} from "#/features/domain/sending-readiness";
 import { useCampaignEditorStore } from "../campaign-editor-store";
 import { CampaignFieldRow } from "./campaign-field-row";
 
@@ -147,12 +152,7 @@ export const CampaignFromField = () => {
 	// Filter domains that have sending enabled & verified
 	const verifiedSendingDomains = useMemo(() => {
 		const list = domainsQuery.data?.domains || [];
-		return list.filter((d) => {
-			const isVerified =
-				d.status === "active" || d.systemVerified || d.userVerifiedDomain;
-			const isSending = d.isSendingEmailEnabled !== false;
-			return isVerified && isSending;
-		});
+		return list.filter(canSendFrom);
 	}, [domainsQuery.data?.domains]);
 
 	const verifiedDomainNames = useMemo(
@@ -446,13 +446,10 @@ export const CampaignFromField = () => {
 					"Please enter a valid email address (e.g., sender@example.com).",
 			};
 		} else if (!isFromDomainVerified && !domainsQuery.isLoading) {
-			fromError = {
-				title: "Domain Verification Required",
-				description:
-					"You cannot send from unverified domains. Please verify this domain to use it.",
-				actionText: "Configure Domain Settings",
-				actionLink: "/domain",
-			};
+			fromError = getFromDomainError(
+				domainsQuery.data?.domains ?? [],
+				fromDomain,
+			);
 		}
 	}
 
@@ -564,21 +561,9 @@ export const CampaignFromField = () => {
 										<span>Fetching verified sending domains...</span>
 									</div>
 								) : verifiedSendingDomains.length === 0 ? (
-									<div className="flex flex-col gap-2 p-3 text-left">
-										<div className="flex items-center gap-2 text-text-sub-600">
-											<Icon
-												name="alert-circle"
-												className="h-4 w-4 text-warning-base"
-											/>
-											<span className="font-medium text-label-xs text-text-strong-950">
-												No Sending Domains Found
-											</span>
-										</div>
-										<p className="text-paragraph-xs text-text-sub-600">
-											You must have at least one verified domain with sending
-											enabled to dispatch campaigns.
-										</p>
-									</div>
+									<NoSendingDomainNotice
+										domains={domainsQuery.data?.domains ?? []}
+									/>
 								) : (
 									<div className="max-h-56 overflow-y-auto">
 										{suggestions.map((item, idx) => {

@@ -26,6 +26,7 @@ import {
 	actionKbdOnSolidClassName,
 } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
+import { canSendFrom } from "#/features/domain/sending-readiness";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
@@ -140,11 +141,7 @@ export function TestEmailModal({
 	});
 	const verifiedDomain = useMemo(() => {
 		const list = domainsQuery.data?.domains || [];
-		return list.find(
-			(d) =>
-				(d.status === "active" || d.systemVerified || d.userVerifiedDomain) &&
-				d.isSendingEmailEnabled !== false,
-		)?.domain;
+		return list.find(canSendFrom)?.domain;
 	}, [domainsQuery.data?.domains]);
 	const [fromInput, setFromInput] = useState("");
 	const fromField = useFieldError<HTMLInputElement>();
