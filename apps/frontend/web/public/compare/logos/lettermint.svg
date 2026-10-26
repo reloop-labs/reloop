@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="330px" height="334px" viewBox="0 0 330 334" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group 21 Copy</title>
+    <g id="Trash" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-435, -433)">
+            <g id="Group-21-Copy" transform="translate(435, 433)">
+                <path d="M330,200.846325 L330,305.794729 C330,321.35412 317.379078,334 301.850394,334 L28.1496063,334 C12.6209224,334 0,321.35412 0,305.794729 L0,167 L166.658043,250.5 L299.870641,182.249443 C313.667042,175.244618 330,185.348924 330,200.846325" id="Fill-18" fill="#2D6A4F"></path>
+                <path d="M167,28.2362658 L167,167 L0,167 L0,28.2362658 C0,12.6396808 12.6396808,0 28.2362658,0 L138.763734,0 C154.360319,0 167,12.6396808 167,28.2362658" id="Fill-19" fill="#2D6A4F"></path>
+                <path d="M330,201.048998 L330,201.048998 C330,185.458797 313.667042,175.293987 299.870641,182.340757 L166.658043,251 L0,167 L296.220472,167 C314.873453,167 330,182.247216 330,201.048998" id="Fill-20" fill-opacity="0.829190341" fill="#40916C"></path>
+            </g>
+        </g>
+    </g>
+</svg>

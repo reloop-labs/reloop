@@ -6,7 +6,6 @@ import {
 } from "@reloop/ui/pricing/feature-hint";
 import { PlanCheckmark, PlanCrossIcon } from "@reloop/ui/pricing/marks";
 import { Fragment, type ReactNode } from "react";
-import type { SimpleIcon } from "simple-icons";
 import { getFeatureHint } from "../compare-feature-hints";
 import type {
 	ComparisonCategory,
@@ -14,7 +13,7 @@ import type {
 	ComparisonFeatureRow,
 } from "../compare-types";
 import { competitorBrands } from "../competitor-brands";
-import { BrandIcon } from "./brand-icon";
+import { BrandIcon, type BrandMark } from "./brand-icon";
 import { CompareTitleIcon } from "./compare-title-icon";
 
 /**
@@ -189,7 +188,7 @@ export function ComparisonGridFrame({
 	competitorName: string;
 	eyebrow: string;
 	title: string;
-	icon?: Pick<SimpleIcon, "hex" | "path">;
+	icon?: BrandMark;
 	children: ReactNode;
 }) {
 	return (
@@ -246,7 +245,7 @@ export function CompareFeatureGrid({
 	categories?: ComparisonCategory[];
 	/** Flat list for pages without categories; rendered as one untitled section. */
 	features?: ComparisonFeatureRow[];
-	icon?: Pick<SimpleIcon, "hex" | "path">;
+	icon?: BrandMark;
 }) {
 	// Pricing rows live in the "02 · Price" section, so the feature table skips them.
 	// The data keeps them for the .md twins and agent content.

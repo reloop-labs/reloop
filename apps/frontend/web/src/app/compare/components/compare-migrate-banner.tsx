@@ -3,8 +3,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import Link from "next/link";
-import type { SimpleIcon } from "simple-icons";
-import { BrandIcon } from "./brand-icon";
+import { BrandIcon, type BrandMark } from "./brand-icon";
 
 /** "Moving from X?" card: what switching takes, the migration guide, and both logos. */
 export function CompareMigrateBanner({
@@ -13,7 +12,7 @@ export function CompareMigrateBanner({
 	guideHref,
 }: {
 	competitorName: string;
-	icon?: Pick<SimpleIcon, "hex" | "path">;
+	icon?: BrandMark;
 	guideHref: string;
 }) {
 	return (

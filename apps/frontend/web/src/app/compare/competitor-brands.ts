@@ -1,5 +1,16 @@
 import type { SimpleIcon } from "simple-icons";
-import { siLoops, siMailchimp, siMailgun, siResend } from "simple-icons";
+import {
+	siBrevo,
+	siCloudflare,
+	siListmonk,
+	siLoops,
+	siMailchimp,
+	siMailgun,
+	siMailtrap,
+	siResend,
+	siSparkpost,
+} from "simple-icons";
+import type { BrandMark } from "./components/brand-icon";
 
 type BrandIconData = Pick<SimpleIcon, "title" | "slug" | "hex" | "path">;
 
@@ -37,4 +48,44 @@ export const competitorBrands = [
 
 export function getCompetitorByHref(href: string) {
 	return competitorBrands.find((brand) => brand.href === href);
+}
+
+/** An image logo from the competitor's own site, saved under public/compare/logos. */
+function logo(file: string, hex: string, invertInDark = false): BrandMark {
+	return { hex, path: "", src: `/compare/logos/${file}`, invertInDark };
+}
+
+/**
+ * Marks for the competitors that only have a page built from their
+ * "Reloop vs X" post, keyed by slug. simple-icons where it has the brand,
+ * otherwise the favicon or app icon from the competitor's site.
+ */
+const postCompetitorMarks: Record<string, BrandMark> = {
+	agentmail: logo("agentmail.png", "000000"),
+	brevo: siBrevo,
+	"cloudflare-email": siCloudflare,
+	"customer-io": logo("customer-io.svg", "B2F6B4"),
+	"elastic-email": logo("elastic-email.png", "5051F9"),
+	lettermint: logo("lettermint.svg", "2D6A4F"),
+	listmonk: siListmonk,
+	// Mandrill is Mailchimp Transactional and ships under Mailchimp's brand.
+	mandrill: siMailchimp,
+	mailersend: logo("mailersend.svg", "4F46E5"),
+	mailjet: logo("mailjet.png", "9585F4"),
+	mailpace: logo("mailpace.svg", "F4900C"),
+	mailtrap: siMailtrap,
+	plunk: logo("plunk.svg", "000000", true),
+	postal: logo("postal.png", "FFC107"),
+	smtp2go: logo("smtp2go.png", "4A90E2"),
+	sparkpost: siSparkpost,
+	sweego: logo("sweego.png", "6EE7A8"),
+	usesend: logo("usesend.png", "000000"),
+	zeptomail: logo("zeptomail.svg", "226DB4"),
+};
+
+/** The brand mark for any /compare/<slug> page, hand-written or built from a post. */
+export function getCompetitorMark(slug: string): BrandMark | undefined {
+	return (
+		getCompetitorByHref(`/compare/${slug}`)?.icon ?? postCompetitorMarks[slug]
+	);
 }

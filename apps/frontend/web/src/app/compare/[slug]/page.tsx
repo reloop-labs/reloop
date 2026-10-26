@@ -7,6 +7,7 @@ import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getCompetitorMark } from "../competitor-brands";
 import { CompareFeatureGrid } from "../components/compare-feature-grid";
 import { CompareFeaturesHeading } from "../components/compare-features-heading";
 import { CompareOtherPills } from "../components/compare-other-pills";
@@ -92,6 +93,7 @@ export default async function BlogComparePage({ params }: Props) {
 						<CompareFeatureGrid
 							competitorName={page.competitor}
 							features={page.features}
+							icon={getCompetitorMark(page.slug)}
 						/>
 					</section>
 				}

@@ -5,7 +5,7 @@ import type React from "react";
 import { SectionSeparator } from "../../(home)/components/section-separator";
 import { getCostSpotlight, getPostSpotlight } from "../compare-hero-costs";
 import { getCompareSource } from "../compare-sources";
-import { getCompetitorByHref } from "../competitor-brands";
+import { getCompetitorByHref, getCompetitorMark } from "../competitor-brands";
 import { CompareAgentsSection } from "./compare-agents-section";
 import { CompareCostSection } from "./compare-cost-section";
 import { CompareHero } from "./compare-hero";
@@ -42,6 +42,7 @@ export function ComparisonPageShell({
 	const brand = getCompetitorByHref(pagePath);
 	const slug = pagePath.replace("/compare/", "");
 	const name = brand?.name ?? competitorName;
+	const icon = getCompetitorMark(slug);
 	const spotlight = getCostSpotlight(slug);
 	const blogPage = spotlight ? null : getBlogComparePage(slug);
 	// Blog-only competitors get the same price card when their post states a 100k price.
@@ -57,7 +58,7 @@ export function ComparisonPageShell({
 			<CompareHero
 				titleLines={titleLines}
 				competitorName={name}
-				icon={brand?.icon}
+				icon={icon}
 				description={description}
 				spotlight={heroSpotlight}
 				source={name ? getCompareSource(name) : null}
@@ -88,7 +89,7 @@ export function ComparisonPageShell({
 							<SectionSeparator hideTop className="h-12 sm:h-24" />
 							<CompareMigrateBanner
 								competitorName={name}
-								icon={brand?.icon}
+								icon={icon}
 								guideHref={`/migrate/${slug}`}
 							/>
 							<SectionSeparator hideTop className="h-12 sm:h-24" />

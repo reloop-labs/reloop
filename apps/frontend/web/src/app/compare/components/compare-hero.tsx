@@ -5,7 +5,6 @@ import { Logo } from "@reloop/ui/logo";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import type { SimpleIcon } from "simple-icons";
 import {
 	type CostSpotlight,
 	costsCheckedAt,
@@ -15,7 +14,7 @@ import {
 import type { CompareSource } from "../compare-sources";
 import type { ComparisonFeatureRow } from "../compare-types";
 import { comparisonCellText } from "../compare-types";
-import { BrandIcon } from "./brand-icon";
+import { BrandIcon, type BrandMark } from "./brand-icon";
 
 function isDarkBrandHex(hex: string) {
 	const r = Number.parseInt(hex.slice(0, 2), 16);
@@ -193,7 +192,7 @@ export function CompareHero({
 }: {
 	titleLines: string[];
 	competitorName?: string;
-	icon?: Pick<SimpleIcon, "hex" | "path">;
+	icon?: BrandMark;
 	description?: string;
 	spotlight?: CostSpotlight | null;
 	source?: CompareSource | null;
