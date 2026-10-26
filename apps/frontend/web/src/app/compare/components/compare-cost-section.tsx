@@ -1,9 +1,9 @@
 import { cn } from "@reloop/ui/cn";
-import { pricingPlans } from "@reloop/web/lib/pricing";
+import { creditPack, pricingPlans } from "@reloop/web/lib/pricing";
 import Link from "next/link";
+import { Fragment } from "react";
 import {
 	type CostMode,
-	type CostRow,
 	costsCheckedAt,
 	formatUsd,
 	getCostSpotlight,
@@ -11,60 +11,76 @@ import {
 	quoteCosts,
 } from "../compare-hero-costs";
 import { getCompareSource } from "../compare-sources";
+import {
+	ComparisonGridFrame,
+	GridRow,
+	GridSectionTitle,
+	GridSpacerRow,
+} from "./compare-feature-grid";
 
-/** The volumes each table walks through, from a small sender up to a large one. */
+/** The volumes each comparison walks through, from a small sender up to a large one. */
 const ROW_VOLUMES: Record<CostMode, number[]> = {
 	transactional: [10_000, 50_000, 100_000, 500_000, 1_000_000],
 	marketing: [5_000, 10_000, 25_000, 50_000, 100_000],
 };
 
-const VOLUME_HEADER: Record<CostMode, string> = {
-	transactional: "Emails a month",
-	marketing: "Contacts",
-};
+const freeMonthlyEmails = Number(
+	(
+		pricingPlans.find((plan) => plan.id === "free")?.comparison.monthlyEmails ??
+		"6000"
+	).replace(/,/g, ""),
+);
 
-const cheapestPaidReloop = Math.min(
+const cheapestPaidPlan = Math.min(
 	...pricingPlans.flatMap((plan) =>
 		plan.monthlyPrice ? [plan.monthlyPrice] : [],
 	),
 );
 
-const INTRO: Record<CostMode, string[]> = {
-	transactional: [
-		"The cheapest plan that covers your monthly volume. Monthly billing, in US dollars.",
-		"Every Reloop plan includes the API, the SMTP relay and agent inboxes. Past the included volume, extra email is $0.50 per 1,000.",
-	],
-	marketing: [
-		`The cheapest plan with room for your list, sending one campaign a week: about ${marketingSendsPerContact} emails per contact a month. Monthly billing, in US dollars.`,
-		"Reloop counts emails sent, not contacts, so every plan holds an unlimited list.",
-	],
-};
+/** Emails a month for a row: the volume itself, or contacts × weekly sends. */
+function monthlySends(mode: CostMode, volume: number) {
+	return mode === "marketing"
+		? Math.round(volume * marketingSendsPerContact)
+		: volume;
+}
 
-function diffNote(reloop: CostRow, competitor: CostRow, name: string): string {
-	const gap = Math.round((competitor.usd - reloop.usd) * 100) / 100;
+/** Pay as you go: the free monthly allowance, then credits for the rest. */
+function creditsCost(sends: number) {
+	const paid = Math.max(0, sends - freeMonthlyEmails);
+	return (paid / 1000) * creditPack.usdPerThousand;
+}
+
+const count = (value: number) => new Intl.NumberFormat("en-US").format(value);
+
+function diffNote(reloopUsd: number, competitorUsd: number, name: string) {
+	const gap = Math.round((competitorUsd - reloopUsd) * 100) / 100;
 	if (gap > 0) return `${formatUsd(gap)} a month less with Reloop.`;
 	if (gap < 0) return `${formatUsd(-gap)} a month less on ${name}.`;
 	return "Same price.";
 }
 
 function PriceCell({
-	row,
+	usd,
+	label,
 	max,
 	strong,
+	note,
 }: {
-	row: CostRow;
+	usd: number;
+	label: string;
 	max: number;
 	strong?: boolean;
+	note?: string;
 }) {
-	const width = row.usd === 0 ? 0 : Math.max(3, (row.usd / max) * 100);
+	const width = usd === 0 ? 0 : Math.max(3, (usd / max) * 100);
 	return (
 		<div>
 			<p className="flex items-baseline gap-2">
-				<span className="font-semibold text-[1.4rem] text-text-strong-950 tabular-nums tracking-tight dark:text-white">
-					{formatUsd(row.usd)}
+				<span className="font-semibold text-[1.35rem] text-text-strong-950 tabular-nums leading-none tracking-tight dark:text-white">
+					{usd === 0 ? "Free" : formatUsd(usd)}
 				</span>
-				<span className="text-[14px] text-text-sub-600 dark:text-white/50">
-					{row.plan}
+				<span className="text-[13px] text-text-sub-600 dark:text-white/50">
+					{label}
 				</span>
 			</p>
 			<span className="mt-3 block h-1.5 overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/[0.07]">
@@ -78,11 +94,32 @@ function PriceCell({
 					style={{ width: `${width}%` }}
 				/>
 			</span>
+			{note ? (
+				<p className="mt-2.5 text-[13px] text-text-sub-600 dark:text-white/45">
+					{note}
+				</p>
+			) : null}
 		</div>
 	);
 }
 
-/** "02 · Price": Reloop vs one competitor across a range of volumes, from verified list prices. */
+type CostRowData = {
+	volume: number;
+	/** Optional line under Reloop's bar, e.g. how long credits last. */
+	reloop: { usd: number; label: string; note?: string };
+	competitor: { usd: number; label: string };
+};
+
+function volumeLabel(mode: CostMode, volume: number) {
+	return mode === "marketing"
+		? `${count(volume)} contacts`
+		: `${count(volume)} emails`;
+}
+
+/**
+ * "02 · Price": the same /pricing-style grid as the feature table, with a
+ * Monthly plans group and a Credits group. Prices are verified list prices.
+ */
 export function CompareCostSection({
 	providerId,
 	competitorName,
@@ -94,97 +131,88 @@ export function CompareCostSection({
 	if (!spotlight) return null;
 	const { mode } = spotlight;
 
-	const rows = ROW_VOLUMES[mode].flatMap((volume) => {
+	const quoted = ROW_VOLUMES[mode].flatMap((volume) => {
 		const quotes = quoteCosts(mode, volume);
-		const reloop = quotes.find((quote) => quote.id === "reloop");
+		const plan = quotes.find((quote) => quote.id === "reloop");
 		const competitor = quotes.find((quote) => quote.id === providerId);
-		return reloop && competitor ? [{ volume, reloop, competitor }] : [];
+		if (!plan || !competitor) return [];
+		return [
+			{
+				volume,
+				plan,
+				credits: creditsCost(monthlySends(mode, volume)),
+				competitor: { usd: competitor.usd, label: competitor.plan },
+			},
+		];
 	});
 	const max = Math.max(
 		1,
-		...rows.flatMap((row) => [row.reloop.usd, row.competitor.usd]),
+		...quoted.flatMap((row) => [row.plan.usd, row.credits, row.competitor.usd]),
 	);
+	const groups: {
+		id: string;
+		label: string;
+		icon: string;
+		rows: CostRowData[];
+	}[] = [
+		{
+			id: "plans",
+			label: "Monthly plans",
+			icon: "refresh",
+			rows: quoted.map((row) => ({
+				volume: row.volume,
+				reloop: { usd: row.plan.usd, label: row.plan.plan },
+				competitor: row.competitor,
+			})),
+		},
+		{
+			id: "credits",
+			label: "Credits",
+			icon: "invoice",
+			rows: quoted.map((row) => ({
+				volume: row.volume,
+				reloop: {
+					usd: row.credits,
+					label: "Credits",
+					note: `Valid for ${creditPack.validityMonths} months`,
+				},
+				competitor: row.competitor,
+			})),
+		},
+	];
 	const source = getCompareSource(competitorName);
 	const sourceLabel = source?.href
 		.replace(/^https?:\/\/(www\.)?/, "")
 		.replace(/\/$/, "");
+	const linkClass =
+		"text-text-strong-950 underline decoration-stroke-soft-200 underline-offset-2 transition-colors hover:decoration-text-strong-950 dark:text-white dark:decoration-white/25";
 
 	return (
-		<section className="grid gap-10 border-stroke-soft-100 border-b px-4 py-16 sm:px-8 sm:py-20 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16 lg:px-12 dark:border-white/10">
-			<div>
+		<section className="border-stroke-soft-100 border-b dark:border-white/10">
+			<div className="px-4 py-16 sm:px-8 sm:py-20 lg:px-12">
 				<span className="font-medium text-[13px] text-text-sub-600 dark:text-white/60">
 					02 · Price
 				</span>
 				<h2 className="mt-3 text-balance font-semibold text-[2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[2.6rem] dark:text-white">
 					What it costs a month
 				</h2>
-				<div className="mt-4 space-y-4 text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
-					{INTRO[mode].map((line) => (
-						<p key={line}>{line}</p>
-					))}
-				</div>
-			</div>
-
-			<div className="min-w-0">
-				<div className="overflow-x-auto">
-					<table className="w-full min-w-[520px] text-left">
-						<thead>
-							<tr className="border-text-strong-950 border-b text-[14px] dark:border-white/80">
-								<th
-									scope="col"
-									className="pb-3 font-medium text-text-strong-950 dark:text-white"
-								>
-									{VOLUME_HEADER[mode]}
-								</th>
-								<th
-									scope="col"
-									className="pb-3 font-medium text-text-strong-950 dark:text-white"
-								>
-									Reloop
-								</th>
-								<th
-									scope="col"
-									className="pb-3 font-medium text-text-strong-950 dark:text-white"
-								>
-									{competitorName}
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							{rows.map((row) => (
-								<tr
-									key={row.volume}
-									className="border-stroke-soft-100 border-b align-top dark:border-white/10"
-								>
-									<th
-										scope="row"
-										className="w-[26%] py-6 pr-6 font-medium text-[1.6rem] text-text-strong-950 tabular-nums tracking-tight dark:text-white"
-									>
-										{new Intl.NumberFormat("en-US").format(row.volume)}
-									</th>
-									<td className="w-[37%] py-6 pr-8">
-										<PriceCell row={row.reloop} max={max} strong />
-									</td>
-									<td className="w-[37%] py-6">
-										<PriceCell row={row.competitor} max={max} />
-										<p className="mt-3 text-[13px] text-text-sub-600 dark:text-white/45">
-											{diffNote(row.reloop, row.competitor, competitorName)}
-										</p>
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</div>
-
-				<p className="mt-8 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
+				<p className="mt-3 max-w-2xl text-pretty text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
+					{mode === "marketing"
+						? `Sending one campaign a week, about ${marketingSendsPerContact} emails per contact a month. Reloop counts emails sent, not contacts.`
+						: "The cheapest way to pay for each monthly volume, in US dollars."}{" "}
+					Plans start at {formatUsd(cheapestPaidPlan)} a month. Credits need no
+					subscription: the free {count(freeMonthlyEmails)} a month, then $
+					{creditPack.usdPerThousand.toFixed(2)} per 1,000, valid{" "}
+					{creditPack.validityMonths} months.
+				</p>
+				<p className="mt-3 text-[13px] text-text-sub-600 dark:text-white/45">
 					Source:{" "}
 					{source ? (
 						<a
 							href={source.href}
 							target="_blank"
 							rel="noreferrer"
-							className="text-text-strong-950 underline decoration-stroke-soft-200 underline-offset-2 transition-colors hover:decoration-text-strong-950 dark:text-white dark:decoration-white/25"
+							className={linkClass}
 						>
 							{sourceLabel}
 						</a>
@@ -192,15 +220,60 @@ export function CompareCostSection({
 						`${competitorName}'s pricing page`
 					)}
 					, checked {costsCheckedAt}. Reloop:{" "}
-					<Link
-						href="/pricing"
-						className="text-text-strong-950 underline decoration-stroke-soft-200 underline-offset-2 transition-colors hover:decoration-text-strong-950 dark:text-white dark:decoration-white/25"
-					>
+					<Link href="/pricing" className={linkClass}>
 						pricing
 					</Link>
-					, from {formatUsd(cheapestPaidReloop)} a month.
+					.
 				</p>
 			</div>
+
+			<ComparisonGridFrame
+				competitorName={competitorName}
+				eyebrow="Price"
+				title={`Reloop vs ${competitorName}`}
+			>
+				{groups.map((group, groupIndex) => (
+					<Fragment key={group.id}>
+						{groupIndex > 0 ? <GridSpacerRow /> : null}
+						<GridSectionTitle label={group.label} icon={group.icon} />
+						{group.rows.map((row) => (
+							<GridRow
+								key={row.volume}
+								label={
+									<span className="font-medium tabular-nums">
+										{volumeLabel(mode, row.volume)}
+									</span>
+								}
+								reloop={
+									<div className="w-full py-1">
+										<PriceCell
+											usd={row.reloop.usd}
+											label={row.reloop.label}
+											max={max}
+											strong
+											note={row.reloop.note}
+										/>
+									</div>
+								}
+								competitor={
+									<div className="w-full py-1">
+										<PriceCell
+											usd={row.competitor.usd}
+											label={row.competitor.label}
+											max={max}
+											note={diffNote(
+												row.reloop.usd,
+												row.competitor.usd,
+												competitorName,
+											)}
+										/>
+									</div>
+								}
+							/>
+						))}
+					</Fragment>
+				))}
+			</ComparisonGridFrame>
 		</section>
 	);
 }
