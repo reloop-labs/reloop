@@ -5,10 +5,10 @@ import { Icon } from "@reloop/ui/icon";
 import { Fragment, type ReactNode, useMemo, useState } from "react";
 import {
 	dayKey,
+	formatCompactTime,
 	formatDayHeader,
 	formatTimeAmPm,
 	TimelineItemWrapper,
-	TimelineMeta,
 	timelineCardClass,
 } from "#/components/timeline/timeline-parts";
 import type { EmailEvent } from "./timeline/types";
@@ -297,15 +297,23 @@ function EventCard({
 		>
 			<div className={timelineCardClass}>
 				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-					<span
-						className={cn(
-							"min-w-0 font-medium text-paragraph-sm",
-							isMachine ? "text-text-sub-600" : "text-text-strong-950",
-						)}
-					>
-						<TitleNode event={event} />
+					{/* Relative time beside the title, where the eye lands first. */}
+					<span className="flex min-w-0 flex-wrap items-center gap-x-2">
+						<span
+							className={cn(
+								"font-medium text-paragraph-sm",
+								isMachine ? "text-text-sub-600" : "text-text-strong-950",
+							)}
+						>
+							<TitleNode event={event} />
+						</span>
+						<span className="text-paragraph-xs text-text-soft-400 tabular-nums">
+							{formatCompactTime(event.createdAt)}
+						</span>
 					</span>
-					<TimelineMeta createdAt={event.createdAt} />
+					<span className="shrink-0 font-medium text-paragraph-xs text-text-sub-600 tabular-nums">
+						{formatTimeAmPm(event.createdAt)}
+					</span>
 				</div>
 				{subtitle ? (
 					<div className="mt-1 flex items-center gap-1 text-paragraph-xs text-text-soft-400">
