@@ -2,22 +2,17 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import type { ReactNode } from "react";
 
-// Same surface as the post's Summary card; only warning gets a colour.
+const blue =
+	"border-information-base/25 bg-information-base/[0.06] dark:border-information-base/30 dark:bg-information-base/10";
+
+// Icon on the left, text on the right, tinted by type.
 const variants = {
-	info: {
-		label: "Note",
-		icon: "info-outline",
-		accent: "text-text-strong-950 dark:text-white",
-	},
-	tip: {
-		label: "Tip",
-		icon: "magic-wand",
-		accent: "text-text-strong-950 dark:text-white",
-	},
+	info: { icon: "info-outline", box: blue, iconColor: "text-information-base" },
+	tip: { icon: "bulb", box: blue, iconColor: "text-information-base" },
 	warning: {
-		label: "Warning",
 		icon: "alert-triangle",
-		accent: "text-warning-base",
+		box: "border-warning-base/25 bg-warning-base/[0.06] dark:border-warning-base/30 dark:bg-warning-base/10",
+		iconColor: "text-warning-base",
 	},
 } as const;
 
@@ -31,17 +26,12 @@ export function Callout({
 	const variant = variants[type];
 
 	return (
-		<aside className="my-6 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/70 p-5 dark:border-white/10 dark:bg-white/[0.03]">
-			<div
-				className={cn(
-					"mb-2 flex items-center gap-1.5 font-mono font-semibold text-[11px] uppercase tracking-widest",
-					variant.accent,
-				)}
-			>
-				<Icon name={variant.icon} className="size-3.5" />
-				<span>{variant.label}</span>
-			</div>
-			<div className="text-[14.5px] text-text-sub-600 leading-relaxed dark:text-white/60 [&_p+p]:mt-3! [&_p]:my-0!">
+		<aside className={cn("my-6 flex gap-3 rounded-xl border p-4", variant.box)}>
+			<Icon
+				name={variant.icon}
+				className={cn("mt-[5px] size-4 shrink-0", variant.iconColor)}
+			/>
+			<div className="min-w-0 flex-1 text-[14.5px] text-text-strong-950 leading-relaxed dark:text-white/85 [&_p+p]:mt-3! [&_p]:my-0!">
 				{children}
 			</div>
 		</aside>
