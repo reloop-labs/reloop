@@ -22,8 +22,8 @@ export function DataTableCheckbox({
 				"peer relative flex size-4 shrink-0 items-center justify-center rounded-sm border border-stroke-soft-200 bg-bg-white-0 outline-none transition-colors",
 				"focus-visible:ring-2 focus-visible:ring-bg-strong-950/30",
 				"disabled:cursor-not-allowed disabled:opacity-50",
-				"data-[state=checked]:border-bg-strong-950 data-[state=checked]:bg-bg-strong-950 data-[state=checked]:text-static-white",
-				"data-[state=indeterminate]:border-bg-strong-950 data-[state=indeterminate]:bg-bg-strong-950 data-[state=indeterminate]:text-static-white",
+				"data-[state=checked]:border-bg-strong-950 data-[state=checked]:bg-bg-strong-950 data-[state=checked]:text-text-white-0",
+				"data-[state=indeterminate]:border-bg-strong-950 data-[state=indeterminate]:bg-bg-strong-950 data-[state=indeterminate]:text-text-white-0",
 				"dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5",
 				className,
 			)}
