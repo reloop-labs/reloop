@@ -1,0 +1,92 @@
+---
+title: Deploy on DigitalOcean
+description: Create a Reloop evaluation Droplet with a manual GitHub Actions workflow.
+icon: siDigitalocean
+---
+
+Deploy the Reloop stack to an Ubuntu 24.04 Droplet using the
+[DigitalOcean workflow](https://github.com/reloop-labs/reloop/blob/main/.github/workflows/deploy-digitalocean.yml).
+It creates a server with 4 vCPUs and 8 GB RAM and runs the existing
+[VPS installer](/docs/self-host/vps) automatically.
+
+<Warning>
+DigitalOcean [blocks SMTP ports 25, 465, and 587](https://docs.digitalocean.com/products/droplets/details/limits/).
+This deployment is for evaluating Reloop's dashboard and API. Direct mail
+delivery does not work on it. The Droplet incurs charges until you destroy it,
+including when installation fails.
+</Warning>
+
+## Prepare your fork
+
+1. Fork the Reloop repository and enable GitHub Actions in your fork.
+2. Register an SSH public key in DigitalOcean and copy its numeric key ID.
+3. Add a `DIGITALOCEAN_TOKEN` repository secret with permission to read/create
+   Droplets and read images and SSH keys.
+4. Choose a hostname on a domain you control, such as `reloop.example.com`.
+
+## Run the deployment
+
+Open **Actions > Deploy to DigitalOcean > Run workflow** in your fork. Enter:
+
+| Input | Value |
+|-------|-------|
+| Domain | Your Reloop hostname |
+| Admin email | Contact email for TLS certificates |
+| SSH key IDs | One or more DigitalOcean numeric key IDs, separated by commas |
+| Region | A DigitalOcean region slug, default `fra1` |
+| Version | A published Reloop image tag, default `latest` |
+| SMTP acknowledgement | Confirm this is a paid evaluation server with SMTP blocked |
+
+Click **Run workflow**. The summary shows the Droplet's public IPv4 address and
+the next steps. Installation continues through cloud-init after the workflow
+finishes. The workflow's success status does not mean the application is healthy.
+
+## DNS and first sign-in
+
+Point these hostnames at the Droplet with DNS `A` records:
+
+```text
+reloop.example.com
+link.reloop.example.com
+inbound.reloop.example.com
+```
+
+Connect with your SSH key and check installation:
+
+```bash
+ssh root@YOUR_DROPLET_IP
+cloud-init status --wait
+cat /var/lib/reloop-install.status
+reloop status
+cat /opt/reloop/admin-setup.key
+```
+
+When the status reads `installed` and services are healthy, wait for DNS and
+HTTPS, then open `https://reloop.example.com/dashboard/setup`. Use the setup key
+to create the first administrator. Keep the key private.
+
+The first session lasts seven days. Later sign-ins need email delivery, so a
+server without an accessible external system-email transport is a temporary
+evaluation. File uploads also need S3 configuration. See the
+[VPS guide](/docs/self-host/vps) for those settings.
+
+## Troubleshooting and cleanup
+
+Installation output is in `/var/log/reloop-install.log`, which contains the
+setup key and must stay private. A failed workflow leaves the Droplet in place.
+Check your DigitalOcean account before retrying; the workflow refuses to create
+another server with the same hostname.
+
+After fixing an installation failure, rerun the saved script over SSH:
+
+```bash
+sudo bash /var/lib/cloud/instance/scripts/part-001
+```
+
+Use `reloop update` for later updates. Destroy the evaluation Droplet in
+DigitalOcean when finished. Canceling a workflow does not stop the server or its
+charges.
+
+See the [deployment source and tests](https://github.com/reloop-labs/reloop/tree/main/install/digitalocean)
+for the full configuration. This workflow targets Droplets; it is not a
+DigitalOcean Marketplace image or App Platform deployment.
