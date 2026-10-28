@@ -8,4 +8,6 @@ export const logsConfig = {
 		process.env.PG_URL || "postgresql://reloop:reloop123@localhost:5432/reloop",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
+	/** Sent-email retention: "dry-run" (default), "enforce" or "off". */
+	EMAIL_RETENTION_MODE: process.env.EMAIL_RETENTION_MODE || "dry-run",
 } as const;

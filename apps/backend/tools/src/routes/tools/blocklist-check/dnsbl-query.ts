@@ -1,5 +1,6 @@
 import dns from "node:dns/promises";
 import net from "node:net";
+import { toolsConfig } from "@be/tools/tools.config";
 import { withDeadline } from "@be/tools/utils/deadline";
 import type { DnsblProvider } from "./dnsbl-providers";
 
@@ -29,8 +30,33 @@ export interface DnsblItemResult {
 	error?: string;
 }
 
-/** System resolver — DNSBL zones (especially Spamhaus) refuse 1.1.1.1 / 8.8.8.8. */
+/**
+ * System resolver unless DNSBL_RESOLVERS is set. DNSBL zones (especially
+ * Spamhaus) refuse 1.1.1.1 / 8.8.8.8 and other shared resolvers.
+ */
 const dnsblResolver = new dns.Resolver();
+const dnsblServers = toolsConfig.DNSBL_RESOLVERS.split(",")
+	.map((server) => server.trim())
+	.filter(Boolean);
+if (dnsblServers.length > 0) {
+	dnsblResolver.setServers(dnsblServers);
+}
+
+/**
+ * DNS name to query for `subject` (a reversed IP or a domain) on `provider`.
+ * Spamhaus lists go through the Data Query Service when a key is set, since
+ * the public zones refuse queries from shared resolvers.
+ */
+export function dnsblQueryName(
+	subject: string,
+	provider: DnsblProvider,
+	dqsKey: string = toolsConfig.SPAMHAUS_DQS_KEY,
+): string {
+	if (provider.dqsZone && dqsKey) {
+		return `${subject}.${dqsKey}.${provider.dqsZone}.dq.spamhaus.net`;
+	}
+	return `${subject}.${provider.host}`;
+}
 
 const RFC_ERROR_PREFIX = "127.255.255.";
 const QUERY_TIMEOUT_MS = 2500;
@@ -235,8 +261,12 @@ export async function querySingleDnsbl(options: {
 			};
 		}
 
-		const message =
+		const rawMessage =
 			error instanceof Error ? error.message : "DNSBL query failed";
+		// Resolver errors echo the query name, which carries the DQS key.
+		const message = toolsConfig.SPAMHAUS_DQS_KEY
+			? rawMessage.replaceAll(toolsConfig.SPAMHAUS_DQS_KEY, "[key]")
+			: rawMessage;
 
 		return {
 			id: provider.id,

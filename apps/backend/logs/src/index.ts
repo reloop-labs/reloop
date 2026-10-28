@@ -15,6 +15,7 @@ import { loader } from "@reloop/logs/utils/loader";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
 import { logCleanupCron } from "./cron/cleanup-logs.cron";
+import { emailRetentionCron } from "./cron/email-retention.cron";
 import { reconcilePendingCron } from "./cron/reconcile-pending.cron";
 import { agentCardRoute } from "./routes/landing/agent-card.route";
 import { healthRoute } from "./routes/landing/health.route";
@@ -89,6 +90,7 @@ const logsService = new Elysia({
 	.use(logsRoutes)
 	.use(logsWsRoute)
 	.use(logCleanupCron)
+	.use(emailRetentionCron)
 	.use(reconcilePendingCron)
 	.onStart(async () => {
 		await loader();

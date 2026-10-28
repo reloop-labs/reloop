@@ -6,12 +6,14 @@ import {
 	parseTarget,
 } from "../src/routes/tools/blocklist-check/blocklist-input";
 import {
+	type DnsblProvider,
 	DOMAIN_DNSBL_PROVIDERS,
 	IP_DNSBL_PROVIDERS,
 } from "../src/routes/tools/blocklist-check/dnsbl-providers";
 import {
 	aggregateVerdict,
 	type DnsblItemResult,
+	dnsblQueryName,
 	evaluateListingStatus,
 	expandIpv6,
 	reverseIpv4,
@@ -36,6 +38,42 @@ function item(
 		...overrides,
 	};
 }
+
+describe("dnsblQueryName", () => {
+	function provider(id: string): DnsblProvider {
+		const found = [...IP_DNSBL_PROVIDERS, ...DOMAIN_DNSBL_PROVIDERS].find(
+			(p) => p.id === id,
+		);
+		if (!found) throw new Error(`Unknown provider ${id}`);
+		return found;
+	}
+	const zen = provider("spamhaus-zen");
+	const dbl = provider("spamhaus-dbl");
+	const barracuda = provider("barracuda");
+	it("uses the public zone when no DQS key is set", () => {
+		expect(dnsblQueryName("2.0.0.127", zen, "")).toBe(
+			"2.0.0.127.zen.spamhaus.org",
+		);
+		expect(dnsblQueryName("example.com", dbl, "")).toBe(
+			"example.com.dbl.spamhaus.org",
+		);
+	});
+
+	it("routes Spamhaus through DQS when a key is set", () => {
+		expect(dnsblQueryName("2.0.0.127", zen, "abc123")).toBe(
+			"2.0.0.127.abc123.zen.dq.spamhaus.net",
+		);
+		expect(dnsblQueryName("example.com", dbl, "abc123")).toBe(
+			"example.com.abc123.dbl.dq.spamhaus.net",
+		);
+	});
+
+	it("leaves non-Spamhaus lists unchanged when a key is set", () => {
+		expect(dnsblQueryName("2.0.0.127", barracuda, "abc123")).toBe(
+			"2.0.0.127.b.barracudacentral.org",
+		);
+	});
+});
 
 describe("reverseIpv4", () => {
 	it("reverses octets for RFC 5782 queries", () => {

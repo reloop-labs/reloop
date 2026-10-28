@@ -20,6 +20,7 @@ import {
 	aggregateVerdict,
 	type BlocklistVerdict,
 	type DnsblItemResult,
+	dnsblQueryName,
 	mergeIpListResults,
 	querySingleDnsbl,
 	reverseIpForDnsbl,
@@ -129,7 +130,7 @@ async function queryIpProviders(
 					}
 					const reversed = reverseIpForDnsbl(item.ip);
 					return querySingleDnsbl({
-						queryName: `${reversed}.${provider.host}`,
+						queryName: dnsblQueryName(reversed, provider),
 						targetLabel: item.ip,
 						provider,
 					});
@@ -146,7 +147,7 @@ async function queryDomainProviders(
 	return Promise.all(
 		DOMAIN_DNSBL_PROVIDERS.map((provider) =>
 			querySingleDnsbl({
-				queryName: `${domain}.${provider.host}`,
+				queryName: dnsblQueryName(domain, provider),
 				targetLabel: domain,
 				provider,
 			}),

@@ -8,6 +8,7 @@ import {
 import { DOMAIN_DNSBL_PROVIDERS } from "@be/tools/routes/tools/blocklist-check/dnsbl-providers";
 import {
 	aggregateVerdict,
+	dnsblQueryName,
 	querySingleDnsbl,
 } from "@be/tools/routes/tools/blocklist-check/dnsbl-query";
 import {
@@ -184,7 +185,7 @@ async function queryDomainDnsbl(domain: string) {
 	const results = await Promise.all(
 		DOMAIN_DNSBL_PROVIDERS.map((provider) =>
 			querySingleDnsbl({
-				queryName: `${domain}.${provider.host}`,
+				queryName: dnsblQueryName(domain, provider),
 				targetLabel: domain,
 				provider,
 			}),

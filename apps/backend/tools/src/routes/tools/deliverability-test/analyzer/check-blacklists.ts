@@ -5,6 +5,7 @@ import {
 } from "../../blocklist-check/dnsbl-providers";
 import {
 	type DnsblItemResult,
+	dnsblQueryName,
 	querySingleDnsbl,
 	reverseIpForDnsbl,
 } from "../../blocklist-check/dnsbl-query";
@@ -41,7 +42,7 @@ export async function checkBlacklists(
 		const ipPromises = IP_DNSBL_PROVIDERS.map(async (provider) => {
 			const reversed = reverseIpForDnsbl(ip);
 			const result = await querySingleDnsbl({
-				queryName: `${reversed}.${provider.host}`,
+				queryName: dnsblQueryName(reversed, provider),
 				targetLabel: ip,
 				provider,
 			});
@@ -65,7 +66,7 @@ export async function checkBlacklists(
 		for (const provider of DOMAIN_DNSBL_PROVIDERS) {
 			domainPromises.push(
 				querySingleDnsbl({
-					queryName: `${domain}.${provider.host}`,
+					queryName: dnsblQueryName(domain, provider),
 					targetLabel: domain,
 					provider,
 				}),

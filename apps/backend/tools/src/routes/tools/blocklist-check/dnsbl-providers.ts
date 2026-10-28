@@ -15,6 +15,8 @@ export interface DnsblProvider {
 	description: string;
 	/** Answers this list uses to say "query refused" (e.g. blocked public/high-volume resolver). */
 	refusedCodes?: string[];
+	/** Spamhaus Data Query Service zone, used instead of `host` when a DQS key is configured. */
+	dqsZone?: "zen" | "dbl";
 }
 
 /**
@@ -27,6 +29,7 @@ export const IP_DNSBL_PROVIDERS: DnsblProvider[] = [
 		id: "spamhaus-zen",
 		name: "Spamhaus ZEN",
 		host: "zen.spamhaus.org",
+		dqsZone: "zen",
 		listType: "ip",
 		category: "reputation",
 		impact: "high",
@@ -464,6 +467,7 @@ export const DOMAIN_DNSBL_PROVIDERS: DnsblProvider[] = [
 		id: "spamhaus-dbl",
 		name: "Spamhaus DBL",
 		host: "dbl.spamhaus.org",
+		dqsZone: "dbl",
 		listType: "domain",
 		category: "domain",
 		impact: "high",

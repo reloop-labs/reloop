@@ -9,6 +9,10 @@ export const toolsConfig = {
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 	TOOLS_GEMINI_API_KEY: process.env.TOOLS_GEMINI_API_KEY || "",
+	/** Spamhaus Data Query Service key. Spamhaus refuses public zone queries from shared resolvers. */
+	SPAMHAUS_DQS_KEY: process.env.SPAMHAUS_DQS_KEY || "",
+	/** Comma-separated DNS servers for DNSBL lookups; empty uses the system resolver. */
+	DNSBL_RESOLVERS: process.env.DNSBL_RESOLVERS || "",
 
 	constants: {
 		maxInputLength: 400,
