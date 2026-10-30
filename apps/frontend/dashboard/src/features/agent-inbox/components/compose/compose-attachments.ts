@@ -1,4 +1,5 @@
 import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
+import type { ComposeDraftAttachment } from "../../types";
 
 export type ComposeAttachment = {
 	id: string;
@@ -8,6 +9,8 @@ export type ComposeAttachment = {
 	path: string;
 	content_type: string;
 	isUploading?: boolean;
+	/** Attachment of the message being forwarded; the server copies it by ID. */
+	originalId?: string;
 };
 
 export const formatBytes = (bytes: number, decimals = 1) => {
@@ -61,4 +64,18 @@ export function toSendAttachments(attachments: ComposeAttachment[]) {
 			path: attachmentRefForSend(a),
 			content_type: a.content_type,
 		}));
+}
+
+/** Restore a saved draft's attachments into composer chips. */
+export function draftAttachmentsToCompose(
+	attachments: ComposeDraftAttachment[] | undefined,
+): ComposeAttachment[] {
+	return (attachments ?? []).map((a, i) => ({
+		id: a.id || String(i),
+		name: a.filename || "file",
+		size: a.size || "",
+		url: a.url || "",
+		path: a.path || a.url || "",
+		content_type: a.content_type || "application/octet-stream",
+	}));
 }

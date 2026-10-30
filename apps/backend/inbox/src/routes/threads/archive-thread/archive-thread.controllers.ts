@@ -1,8 +1,12 @@
 import { db } from "@reloop/db/client";
-import { emailLog, emailThread, inboundEmail } from "@reloop/db/schema";
+import { emailLog, emailThread } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
+import {
+	ensureOutboundThreadForEmailLog,
+	resolveThreadIdForMessage,
+} from "../../../lib/thread-correlation";
 
 export async function archiveThreadController(
 	id: string,
@@ -19,62 +23,34 @@ export async function archiveThreadController(
 
 	let targetThreadId = id;
 
+	// Also accept message IDs (inbound, sent, thread message).
 	if (!thread) {
-		const msg = await db.query.inboundEmail.findFirst({
-			where: and(
-				eq(inboundEmail.id, id),
-				eq(inboundEmail.organizationId, organizationId),
-			),
-		});
-		if (msg?.threadId) {
-			targetThreadId = msg.threadId;
+		const resolved =
+			(await resolveThreadIdForMessage(id, organizationId)) ??
+			(await db.query.emailLog
+				.findFirst({
+					where: and(
+						eq(emailLog.id, id),
+						eq(emailLog.organizationId, organizationId),
+					),
+					columns: { id: true },
+				})
+				.then((outMsg) =>
+					outMsg
+						? ensureOutboundThreadForEmailLog({
+								emailLogId: outMsg.id,
+								organizationId,
+							}).then((r) => r.threadId)
+						: undefined,
+				));
+		if (resolved) {
+			targetThreadId = resolved;
 			thread = await db.query.emailThread.findFirst({
 				where: and(
-					eq(emailThread.id, targetThreadId),
+					eq(emailThread.id, resolved),
 					eq(emailThread.organizationId, organizationId),
 				),
 			});
-		}
-	}
-
-	if (!thread) {
-		const outMsg = await db.query.emailLog.findFirst({
-			where: and(
-				eq(emailLog.id, id),
-				eq(emailLog.organizationId, organizationId),
-			),
-		});
-		if (outMsg?.threadId) {
-			targetThreadId = outMsg.threadId;
-			thread = await db.query.emailThread.findFirst({
-				where: and(
-					eq(emailThread.id, targetThreadId),
-					eq(emailThread.organizationId, organizationId),
-				),
-			});
-		} else if (outMsg) {
-			const [created] = await db
-				.insert(emailThread)
-				.values({
-					id: outMsg.id,
-					organizationId,
-					mailboxId: null,
-					subject: outMsg.subject || "(No Subject)",
-					lastMessagePreview: outMsg.textBody
-						? outMsg.textBody.substring(0, 120)
-						: "",
-					lastMessageAt: outMsg.createdAt,
-					status: "archived",
-					messageCount: 1,
-					participants: [outMsg.fromEmail, ...(outMsg.toEmails ?? [])],
-				})
-				.onConflictDoUpdate({
-					target: emailThread.id,
-					set: { status: "archived" },
-				})
-				.returning();
-			thread = created;
-			targetThreadId = outMsg.id;
 		}
 	}
 

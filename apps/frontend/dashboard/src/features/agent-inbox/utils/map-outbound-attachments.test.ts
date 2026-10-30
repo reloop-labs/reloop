@@ -32,18 +32,25 @@ describe("mapOutboundAttachments", () => {
 	test("keeps file attachments visible even when they have a content id", () => {
 		const mapped = mapOutboundAttachments([
 			{
+				id: "outatt_1",
 				filename: "invoice.pdf",
 				contentType: "application/pdf",
 				size: 2048,
+				storagePath: "uploads/2026/10/invoice.pdf",
 				contentDisposition: "attachment",
 				contentId: "cid:invoice@reloop",
 			},
 		]);
+		// id + storagePath must survive, or the chip can't be downloaded.
 		expect(mapped).toEqual([
 			{
+				id: "outatt_1",
 				name: "invoice.pdf",
 				size: "2.0 KB",
 				contentType: "application/pdf",
+				storagePath: "uploads/2026/10/invoice.pdf",
+				contentId: "cid:invoice@reloop",
+				contentDisposition: "attachment",
 				isInline: false,
 			},
 		]);

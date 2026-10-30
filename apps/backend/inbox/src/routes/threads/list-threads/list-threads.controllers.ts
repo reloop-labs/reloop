@@ -77,6 +77,8 @@ export async function getThreadsController(
 			desc(emailThread.isPinned),
 			desc(emailThread.pinnedAt),
 			desc(emailThread.lastMessageAt),
+			// Unique tiebreaker so offset pages never repeat or skip rows.
+			desc(emailThread.id),
 		],
 		limit: Math.min(limit, 200),
 		offset,

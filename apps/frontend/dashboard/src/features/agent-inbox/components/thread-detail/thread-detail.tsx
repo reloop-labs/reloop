@@ -20,13 +20,14 @@ import { buildDisplayMessages } from "#/features/agent-inbox/utils/build-display
 import type {
 	AgentMailbox,
 	ComposeDraft,
+	ComposeDraftAttachment,
 	ComposeDraftKind,
 	InboundThread,
 } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
 import { cleanHtml } from "./email-html";
 import { ForwardComposer } from "./forward-composer";
-import type { AttachmentItem } from "./message-attachments";
+import { type AttachmentItem, toAttachmentItems } from "./message-attachments";
 import { RawHeadersModal } from "./raw-headers-modal";
 import { ReplyComposer } from "./reply-composer";
 import type { ThreadParticipant } from "./thread-header";
@@ -150,6 +151,7 @@ export const ThreadDetail = ({
 		archiveThread,
 		trashThread,
 		restoreThread,
+		deleteThread,
 		unarchiveThread,
 		sendReply,
 		sendReplyAll,
@@ -168,6 +170,9 @@ export const ThreadDetail = ({
 	const [showReplyComposer, setShowReplyComposer] = useState(false);
 	const [replySeed, setReplySeed] = useState("");
 	const [replyInitialHtml, setReplyInitialHtml] = useState("");
+	const [replyInitialAttachments, setReplyInitialAttachments] = useState<
+		ComposeDraftAttachment[]
+	>([]);
 	const [replyDraftId, setReplyDraftId] = useState<string | null>(null);
 	/** Saved reply draft for this thread, shown when composer is closed. */
 	const [savedReplyDraft, setSavedReplyDraft] = useState<ComposeDraft | null>(
@@ -193,6 +198,9 @@ export const ThreadDetail = ({
 	const [forwardDraftId, setForwardDraftId] = useState<string | null>(null);
 	const [forwardSeed, setForwardSeed] = useState("");
 	const [forwardInitialHtml, setForwardInitialHtml] = useState("");
+	const [forwardInitialAttachments, setForwardInitialAttachments] = useState<
+		ComposeDraftAttachment[]
+	>([]);
 	const [forwardInitialTo, setForwardInitialTo] = useState<string[]>([]);
 	const [forwardInitialCc, setForwardInitialCc] = useState<string[]>([]);
 	const [replyMode, setReplyMode] = useState<"reply" | "replyAll">("reply");
@@ -263,6 +271,7 @@ export const ThreadDetail = ({
 		setShowReplyComposer(false);
 		setReplySeed("");
 		setReplyInitialHtml("");
+		setReplyInitialAttachments([]);
 		setReplyDraftId(null);
 		setSavedReplyDraft(null);
 		setReplyAnchorMessageId(null);
@@ -278,6 +287,7 @@ export const ThreadDetail = ({
 		setForwardDraftId(null);
 		setForwardSeed("");
 		setForwardInitialHtml("");
+		setForwardInitialAttachments([]);
 		setForwardInitialTo([]);
 		setForwardInitialCc([]);
 		setReplyTargetPerson(null);
@@ -385,12 +395,14 @@ export const ThreadDetail = ({
 					setForwardDraftId(fromUrl.id);
 					setForwardSeed(fromUrl.text);
 					setForwardInitialHtml(fromUrl.html);
+					setForwardInitialAttachments(fromUrl.attachments);
 					setForwardInitialTo(fromUrl.to);
 					setForwardInitialCc(fromUrl.cc);
 				} else {
 					setForwardDraftId(null);
 					setForwardSeed("");
 					setForwardInitialHtml("");
+					setForwardInitialAttachments([]);
 					setForwardInitialTo([]);
 					setForwardInitialCc([]);
 				}
@@ -414,11 +426,13 @@ export const ThreadDetail = ({
 					setReplyDraftId(fromUrl.id);
 					setReplySeed(fromUrl.text);
 					setReplyInitialHtml(fromUrl.html);
+					setReplyInitialAttachments(fromUrl.attachments);
 					if (fromUrl.kind === "reply_all") setReplyMode("replyAll");
 				} else {
 					setReplyDraftId(null);
 					setReplySeed("");
 					setReplyInitialHtml("");
+					setReplyInitialAttachments([]);
 				}
 				setShowReplyComposer(true);
 			}
@@ -570,26 +584,17 @@ export const ThreadDetail = ({
 		const items: AttachmentItem[] = [];
 		const seen = new Set<string>();
 		for (const msg of displayMessages) {
-			const atts = msg.email?.attachments || msg.attachments || [];
-			for (const att of atts) {
+			const messageId = msg.email?.id || msg.inboundEmailId || undefined;
+			const mapped = toAttachmentItems(
+				msg.email?.attachments || msg.attachments,
+				{ messageId, html: msg.email?.htmlBody ?? msg.htmlBody },
+			);
+			for (const att of mapped) {
 				if (att.isInline) continue;
-				const id = att.id || `${att.filename || att.name}-${att.size}`;
-				if (seen.has(id)) continue;
-				seen.add(id);
-				items.push({
-					id: att.id,
-					name: att.filename || att.name || "Attachment",
-					size:
-						typeof att.size === "number"
-							? `${(att.size / 1024).toFixed(1)} KB`
-							: att.size || "Unknown size",
-					contentType: att.contentType,
-					storagePath: att.storagePath,
-					isInline: att.isInline,
-					inboundEmailId:
-						att.inboundEmailId || msg.email?.id || msg.inboundEmailId,
-					messageId: msg.email?.id || msg.inboundEmailId || msg.id,
-				});
+				const key = att.id || `${att.name}-${att.size}`;
+				if (seen.has(key)) continue;
+				seen.add(key);
+				items.push(att);
 			}
 		}
 		return items;
@@ -679,7 +684,9 @@ export const ThreadDetail = ({
 		}
 		try {
 			if (inTrash) {
-				if (messageId) await deleteMessage(messageId);
+				// Trash rows are threads (thr_…), not messages.
+				if (threadKey) await deleteThread(threadKey);
+				else if (messageId) await deleteMessage(messageId);
 			} else if (threadKey) {
 				await trashThread(threadKey);
 			} else if (messageId) {
@@ -848,12 +855,14 @@ export const ThreadDetail = ({
 					setForwardDraftId(existing.id);
 					setForwardSeed(existing.text);
 					setForwardInitialHtml(existing.html);
+					setForwardInitialAttachments(existing.attachments);
 					setForwardInitialTo(existing.to);
 					setForwardInitialCc(existing.cc);
 				} else {
 					setForwardDraftId(null);
 					setForwardSeed("");
 					setForwardInitialHtml("");
+					setForwardInitialAttachments([]);
 					setForwardInitialTo([]);
 					setForwardInitialCc([]);
 				}
@@ -865,6 +874,7 @@ export const ThreadDetail = ({
 		setForwardDraftId(null);
 		setForwardSeed("");
 		setForwardInitialHtml("");
+		setForwardInitialAttachments([]);
 		setForwardInitialTo([]);
 		setForwardInitialCc([]);
 		setShowForwardComposer(true);
@@ -939,6 +949,7 @@ export const ThreadDetail = ({
 					setReplyDraftId(existing.id);
 					setReplySeed(existing.text);
 					setReplyInitialHtml(existing.html);
+					setReplyInitialAttachments(existing.attachments);
 					if (existing.inReplyToMessageId) {
 						setReplyApiMessageId(existing.inReplyToMessageId);
 					}
@@ -946,6 +957,7 @@ export const ThreadDetail = ({
 					setReplyDraftId(null);
 					setReplySeed("");
 					setReplyInitialHtml("");
+					setReplyInitialAttachments([]);
 				}
 				setShowReplyComposer(true);
 			});
@@ -955,6 +967,7 @@ export const ThreadDetail = ({
 		setReplyDraftId(null);
 		setReplySeed("");
 		setReplyInitialHtml("");
+		setReplyInitialAttachments([]);
 		setShowReplyComposer(true);
 	};
 
@@ -989,18 +1002,26 @@ export const ThreadDetail = ({
 			path?: string;
 			content_type?: string;
 		}>;
+		includeAttachments?: string[];
 	}) => {
-		if (!thread || !messageId || data.to.length === 0) return;
+		// Forward the message the composer was opened on (not the list row,
+		// which is a thr_ id for archived/trashed threads).
+		const source =
+			displayMessages.find((m) => m.id === forwardAnchorMessageId) ??
+			displayMessages[displayMessages.length - 1];
+		const sourceId = resolveReplyMessageId(source) ?? messageId;
+		if (!thread || !sourceId || data.to.length === 0) return;
 
 		setIsForwarding(true);
 		const toList = data.to;
 		const ccList = data.cc;
 
-		const fwdPromise = sendForward(messageId, toList, {
+		const fwdPromise = sendForward(sourceId, toList, {
 			text: data.text.trim() || undefined,
 			html: data.html || undefined,
 			cc: ccList.length ? ccList : undefined,
 			attachments: data.attachments,
+			include_attachments: data.includeAttachments,
 		});
 
 		const draftToDelete = forwardDraftId;
@@ -1211,6 +1232,18 @@ export const ThreadDetail = ({
 		displayMessages[displayMessages.length - 1] ??
 		null;
 
+	const forwardOriginalAttachments = toAttachmentItems(
+		forwardSourceMsg?.email?.attachments || forwardSourceMsg?.attachments,
+		{
+			messageId: resolveReplyMessageId(forwardSourceMsg) ?? undefined,
+			html: forwardSourceMsg?.email?.htmlBody ?? forwardSourceMsg?.htmlBody,
+		},
+	).flatMap((att) =>
+		att.id && !att.isInline
+			? [{ id: att.id, name: att.name, size: att.size }]
+			: [],
+	);
+
 	const forwardOriginalFrom = (() => {
 		if (!forwardSourceMsg) {
 			return thread.from.name
@@ -1285,6 +1318,7 @@ export const ThreadDetail = ({
 			}
 			initialContent={replySeed}
 			initialHtml={replyInitialHtml}
+			initialAttachments={replyInitialAttachments}
 			draft={
 				mailbox && conversationThreadId && replyApiMessageId
 					? {
@@ -1329,6 +1363,8 @@ export const ThreadDetail = ({
 			initialCc={forwardInitialCc}
 			initialContent={forwardSeed}
 			initialHtml={forwardInitialHtml}
+			initialAttachments={forwardInitialAttachments}
+			originalAttachments={forwardOriginalAttachments}
 			draft={
 				mailbox && conversationThreadId
 					? {

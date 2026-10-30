@@ -375,6 +375,10 @@ export namespace MailModel {
 		storagePath: t.String(),
 		contentDisposition: t.Union([t.String(), t.Null()]),
 		contentId: t.Union([t.String(), t.Null()]),
+		downloadUrl: t.String({
+			description:
+				"Relative URL that returns the attachment bytes (same auth as this endpoint)",
+		}),
 		createdAt: t.Union([t.Date(), t.String()]),
 	});
 

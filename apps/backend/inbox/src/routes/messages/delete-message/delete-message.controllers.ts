@@ -1,8 +1,9 @@
 import { db } from "@reloop/db/client";
-import { inboundEmail } from "@reloop/db/schema";
+import { inboundEmail, threadMessage } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
+import { recomputeThread } from "../../../lib/thread-maintenance";
 
 export async function deleteMessageController(
 	id: string,
@@ -26,7 +27,16 @@ export async function deleteMessageController(
 		});
 	}
 
+	const links = await db.query.threadMessage.findMany({
+		where: eq(threadMessage.inboundEmailId, id),
+		columns: { threadId: true },
+	});
+
+	// thread_message rows cascade; the threads' counters must follow.
 	await db.delete(inboundEmail).where(eq(inboundEmail.id, id));
+	for (const threadId of new Set(links.map((l) => l.threadId))) {
+		await recomputeThread(threadId);
+	}
 
 	log.info(`[INBOX] Deleted message ${id} (Org: ${organizationId})`);
 	return { success: true };

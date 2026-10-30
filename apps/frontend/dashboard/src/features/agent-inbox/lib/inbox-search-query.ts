@@ -1,5 +1,6 @@
 import { parseEmail } from "#/features/agent-inbox/lib/email-address";
 import type { InboundThread } from "../types";
+import { hasVisibleAttachments } from "../utils/map-outbound-attachments";
 
 export type InboxFilterChip =
 	| "unread"
@@ -175,9 +176,10 @@ export function threadMatchesFilters(
 	) {
 		return false;
 	}
+	// Inline parts (logos, signatures) don't count, matching the list chip.
 	if (
 		filters.includes("has_attachment") &&
-		(thread.attachments?.length ?? 0) === 0
+		!hasVisibleAttachments(thread.attachments)
 	) {
 		return false;
 	}

@@ -18,10 +18,17 @@ export interface InboundTimelineStep {
 }
 
 export interface InboundAttachment {
+	/** Present on API-backed attachments; needed to download them. */
+	id?: string;
 	name: string;
 	size: string;
 	contentType?: string;
 	isInline?: boolean;
+	storagePath?: string;
+	contentId?: string | null;
+	contentDisposition?: string | null;
+	/** Message the attachment belongs to (inbound email or sent log). */
+	inboundEmailId?: string;
 }
 
 export interface AgentMailbox {

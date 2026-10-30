@@ -1,6 +1,8 @@
 import { cn } from "@reloop/ui/cn";
+import { toast } from "@reloop/ui/toast";
 import { HardDriveDownload } from "lucide-react";
-import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
+import { apiFetch, responseError } from "#/features/agent-inbox/lib/api-fetch";
+import { isInlineAttachment } from "#/features/agent-inbox/utils/map-outbound-attachments";
 import { FileTypeIcon } from "./file-type-icon";
 
 export interface AttachmentItem {
@@ -34,7 +36,7 @@ const formatFileSize = (size: string | number) => {
 	return size;
 };
 
-function triggerDownload(href: string, filename: string, revoke?: string) {
+function triggerDownload(href: string, filename: string) {
 	const a = document.createElement("a");
 	a.href = href;
 	a.download = filename;
@@ -43,60 +45,139 @@ function triggerDownload(href: string, filename: string, revoke?: string) {
 		a.rel = "noopener noreferrer";
 	}
 	a.click();
-	if (revoke) URL.revokeObjectURL(revoke);
 }
+
+async function downloadBlob(url: string, filename: string): Promise<void> {
+	const res = await apiFetch(url);
+	if (!res.ok) throw await responseError(res, "Could not download attachment");
+	const objectUrl = URL.createObjectURL(await res.blob());
+	triggerDownload(objectUrl, filename);
+	// Revoke after the click has been handled, or some browsers cancel it.
+	setTimeout(() => URL.revokeObjectURL(objectUrl), 10_000);
+}
+
+/** URL that returns an attachment's bytes (inbound or sent). */
+export const attachmentContentUrl = (
+	messageId: string,
+	attachmentId: string,
+	inline = false,
+) =>
+	`/api/inbox/v1/messages/${encodeURIComponent(messageId)}/attachments/${encodeURIComponent(attachmentId)}/content${inline ? "?inline=true" : ""}`;
 
 export const downloadAttachment = async (
 	file: AttachmentItem,
 	messageId?: string,
-) => {
-	const path = file.storagePath?.trim();
-	if (path?.startsWith("http://") || path?.startsWith("https://")) {
-		triggerDownload(path, file.name);
-		return;
-	}
-	if (path?.startsWith("uploads/")) {
-		const fileRes = await apiFetch(
-			`/api/upload/v1/files/content?path=${encodeURIComponent(path)}`,
+): Promise<void> => {
+	try {
+		const path = file.storagePath?.trim();
+		if (path?.startsWith("http://") || path?.startsWith("https://")) {
+			triggerDownload(path, file.name);
+			return;
+		}
+		if (path?.startsWith("uploads/")) {
+			await downloadBlob(
+				`/api/upload/v1/files/content?path=${encodeURIComponent(path)}`,
+				file.name,
+			);
+			return;
+		}
+		const msgId = file.inboundEmailId || file.messageId || messageId;
+		if (!msgId || !file.id) {
+			throw new Error("This attachment is not available for download");
+		}
+		await downloadBlob(attachmentContentUrl(msgId, file.id), file.name);
+	} catch (err) {
+		toast.error(
+			err instanceof Error ? err.message : "Could not download attachment",
 		);
-		if (!fileRes.ok) return;
-		const blob = await fileRes.blob();
-		const objectUrl = URL.createObjectURL(blob);
-		triggerDownload(objectUrl, file.name, objectUrl);
-		return;
 	}
-
-	const msgId = messageId || file.messageId || file.inboundEmailId;
-	if (!msgId || !file.id) return;
-
-	const url = `/api/inbox/v1/messages/${msgId}/attachments/${file.id}`;
-	const res = await apiFetch(url);
-	if (!res.ok) return;
-
-	const meta = (await res.json()) as {
-		filename: string;
-		storagePath: string;
-		contentType: string;
-	};
-
-	if (meta.storagePath?.startsWith("http")) {
-		triggerDownload(meta.storagePath, meta.filename || file.name);
-		return;
-	}
-
-	if (meta.storagePath?.startsWith("uploads/")) {
-		const fileRes = await apiFetch(
-			`/api/upload/v1/files/content?path=${encodeURIComponent(meta.storagePath)}`,
-		);
-		if (!fileRes.ok) return;
-		const blob = await fileRes.blob();
-		const objectUrl = URL.createObjectURL(blob);
-		triggerDownload(objectUrl, meta.filename || file.name, objectUrl);
-		return;
-	}
-
-	triggerDownload(url, meta.filename || file.name);
 };
+
+/** Attachment as the API returns it (inbound row or sent-log entry). */
+export interface RawMessageAttachment {
+	id?: string;
+	filename?: string;
+	name?: string;
+	size?: number | string;
+	contentType?: string;
+	storagePath?: string;
+	contentDisposition?: string | null;
+	contentId?: string | null;
+	isInline?: boolean;
+	inboundEmailId?: string;
+}
+
+const normalizeCid = (cid: string) =>
+	cid.trim().replace(/^<|>$/g, "").toLowerCase();
+
+/** `cid:` references in an HTML body, normalized. */
+const referencedCids = (html: string | null | undefined): Set<string> =>
+	new Set(
+		Array.from((html ?? "").matchAll(/cid:([^"'\s)>]+)/gi), (m) => {
+			const raw = m[1] ?? "";
+			try {
+				return normalizeCid(decodeURIComponent(raw));
+			} catch {
+				return normalizeCid(raw);
+			}
+		}),
+	);
+
+/** Where an attachment's bytes can be fetched from the dashboard. */
+function attachmentSrc(
+	att: RawMessageAttachment,
+	messageId: string | undefined,
+	inline: boolean,
+): string | undefined {
+	const path = att.storagePath?.trim();
+	if (path?.startsWith("https://")) return path;
+	if (path?.startsWith("uploads/")) {
+		return `/api/upload/v1/files/content?path=${encodeURIComponent(path)}`;
+	}
+	const msgId = att.inboundEmailId || messageId;
+	return msgId && att.id
+		? attachmentContentUrl(msgId, att.id, inline)
+		: undefined;
+}
+
+/**
+ * Normalize API attachments for the chips. Parts shown inside the body
+ * (Content-Disposition: inline, or a Content-ID the HTML references) are
+ * marked inline so they don't also appear as chips.
+ */
+export function toAttachmentItems(
+	attachments: RawMessageAttachment[] | undefined,
+	opts: { messageId?: string; html?: string | null },
+): AttachmentItem[] {
+	const cids = referencedCids(opts.html);
+	return (attachments ?? []).map((att) => ({
+		id: att.id,
+		name: att.filename || att.name || "Attachment",
+		size:
+			typeof att.size === "number" ? formatFileSize(att.size) : att.size || "",
+		contentType: att.contentType,
+		storagePath: att.storagePath,
+		inboundEmailId: att.inboundEmailId || opts.messageId,
+		messageId: opts.messageId,
+		isInline:
+			isInlineAttachment(att) ||
+			(!!att.contentId && cids.has(normalizeCid(att.contentId))),
+	}));
+}
+
+/** Content-ID → URL map so `cid:` images in the body render. */
+export function inlineImageUrls(
+	attachments: RawMessageAttachment[] | undefined,
+	messageId: string | undefined,
+): Record<string, string> {
+	const out: Record<string, string> = {};
+	for (const att of attachments ?? []) {
+		if (!att.contentId) continue;
+		const src = attachmentSrc(att, messageId, true);
+		if (src) out[normalizeCid(att.contentId)] = src;
+	}
+	return out;
+}
 
 /**
  * Horizontal attachment chips with file-type icons.

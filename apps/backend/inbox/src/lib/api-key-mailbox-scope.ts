@@ -26,6 +26,7 @@ import {
 } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { InboxErrors } from "./errors";
+import { resolveThreadIdForMessage } from "./thread-correlation";
 
 export type MailboxScope =
 	| { restricted: false }
@@ -122,7 +123,9 @@ export function listMailboxFilter(
 
 /**
  * Throws 403 when the thread belongs to a mailbox outside the scope.
- * Unknown threads pass so the controller can return its usual 404.
+ * Thread routes also accept message IDs (inbound, email log, thread message)
+ * and resolve them to a thread, so those are resolved and checked too.
+ * Unknown IDs pass so the controller can return its usual 404.
  */
 export async function assertThreadAllowed(
 	scope: MailboxScope,
@@ -130,14 +133,21 @@ export async function assertThreadAllowed(
 	threadId: string,
 ): Promise<void> {
 	if (!scope.restricted) return;
+	const resolvedId =
+		(await resolveThreadIdForMessage(threadId, organizationId)) ?? threadId;
 	const thread = await db.query.emailThread.findFirst({
 		where: and(
-			eq(emailThread.id, threadId),
+			eq(emailThread.id, resolvedId),
 			eq(emailThread.organizationId, organizationId),
 		),
 		columns: { mailboxId: true },
 	});
-	if (thread) assertMailboxAllowed(scope, thread.mailboxId);
+	if (thread) {
+		assertMailboxAllowed(scope, thread.mailboxId);
+		return;
+	}
+	// Standalone messages with no thread row are served by thread routes too.
+	await assertMessageAllowed(scope, organizationId, threadId);
 }
 
 export async function assertThreadsAllowed(

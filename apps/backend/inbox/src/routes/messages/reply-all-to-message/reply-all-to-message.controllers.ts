@@ -9,7 +9,13 @@ import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
 import { resolveThreadIdForMessage } from "../../../lib/thread-correlation";
-import { proxySendToMailService } from "../messages.helper";
+import {
+	addressKey,
+	mailboxForSender,
+	proxySendToMailService,
+	replySubject,
+	replyThreadingHeaders,
+} from "../messages.helper";
 
 export async function replyAllToMessageController(
 	messageId: string,
@@ -47,6 +53,7 @@ export async function replyAllToMessageController(
 		originalInbound?.replyTo ?? originalInbound?.fromEmail ?? "";
 	let originalSubject = originalInbound?.subject ?? "";
 	let headerMsgId = originalInbound?.messageId ?? null;
+	let headerRefs: unknown = originalInbound?.references;
 	let originalToEmails = originalInbound?.toEmails ?? [];
 	let originalCcEmails = (originalInbound?.ccEmails as string[]) ?? [];
 
@@ -90,20 +97,9 @@ export async function replyAllToMessageController(
 			originalCcEmails = (inb.ccEmails as string[]) ?? [];
 			originalSubject = inb.subject || lastInbound?.subject || "";
 			headerMsgId = inb.messageId ?? lastInbound?.rfc822MessageId ?? null;
+			headerRefs = inb.references;
 		} else {
-			const mbx = await db.query.mailbox.findFirst({
-				where: and(
-					eq(mailbox.organizationId, organizationId),
-					eq(mailbox.email, outboundLog.fromEmail),
-				),
-			});
-			const firstMbx =
-				mbx ||
-				(await db.query.mailbox.findFirst({
-					where: eq(mailbox.organizationId, organizationId),
-				}));
-
-			mailboxId = firstMbx?.id ?? "";
+			mailboxId = await mailboxForSender(organizationId, outboundLog.fromEmail);
 			const toArray = Array.isArray(outboundLog.toEmails)
 				? (outboundLog.toEmails as string[])
 				: [];
@@ -132,16 +128,23 @@ export async function replyAllToMessageController(
 	// Build reply-all recipients
 	const replyTo = body.to ?? defaultReplyTo;
 
-	const defaultCc = [...originalToEmails, ...originalCcEmails].filter(
-		(email) => email && email !== ourEmail && email !== defaultReplyTo,
+	// Drop ourselves (any case / +tag), the reply's own recipients, and dupes.
+	const toList = Array.isArray(replyTo) ? replyTo : [replyTo];
+	const excluded = new Set(
+		[ourEmail, ...toList].filter(Boolean).map((e) => addressKey(e)),
 	);
+	const defaultCc: string[] = [];
+	for (const email of [...originalToEmails, ...originalCcEmails]) {
+		const key = email ? addressKey(email) : "";
+		if (!key || excluded.has(key)) continue;
+		excluded.add(key);
+		defaultCc.push(email);
+	}
 
 	const replyCc = body.cc !== undefined ? body.cc : defaultCc;
 	const ccList = Array.isArray(replyCc) ? replyCc : replyCc ? [replyCc] : [];
 
-	const replySubject = originalSubject.startsWith("Re:")
-		? originalSubject
-		: `Re: ${originalSubject}`;
+	const subject = replySubject(originalSubject);
 
 	log.info(
 		`[INBOX] Reply-all to message ${messageId} → ${Array.isArray(replyTo) ? replyTo.join(", ") : replyTo}, CC: ${ccList.join(", ")}`,
@@ -152,14 +155,14 @@ export async function replyAllToMessageController(
 			mailboxId: mailboxId ?? "",
 			organizationId,
 			to: replyTo,
-			subject: replySubject,
+			subject,
 			text: body.text,
 			html: body.html,
 			cc: ccList.length > 0 ? ccList : undefined,
 			bcc: body.bcc,
 			attachments: body.attachments,
 			threadId: resolvedThreadId,
-			headers: headerMsgId ? { "In-Reply-To": headerMsgId } : undefined,
+			headers: replyThreadingHeaders(headerMsgId, headerRefs),
 		},
 		apiKey,
 		cookie,

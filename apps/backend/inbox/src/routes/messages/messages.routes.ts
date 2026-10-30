@@ -5,6 +5,7 @@ import { deleteMessageRoute } from "./delete-message/delete-message.route";
 import { forwardMessageRoute } from "./forward-message/forward-message.route";
 import { getMessageRoute } from "./get-message/get-message.route";
 import { getMessageAttachmentRoute } from "./get-message-attachment/get-message-attachment.route";
+import { getMessageAttachmentContentRoute } from "./get-message-attachment-content/get-message-attachment-content.route";
 import { getRawMessageRoute } from "./get-raw-message/get-raw-message.route";
 import { listMessagesRoute } from "./list-messages/list-messages.route";
 import { listSentMessagesRoute } from "./list-sent-messages/list-sent-messages.route";
@@ -24,6 +25,7 @@ export const messagesRoutes = new Elysia({
 	.use(getMessageRoute)
 	.use(batchGetMessagesRoute)
 	.use(getMessageAttachmentRoute)
+	.use(getMessageAttachmentContentRoute)
 	.use(getRawMessageRoute)
 	.use(updateMessageRoute)
 	.use(markMessageReadRoute)

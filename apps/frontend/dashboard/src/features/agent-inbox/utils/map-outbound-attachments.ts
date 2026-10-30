@@ -10,6 +10,7 @@ export type OutboundAttachmentInput = {
 	contentDisposition?: string | null;
 	contentId?: string | null;
 	isInline?: boolean;
+	storagePath?: string;
 };
 
 /**
@@ -40,9 +41,13 @@ export function mapOutboundAttachments(
 				? `${(att.size / 1024).toFixed(1)} KB`
 				: att.size || "";
 		return {
+			id: att.id,
 			name: att.filename || att.name || "Attachment",
 			size,
 			contentType: att.contentType || att.content_type,
+			storagePath: att.storagePath,
+			contentId: att.contentId,
+			contentDisposition: att.contentDisposition,
 			isInline: isInlineAttachment(att),
 		};
 	});

@@ -1,7 +1,13 @@
 import { db } from "@reloop/db/client";
-import { emailThread, inboundAttachment } from "@reloop/db/schema";
+import {
+	emailThread,
+	inboundAttachment,
+	inboundEmail,
+	threadMessage,
+} from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
+import { attachmentDownloadUrl } from "../../messages/get-message-attachment/get-message-attachment.controllers";
 
 export async function getThreadAttachmentController(
 	threadId: string,
@@ -30,11 +36,33 @@ export async function getThreadAttachmentController(
 		where: eq(inboundAttachment.id, attachmentId),
 	});
 
-	if (!attachment) {
+	// The attachment must be on a message in this thread (and this org);
+	// a bare ID lookup would expose any org's attachment.
+	const owner = attachment
+		? await db.query.inboundEmail.findFirst({
+				where: and(
+					eq(inboundEmail.id, attachment.inboundEmailId),
+					eq(inboundEmail.organizationId, organizationId),
+				),
+				columns: { id: true, threadId: true },
+			})
+		: undefined;
+	const inThread =
+		owner &&
+		(owner.threadId === threadId ||
+			(await db.query.threadMessage.findFirst({
+				where: and(
+					eq(threadMessage.threadId, threadId),
+					eq(threadMessage.inboundEmailId, owner.id),
+				),
+				columns: { id: true },
+			})));
+
+	if (!attachment || !inThread) {
 		throw createError({
 			status: 404,
 			message: "Attachment not found",
-			why: `Attachment ${attachmentId} was not found`,
+			why: `Attachment ${attachmentId} was not found in thread ${threadId}`,
 			fix: "Verify the attachment ID",
 		});
 	}
@@ -47,6 +75,10 @@ export async function getThreadAttachmentController(
 		storagePath: attachment.storagePath,
 		contentDisposition: attachment.contentDisposition,
 		contentId: attachment.contentId,
+		downloadUrl: attachmentDownloadUrl(
+			attachment.inboundEmailId,
+			attachment.id,
+		),
 		createdAt: attachment.createdAt,
 	};
 }

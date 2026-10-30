@@ -180,6 +180,19 @@ export async function assignLabelController(
 		});
 	}
 
+	if (
+		foundLabel.mailboxId &&
+		foundThread.mailboxId &&
+		foundLabel.mailboxId !== foundThread.mailboxId
+	) {
+		throw createError({
+			status: 400,
+			message: "Label belongs to another inbox",
+			why: `Label ${labelId} is for a different inbox than thread ${threadId}`,
+			fix: "Use a label created for this thread's inbox",
+		});
+	}
+
 	await db
 		.insert(threadLabel)
 		.values({ threadId, labelId })

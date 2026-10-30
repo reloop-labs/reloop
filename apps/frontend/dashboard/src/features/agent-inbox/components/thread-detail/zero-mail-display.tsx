@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import {
 	extractBareEmail,
@@ -13,12 +13,19 @@ import { formatMessageHeaderTime, formatMessageTimestamp } from "./date-utils";
 import { HoverPopover } from "./hover-popover";
 import { MessageActionBar } from "./message-action-bar";
 import { MessageActionsDropdown } from "./message-actions-dropdown";
-import { MessageAttachments } from "./message-attachments";
+import {
+	inlineImageUrls,
+	MessageAttachments,
+	type RawMessageAttachment,
+	toAttachmentItems,
+} from "./message-attachments";
 import { MessageBody } from "./message-body";
 import { MessageDeliveryError } from "./message-delivery-error";
 import { MessageDraftActions } from "./message-draft-actions";
 import { MessageDraftBanner } from "./message-draft-banner";
 import { MessageParsedData } from "./message-parsed-data";
+
+const NO_ATTACHMENTS: RawMessageAttachment[] = [];
 
 const YouBadge = ({ className }: { className?: string }) => (
 	<span
@@ -166,20 +173,16 @@ export const ZeroMailDisplay = ({
 		? parseRecipients(email?.bccEmails ?? msg.bccEmails)
 		: [];
 
-	const displayAttachments = (email?.attachments || msg.attachments || []).map(
-		(att: any) => ({
-			id: att.id,
-			name: att.filename || att.name || "Attachment",
-			size:
-				typeof att.size === "number"
-					? `${(att.size / 1024).toFixed(1)} KB`
-					: att.size || "Unknown size",
-			contentType: att.contentType,
-			isInline: att.isInline,
-			inboundEmailId: att.inboundEmailId || email?.id || msg.inboundEmailId,
-			messageId: email?.id || msg.inboundEmailId || msg.id,
-			...att,
-		}),
+	const attachmentMessageId = email?.id || msg.inboundEmailId || undefined;
+	const rawAttachments: RawMessageAttachment[] =
+		email?.attachments || msg.attachments || NO_ATTACHMENTS;
+	const displayAttachments = toAttachmentItems(rawAttachments, {
+		messageId: attachmentMessageId,
+		html: bodyHtml,
+	});
+	const inlineImages = useMemo(
+		() => inlineImageUrls(rawAttachments, attachmentMessageId),
+		[rawAttachments, attachmentMessageId],
 	);
 
 	const toggleCollapse = () => {
@@ -489,6 +492,7 @@ export const ZeroMailDisplay = ({
 								isTranslated={isTranslated}
 								targetLanguage={targetLanguage}
 								messageId={msg.id}
+								inlineImages={inlineImages}
 							/>
 
 							{isApproval && (
@@ -511,7 +515,7 @@ export const ZeroMailDisplay = ({
 								<div className="mt-4">
 									<MessageAttachments
 										attachments={displayAttachments}
-										messageId={email?.id || msg.inboundEmailId}
+										messageId={attachmentMessageId}
 									/>
 								</div>
 							)}

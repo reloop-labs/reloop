@@ -80,6 +80,8 @@ interface MessageBodyProps {
 	targetLanguage: string;
 	/** Stable id for this message, used to reset image toggle when switching */
 	messageId?: string;
+	/** Content-ID → URL for images embedded in the message (`cid:`). */
+	inlineImages?: Record<string, string>;
 }
 
 /**
@@ -93,6 +95,7 @@ export const MessageBody = ({
 	isTranslated,
 	targetLanguage,
 	messageId,
+	inlineImages,
 }: MessageBodyProps) => {
 	const { resolvedTheme } = useTheme();
 	const theme: EmailTheme = resolvedTheme === "light" ? "light" : "dark";
@@ -114,8 +117,9 @@ export const MessageBody = ({
 			html: bodyHtml,
 			shouldLoadImages: showImages,
 			theme,
+			inlineImages,
 		});
-	}, [bodyHtml, showImages, theme]);
+	}, [bodyHtml, showImages, theme, inlineImages]);
 
 	useEffect(() => {
 		if (processed?.hasBlockedImages) {

@@ -19,6 +19,7 @@ import {
 	useInboxSocket,
 } from "../hooks/use-inbox-socket";
 import { extractBareEmail, extractDisplayName } from "../lib/email-address";
+import { parseInboxQuery } from "../lib/inbox-search-query";
 import type {
 	AgentMailbox,
 	BackendMessage,
@@ -30,7 +31,10 @@ import type {
 	SaveComposeDraftInput,
 } from "../types";
 import { findComposeDraft } from "../utils/find-compose-draft";
-import { mapOutboundAttachments } from "../utils/map-outbound-attachments";
+import {
+	isInlineAttachment,
+	mapOutboundAttachments,
+} from "../utils/map-outbound-attachments";
 import {
 	parseComposeDraft,
 	parseComposeDraftsList,
@@ -182,6 +186,8 @@ interface AgentInboxContextValue {
 	unarchiveThread: (threadId: string) => Promise<void>;
 	trashThread: (threadId: string) => Promise<void>;
 	restoreThread: (threadId: string) => Promise<void>;
+	/** Permanently delete a thread and its received messages. */
+	deleteThread: (threadId: string) => Promise<void>;
 	toggleThreadImportant: (
 		threadId: string,
 		isImportant: boolean,
@@ -233,6 +239,8 @@ interface AgentInboxContextValue {
 				path?: string;
 				content_type?: string;
 			}>;
+			/** Original attachment IDs to keep; omitted = all. */
+			include_attachments?: string[];
 		},
 	) => Promise<void>;
 	sendMessage: (input: {
@@ -333,10 +341,15 @@ const mapMessageToThread = (msg: BackendMessage): InboundThread => {
 		toEmails: msg.toEmails,
 		attachments:
 			msg.attachments?.map((att) => ({
+				id: att.id,
 				name: att.filename,
 				size: `${(att.size / 1024).toFixed(1)} KB`,
 				contentType: att.contentType,
-				isInline: att.contentDisposition === "inline",
+				storagePath: att.storagePath,
+				contentId: att.contentId,
+				contentDisposition: att.contentDisposition,
+				inboundEmailId: att.inboundEmailId || msg.id,
+				isInline: isInlineAttachment(att),
 			})) || [],
 		timeline: [
 			{ label: "Email received", at: createdAtStr, state: "done" as const },
@@ -433,7 +446,9 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		mutate: mutateMailboxes,
 	} = useSWR<BackendMailbox[]>("/api/inbox/v1/mailboxes/list");
 
-	const trimmedSearch = searchQuery.trim();
+	// Server search is a plain ILIKE: send only free text. Operators
+	// (from:, subject:, is:, has:) are applied client-side by applyInboxFilters.
+	const trimmedSearch = parseInboxQuery(searchQuery).text;
 	const messagesListUrl = trimmedSearch
 		? `/api/inbox/v1/messages?q=${encodeURIComponent(trimmedSearch)}&limit=200`
 		: "/api/inbox/v1/messages";
@@ -1225,6 +1240,23 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		],
 	);
 
+	const deleteThread = useCallback(
+		async (threadId: string) => {
+			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}`, {
+				method: "DELETE",
+			});
+			if (!res.ok) {
+				throw await responseError(res, "Failed to delete thread");
+			}
+			await Promise.all([
+				mutateMessages(),
+				mutateThreads(),
+				mutateSentMessages(),
+			]);
+		},
+		[mutateMessages, mutateThreads, mutateSentMessages],
+	);
+
 	const toggleThreadImportant = useCallback(
 		async (threadId: string, isImportant: boolean) => {
 			const res = await apiFetch(`/api/inbox/v1/threads/${threadId}`, {
@@ -1396,6 +1428,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 					path?: string;
 					content_type?: string;
 				}>;
+				/** Original attachment IDs to keep; omitted = all. */
+				include_attachments?: string[];
 			},
 		) => {
 			const res = await apiFetch(`/api/inbox/v1/messages/${id}/forward`, {
@@ -1620,6 +1654,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			unarchiveThread,
 			trashThread,
 			restoreThread,
+			deleteThread,
 			toggleThreadImportant,
 			toggleThreadPinned,
 			batchThreads,
@@ -1659,6 +1694,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			unarchiveThread,
 			trashThread,
 			restoreThread,
+			deleteThread,
 			toggleThreadImportant,
 			toggleThreadPinned,
 			batchThreads,

@@ -24,7 +24,7 @@ import { useDraftAutosave } from "../../hooks/use-draft-autosave";
 import { extractBareEmail, extractDisplayName } from "../../lib/email-address";
 import { plainToHtml } from "../../lib/plain-to-html";
 import { readAiTextStreamAfterThink } from "../../lib/read-ai-text-stream-after-think";
-import type { ComposeDraftKind } from "../../types";
+import type { ComposeDraftAttachment, ComposeDraftKind } from "../../types";
 import { AiComposerSlot } from "../compose/ai-composer-slot";
 import {
 	type AiDraftPhase,
@@ -34,6 +34,7 @@ import {
 import { AiSparkleButton } from "../compose/ai-sparkle-button";
 import {
 	type ComposeAttachment,
+	draftAttachmentsToCompose,
 	formatBytes,
 	toSendAttachments,
 	uploadComposeFile,
@@ -77,6 +78,8 @@ interface ReplyComposerProps {
 	initialContent?: string;
 	/** HTML seed when reopening a saved draft */
 	initialHtml?: string;
+	/** Attachments restored from a saved draft. */
+	initialAttachments?: ComposeDraftAttachment[];
 	draft?: ReplyDraftContext;
 	onModeChange?: (mode: ReplyMode) => void;
 	onForward?: () => void;
@@ -125,6 +128,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			threadId = null,
 			initialContent = "",
 			initialHtml = "",
+			initialAttachments,
 			draft,
 			onModeChange,
 			onForward,
@@ -231,7 +235,9 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 		const [editorContent, setEditorContent] = useState(seedHtml);
 		const [htmlBody, setHtmlBody] = useState(seedHtml);
 		const [textBody, setTextBody] = useState(initialContent);
-		const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
+		const [attachments, setAttachments] = useState<ComposeAttachment[]>(() =>
+			draftAttachmentsToCompose(initialAttachments),
+		);
 		const [aiPhase, setAiPhase] = useState<AiDraftPhase>("idle");
 		const aiAbortRef = useRef<AbortController | null>(null);
 		const aiRestoreRef = useRef<{ html: string; text: string } | null>(null);
@@ -301,7 +307,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 				.map((a) => ({
 					id: a.id,
 					filename: a.name,
-					path: a.url || a.path,
+					path: a.path || a.url,
 					url: a.url,
 					content_type: a.content_type,
 					size: a.size,

@@ -20,9 +20,10 @@ import {
 	actionKbdOnSolidClassName,
 } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useDraftAutosave } from "../../hooks/use-draft-autosave";
-import type { ComposeDraftKind } from "../../types";
+import type { ComposeDraftAttachment, ComposeDraftKind } from "../../types";
 import {
 	type ComposeAttachment,
+	draftAttachmentsToCompose,
 	formatBytes,
 	toSendAttachments,
 	uploadComposeFile,
@@ -44,6 +45,8 @@ export interface ForwardFormValues {
 		path?: string;
 		content_type?: string;
 	}>;
+	/** IDs of the original message's attachments to keep. */
+	includeAttachments?: string[];
 }
 
 export type ForwardDraftContext = {
@@ -72,7 +75,11 @@ interface ForwardComposerProps {
 	initialCc?: string[];
 	initialContent?: string;
 	initialHtml?: string;
+	/** Attachments restored from a saved draft. */
+	initialAttachments?: ComposeDraftAttachment[];
 	draft?: ForwardDraftContext;
+	/** Files on the forwarded message; included unless the user removes them. */
+	originalAttachments?: Array<{ id: string; name: string; size: string }>;
 }
 
 const modKey =
@@ -104,7 +111,9 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 			initialCc = [],
 			initialContent = "",
 			initialHtml = "",
+			initialAttachments,
 			draft,
+			originalAttachments,
 		},
 		ref,
 	) {
@@ -113,7 +122,18 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 		const editorRef = useRef<ComposeBodyEditorHandle>(null);
 		const [htmlBody, setHtmlBody] = useState(initialHtml);
 		const [textBody, setTextBody] = useState(initialContent);
-		const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
+		const [attachments, setAttachments] = useState<ComposeAttachment[]>(() => [
+			...(originalAttachments ?? []).map((att) => ({
+				id: `original-${att.id}`,
+				originalId: att.id,
+				name: att.name,
+				size: att.size,
+				url: "",
+				path: "",
+				content_type: "",
+			})),
+			...draftAttachmentsToCompose(initialAttachments),
+		]);
 		const [showCc, setShowCc] = useState(initialCc.length > 0);
 		const [focusCcOnShow, setFocusCcOnShow] = useState(false);
 		const addressFieldsRef = useRef<HTMLDivElement>(null);
@@ -170,11 +190,11 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 			html: htmlBody,
 			text: textBody,
 			attachments: attachments
-				.filter((a) => !a.isUploading)
+				.filter((a) => !a.isUploading && !a.originalId)
 				.map((a) => ({
 					id: a.id,
 					filename: a.name,
-					path: a.url || a.path,
+					path: a.path || a.url,
 					url: a.url,
 					content_type: a.content_type,
 					size: a.size,
@@ -253,6 +273,9 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 				text: (exported.text || textBody).trim(),
 				html: exported.html || htmlBody,
 				attachments: toSendAttachments(attachments),
+				includeAttachments: originalAttachments
+					? attachments.flatMap((a) => (a.originalId ? [a.originalId] : []))
+					: undefined,
 			});
 		};
 

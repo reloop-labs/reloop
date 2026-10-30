@@ -44,6 +44,7 @@ export async function getMessagesController(
 		orderBy: [desc(inboundEmail.createdAt)],
 		limit: Math.min(limit, 200),
 		offset,
+		columns: { rawMessage: false },
 		with: {
 			attachments: true,
 		},

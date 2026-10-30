@@ -6,7 +6,7 @@ import {
 	inboundEmail,
 	mailbox,
 } from "@reloop/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { createError, log as evlog } from "evlog";
 import { broadcastToOrg } from "../rooms/inbox.rooms";
 
@@ -121,13 +121,30 @@ export async function receiveInboundEmailController(rawMessage: string) {
 
 		const replyTo = parsed.replyTo?.value?.[0]?.address || undefined;
 
-		const recipientEmail = toEmails[0];
-		if (!recipientEmail) {
+		// The mailbox may be anywhere in To/Cc, or only in the envelope
+		// (Bcc, mailing lists): try every candidate, To first.
+		const headerValue = (key: string): string[] => {
+			const v = parsed.headers?.get(key);
+			if (!v) return [];
+			const text = typeof v === "string" ? v : String(v);
+			return text.match(/[^\s<>,;"]+@[^\s<>,;"]+/g) ?? [];
+		};
+		const candidates = [
+			...toEmails,
+			...ccEmails,
+			...headerValue("x-original-to"),
+			...headerValue("delivered-to"),
+			...bccEmails,
+		]
+			.map((e) => e.toLowerCase().trim())
+			.filter((e, i, all) => e.includes("@") && all.indexOf(e) === i);
+
+		if (candidates.length === 0) {
 			log.warn("[INBOX] No valid recipient found in email");
 			throw createError({
 				status: 400,
 				message: "No valid recipient found in email",
-				why: "The parsed email does not contain any recipient in the To header",
+				why: "The parsed email does not contain any recipient in the To or Cc headers",
 				fix: "Verify the incoming raw email format",
 			});
 		}
@@ -154,35 +171,36 @@ export async function receiveInboundEmailController(rawMessage: string) {
 		const date = parsed.date || undefined;
 		const size = rawMessage.length;
 
-		const normalizedRecipient = recipientEmail.toLowerCase().trim();
-		let mailboxRecord = await db.query.mailbox.findFirst({
+		// Plus-addressed recipients (user+alias@domain.com) fall back to the base.
+		const lookup = new Map<string, string>();
+		for (const addr of candidates) {
+			lookup.set(addr, addr);
+			const [localPart, domainPart] = addr.split("@");
+			if (localPart?.includes("+") && domainPart) {
+				const base = `${localPart.split("+")[0]}@${domainPart}`;
+				if (!lookup.has(base)) lookup.set(base, addr);
+			}
+		}
+		const matches = await db.query.mailbox.findMany({
 			where: and(
-				eq(mailbox.email, normalizedRecipient),
+				inArray(mailbox.email, [...lookup.keys()]),
 				eq(mailbox.status, "active"),
 			),
 		});
-
-		// Fallback: If recipient is plus-addressed (e.g. user+alias@domain.com), try base email
-		if (!mailboxRecord && normalizedRecipient.includes("+")) {
-			const [localPart, domainPart] = normalizedRecipient.split("@");
-			if (localPart && domainPart) {
-				const baseLocalPart = localPart.split("+")[0];
-				const baseEmail = `${baseLocalPart}@${domainPart}`;
-				mailboxRecord = await db.query.mailbox.findFirst({
-					where: and(
-						eq(mailbox.email, baseEmail),
-						eq(mailbox.status, "active"),
-					),
-				});
-			}
-		}
+		const order = [...lookup.keys()];
+		matches.sort((a, b) => order.indexOf(a.email) - order.indexOf(b.email));
+		const mailboxRecord = matches[0];
+		const recipientEmail = candidates[0] ?? "";
+		const normalizedRecipient = mailboxRecord
+			? (lookup.get(mailboxRecord.email) ?? mailboxRecord.email)
+			: recipientEmail;
 
 		if (!mailboxRecord) {
 			log.warn(`[INBOX] Mailbox not found or inactive for: ${recipientEmail}`);
 			throw createError({
 				status: 404,
 				message: "Mailbox not found",
-				why: `No active mailbox exists for recipient email: ${recipientEmail}`,
+				why: `No active mailbox exists for any recipient: ${candidates.join(", ")}`,
 				fix: "Verify that the mailbox is registered and active",
 			});
 		}
@@ -246,8 +264,12 @@ export async function receiveInboundEmailController(rawMessage: string) {
 				filename: att.filename || "unnamed",
 				contentType: att.contentType || "application/octet-stream",
 				size: att.size || 0,
-				storagePath: "", // TODO: Upload via be-upload service and store path
-				contentDisposition: (att.contentDisposition as string) || "attachment",
+				// Bytes stay in raw_message; see lib/inbound-attachment-content.ts.
+				storagePath: "",
+				// multipart/related parts are body images even without a disposition.
+				contentDisposition:
+					(att.contentDisposition as string) ||
+					(att.related ? "inline" : "attachment"),
 				contentId: att.contentId || undefined,
 				checksum: att.checksum || undefined,
 			}));

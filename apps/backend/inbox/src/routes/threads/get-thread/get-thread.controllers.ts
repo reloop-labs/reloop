@@ -57,11 +57,18 @@ export async function getThreadController(id: string, organizationId: string) {
 	// 2. If not found by emailThread.id, check if id is an inboundEmail.id with a threadId column
 	if (!thread) {
 		const inb = await db.query.inboundEmail.findFirst({
-			where: eq(inboundEmail.id, id),
+			where: and(
+				eq(inboundEmail.id, id),
+				eq(inboundEmail.organizationId, organizationId),
+			),
+			columns: { threadId: true },
 		});
 		if (inb?.threadId) {
 			thread = await db.query.emailThread.findFirst({
-				where: eq(emailThread.id, inb.threadId),
+				where: and(
+					eq(emailThread.id, inb.threadId),
+					eq(emailThread.organizationId, organizationId),
+				),
 				with: {
 					messages: {
 						orderBy: [desc(threadMessage.messageAt)],
@@ -83,7 +90,10 @@ export async function getThreadController(id: string, organizationId: string) {
 
 		if (tm?.threadId) {
 			thread = await db.query.emailThread.findFirst({
-				where: eq(emailThread.id, tm.threadId),
+				where: and(
+					eq(emailThread.id, tm.threadId),
+					eq(emailThread.organizationId, organizationId),
+				),
 				with: {
 					messages: {
 						orderBy: [desc(threadMessage.messageAt)],
@@ -127,6 +137,7 @@ export async function getThreadController(id: string, organizationId: string) {
 				if (msg.direction === "inbound" && msg.inboundEmailId) {
 					const email = await db.query.inboundEmail.findFirst({
 						where: eq(inboundEmail.id, msg.inboundEmailId),
+						columns: { rawMessage: false },
 						with: { attachments: true },
 					});
 					return {
@@ -236,6 +247,7 @@ export async function getThreadController(id: string, organizationId: string) {
 			eq(inboundEmail.id, id),
 			eq(inboundEmail.organizationId, organizationId),
 		),
+		columns: { rawMessage: false },
 		with: { attachments: true },
 	});
 
@@ -277,6 +289,7 @@ export async function getThreadController(id: string, organizationId: string) {
 					fromName: standaloneInbound.fromName ?? null,
 					subject: standaloneInbound.subject ?? null,
 					preview,
+					errorMessage: null,
 					messageAt: createdAt,
 					rfc822MessageId: standaloneInbound.messageId ?? null,
 					inReplyTo: null,

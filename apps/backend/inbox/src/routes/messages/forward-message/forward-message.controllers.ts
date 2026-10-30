@@ -1,9 +1,15 @@
 import { db } from "@reloop/db/client";
-import { emailLog, inboundEmail, mailbox } from "@reloop/db/schema";
-import { and, eq } from "drizzle-orm";
+import { emailLog, inboundAttachment, inboundEmail } from "@reloop/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
-import { proxySendToMailService } from "../messages.helper";
+import { forwardableInboundAttachments } from "../../../lib/inbound-attachment-content";
+import { mapEmailLogAttachments } from "../../../lib/outbound-attachments";
+import {
+	forwardSubject,
+	mailboxForSender,
+	proxySendToMailService,
+} from "../messages.helper";
 
 export async function forwardMessageController(
 	messageId: string,
@@ -21,6 +27,8 @@ export async function forwardMessageController(
 			content_type?: string;
 			content_id?: string;
 		}>;
+		/** true (default) = all, false = none, IDs = only these. */
+		include_attachments?: boolean | string[];
 	},
 	apiKey: string,
 	cookie?: string,
@@ -46,6 +54,30 @@ export async function forwardMessageController(
 		: null;
 	let textBody = originalInbound?.textBody || "";
 	let htmlBody = originalInbound?.htmlBody || undefined;
+	let originalAttachments: Array<{
+		content?: string;
+		filename?: string;
+		path?: string;
+		content_type?: string;
+		content_id?: string;
+	}> = [];
+	const selection = body.include_attachments ?? true;
+	const includeAttachments = selection !== false;
+	const selectedIds = Array.isArray(selection) ? new Set(selection) : null;
+	if (includeAttachments && originalInbound?.rawMessage) {
+		const selectedRows = selectedIds
+			? await db.query.inboundAttachment.findMany({
+					where: and(
+						eq(inboundAttachment.inboundEmailId, originalInbound.id),
+						inArray(inboundAttachment.id, [...selectedIds]),
+					),
+				})
+			: undefined;
+		originalAttachments = await forwardableInboundAttachments(
+			originalInbound.rawMessage,
+			selectedRows,
+		);
+	}
 
 	if (!originalInbound) {
 		const outboundLog = await db.query.emailLog.findFirst({
@@ -64,19 +96,7 @@ export async function forwardMessageController(
 			});
 		}
 
-		const mbx = await db.query.mailbox.findFirst({
-			where: and(
-				eq(mailbox.organizationId, organizationId),
-				eq(mailbox.email, outboundLog.fromEmail),
-			),
-		});
-		const firstMbx =
-			mbx ||
-			(await db.query.mailbox.findFirst({
-				where: eq(mailbox.organizationId, organizationId),
-			}));
-
-		mailboxId = firstMbx?.id ?? "";
+		mailboxId = await mailboxForSender(organizationId, outboundLog.fromEmail);
 		fromName = outboundLog.fromName;
 		fromEmail = outboundLog.fromEmail;
 		originalDate = outboundLog.sentAt || outboundLog.createdAt;
@@ -89,12 +109,26 @@ export async function forwardMessageController(
 			: null;
 		textBody = outboundLog.textBody || "";
 		htmlBody = outboundLog.htmlBody || undefined;
+		if (includeAttachments) {
+			originalAttachments = mapEmailLogAttachments(outboundLog.attachments)
+				.filter(
+					(att) =>
+						att.storagePath &&
+						(!selectedIds ||
+							selectedIds.has(att.id) ||
+							att.contentDisposition === "inline"),
+				)
+				.map((att) => ({
+					filename: att.filename,
+					path: att.storagePath,
+					content_type: att.contentType,
+					...(att.contentId ? { content_id: att.contentId } : {}),
+				}));
+		}
 	}
 
 	// Build forward
-	const fwdSubject = originalSubject.startsWith("Fwd:")
-		? originalSubject
-		: `Fwd: ${originalSubject}`;
+	const fwdSubject = forwardSubject(originalSubject);
 
 	const forwardHeader = [
 		"---------- Forwarded message ----------",
@@ -143,7 +177,10 @@ export async function forwardMessageController(
 			html: forwardedHtml,
 			cc: body.cc,
 			bcc: body.bcc,
-			attachments: body.attachments,
+			attachments:
+				originalAttachments.length > 0 || body.attachments
+					? [...originalAttachments, ...(body.attachments ?? [])]
+					: undefined,
 		},
 		apiKey,
 		cookie,

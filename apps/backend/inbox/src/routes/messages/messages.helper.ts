@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
 import { mailbox } from "@reloop/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
 import { inboxConfig } from "../../inbox.config";
@@ -157,4 +157,65 @@ export async function proxySendToMailService(
 	}
 
 	return await response.json();
+}
+
+const bareLower = (value: string): string =>
+	(value.match(/<([^>]+)>/)?.[1] ?? value).trim().toLowerCase();
+
+/** Bare lowercased address with any `+tag` dropped, for "is this us?" checks. */
+export function addressKey(value: string): string {
+	const bare = bareLower(value);
+	const at = bare.lastIndexOf("@");
+	if (at < 0) return bare;
+	return `${bare.slice(0, at).split("+")[0]}${bare.slice(at)}`;
+}
+
+/** `Re: Hi` stays as is; `RE: Hi` is not prefixed again. */
+export function replySubject(subject: string): string {
+	return /^re:/i.test(subject.trim()) ? subject : `Re: ${subject}`;
+}
+
+export function forwardSubject(subject: string): string {
+	return /^(fwd?|fw):/i.test(subject.trim()) ? subject : `Fwd: ${subject}`;
+}
+
+/** In-Reply-To + References so every client threads the reply (RFC 5322 §3.6.4). */
+export function replyThreadingHeaders(
+	messageId: string | null | undefined,
+	references: unknown,
+): Record<string, string> | undefined {
+	if (!messageId) return undefined;
+	const refs = Array.isArray(references)
+		? references.filter((r): r is string => typeof r === "string" && !!r)
+		: [];
+	const chain = [...refs.filter((r) => r !== messageId), messageId];
+	return { "In-Reply-To": messageId, References: chain.join(" ") };
+}
+
+/**
+ * Mailbox that sent an outbound log. Matches the bare address, case-insensitive.
+ * Never falls back to another mailbox: that would send from an address the
+ * user did not pick (and possibly one their API key may not use).
+ */
+export async function mailboxForSender(
+	organizationId: string,
+	fromEmail: string,
+): Promise<string> {
+	const address = bareLower(fromEmail);
+	const mbx = await db.query.mailbox.findFirst({
+		where: and(
+			eq(mailbox.organizationId, organizationId),
+			sql`lower(${mailbox.email}) = ${address}`,
+		),
+		columns: { id: true },
+	});
+	if (!mbx) {
+		throw createError({
+			status: 400,
+			message: "No inbox for this sender",
+			why: `${address} is not an inbox in your organization, so there is no address to reply from`,
+			fix: "Reply from the inbox that sent the message, or create an inbox for this address",
+		});
+	}
+	return mbx.id;
 }

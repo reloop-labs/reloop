@@ -1,15 +1,15 @@
 import { db } from "@reloop/db/client";
-import {
-	emailLog,
-	inboundEmail,
-	mailbox,
-	threadMessage,
-} from "@reloop/db/schema";
+import { emailLog, inboundEmail, threadMessage } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
 import { resolveThreadIdForMessage } from "../../../lib/thread-correlation";
-import { proxySendToMailService } from "../messages.helper";
+import {
+	mailboxForSender,
+	proxySendToMailService,
+	replySubject,
+	replyThreadingHeaders,
+} from "../messages.helper";
 
 export async function replyToMessageController(
 	messageId: string,
@@ -47,6 +47,7 @@ export async function replyToMessageController(
 		originalInbound?.replyTo ?? originalInbound?.fromEmail ?? "";
 	let originalSubject = originalInbound?.subject ?? "";
 	let headerMsgId = originalInbound?.messageId ?? null;
+	let headerRefs: unknown = originalInbound?.references;
 
 	if (!originalInbound) {
 		const outboundLog = await db.query.emailLog.findFirst({
@@ -86,20 +87,9 @@ export async function replyToMessageController(
 			defaultReplyTo = inb.replyTo ?? inb.fromEmail ?? "";
 			originalSubject = inb.subject || lastInbound?.subject || "";
 			headerMsgId = inb.messageId ?? lastInbound?.rfc822MessageId ?? null;
+			headerRefs = inb.references;
 		} else {
-			const mbx = await db.query.mailbox.findFirst({
-				where: and(
-					eq(mailbox.organizationId, organizationId),
-					eq(mailbox.email, outboundLog.fromEmail),
-				),
-			});
-			const firstMbx =
-				mbx ||
-				(await db.query.mailbox.findFirst({
-					where: eq(mailbox.organizationId, organizationId),
-				}));
-
-			mailboxId = firstMbx?.id ?? "";
+			mailboxId = await mailboxForSender(organizationId, outboundLog.fromEmail);
 			const toArray = Array.isArray(outboundLog.toEmails)
 				? (outboundLog.toEmails as string[])
 				: [];
@@ -116,9 +106,7 @@ export async function replyToMessageController(
 
 	// Build reply
 	const replyTo = body.to ?? defaultReplyTo;
-	const replySubject = originalSubject.startsWith("Re:")
-		? originalSubject
-		: `Re: ${originalSubject}`;
+	const subject = replySubject(originalSubject);
 
 	log.info(
 		`[INBOX] Replying to message ${messageId} → ${Array.isArray(replyTo) ? replyTo.join(", ") : replyTo} (thread: ${resolvedThreadId})`,
@@ -129,14 +117,14 @@ export async function replyToMessageController(
 			mailboxId: mailboxId ?? "",
 			organizationId,
 			to: replyTo,
-			subject: replySubject,
+			subject,
 			text: body.text,
 			html: body.html,
 			cc: body.cc,
 			bcc: body.bcc,
 			attachments: body.attachments,
 			threadId: resolvedThreadId,
-			headers: headerMsgId ? { "In-Reply-To": headerMsgId } : undefined,
+			headers: replyThreadingHeaders(headerMsgId, headerRefs),
 		},
 		apiKey,
 		cookie,

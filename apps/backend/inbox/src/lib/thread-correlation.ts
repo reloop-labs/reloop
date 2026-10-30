@@ -44,6 +44,32 @@ function uniqueParticipants(...groups: Array<string[] | null | undefined>) {
 }
 
 /**
+ * Find the thread holding an RFC 822 Message-ID, scoped to one org (and
+ * mailbox when known). Message-IDs are sender-controlled, so an unscoped
+ * lookup would let anyone splice mail into another tenant's thread.
+ */
+async function findThreadByRfcMessageId(
+	rfcMessageId: string,
+	scope: { organizationId: string; mailboxId?: string | null },
+): Promise<string | null> {
+	const [row] = await db
+		.select({ threadId: threadMessage.threadId })
+		.from(threadMessage)
+		.innerJoin(emailThread, eq(emailThread.id, threadMessage.threadId))
+		.where(
+			and(
+				eq(threadMessage.rfc822MessageId, rfcMessageId),
+				eq(emailThread.organizationId, scope.organizationId),
+				scope.mailboxId
+					? eq(emailThread.mailboxId, scope.mailboxId)
+					: undefined,
+			),
+		)
+		.limit(1);
+	return row?.threadId ?? null;
+}
+
+/**
  * Finds or creates a thread for an inbound email.
  *
  * Threading strategy:
@@ -87,12 +113,12 @@ export async function correlateInboundThread({
 
 	// Strategy 1: Check In-Reply-To header
 	if (inReplyTo) {
-		const match = await db.query.threadMessage.findFirst({
-			where: eq(threadMessage.rfc822MessageId, inReplyTo),
-			columns: { threadId: true },
+		const match = await findThreadByRfcMessageId(inReplyTo, {
+			organizationId,
+			mailboxId,
 		});
 		if (match) {
-			existingThreadId = match.threadId;
+			existingThreadId = match;
 			log.info(`[THREAD] Matched thread via In-Reply-To: ${existingThreadId}`);
 		}
 	}
@@ -100,12 +126,12 @@ export async function correlateInboundThread({
 	// Strategy 2: Check References header (walk backwards, most recent first)
 	if (!existingThreadId && references.length > 0) {
 		for (const ref of [...references].reverse()) {
-			const match = await db.query.threadMessage.findFirst({
-				where: eq(threadMessage.rfc822MessageId, ref),
-				columns: { threadId: true },
+			const match = await findThreadByRfcMessageId(ref, {
+				organizationId,
+				mailboxId,
 			});
 			if (match) {
-				existingThreadId = match.threadId;
+				existingThreadId = match;
 				log.info(`[THREAD] Matched thread via References: ${existingThreadId}`);
 				break;
 			}
@@ -138,6 +164,7 @@ export async function correlateInboundThread({
 				messageCount: sql`${emailThread.messageCount} + 1`,
 				isRead: false, // New message → unread
 				status: "active", // New message → unarchive thread to inbox
+				deletedAt: null, // ...including out of trash
 				participants: sql`
 					(
 						SELECT jsonb_agg(DISTINCT elem)
@@ -212,14 +239,21 @@ export async function resolveThreadIdForMessage(
 	});
 	if (threadById) return threadById.id;
 
-	const linked = await db.query.threadMessage.findFirst({
-		where: or(
-			eq(threadMessage.id, id),
-			eq(threadMessage.inboundEmailId, id),
-			eq(threadMessage.emailLogId, id),
-		),
-		columns: { threadId: true },
-	});
+	const [linked] = await db
+		.select({ threadId: threadMessage.threadId })
+		.from(threadMessage)
+		.innerJoin(emailThread, eq(emailThread.id, threadMessage.threadId))
+		.where(
+			and(
+				or(
+					eq(threadMessage.id, id),
+					eq(threadMessage.inboundEmailId, id),
+					eq(threadMessage.emailLogId, id),
+				),
+				eq(emailThread.organizationId, organizationId),
+			),
+		)
+		.limit(1);
 	if (linked?.threadId) return linked.threadId;
 
 	const inbound = await db.query.inboundEmail.findFirst({
@@ -377,13 +411,13 @@ export async function ensureOutboundThreadForEmailLog({
 		logRow.headers?.["in-reply-to"] ||
 		undefined;
 	if (headerInReplyTo) {
-		const match = await db.query.threadMessage.findFirst({
-			where: eq(threadMessage.rfc822MessageId, headerInReplyTo),
-			columns: { threadId: true },
+		const matchThreadId = await findThreadByRfcMessageId(headerInReplyTo, {
+			organizationId,
+			mailboxId: resolvedMailboxId,
 		});
-		if (match?.threadId) {
+		if (matchThreadId) {
 			await appendOutboundToThread({
-				threadId: match.threadId,
+				threadId: matchThreadId,
 				organizationId,
 				emailLogId,
 				fromEmail: bareEmail(logRow.fromEmail) || logRow.fromEmail,
@@ -394,7 +428,7 @@ export async function ensureOutboundThreadForEmailLog({
 				inReplyTo: headerInReplyTo,
 				sentAt: messageAt,
 			});
-			return { threadId: match.threadId, created: false };
+			return { threadId: matchThreadId, created: false };
 		}
 	}
 

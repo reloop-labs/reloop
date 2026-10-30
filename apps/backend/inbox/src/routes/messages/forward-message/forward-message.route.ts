@@ -53,8 +53,14 @@ export const forwardMessageRoute = new Elysia().use(authMiddleware).post(
 						content_type: t.Optional(t.String()),
 						content_id: t.Optional(t.String()),
 					}),
-					{ description: "Email attachments" },
+					{ description: "Extra attachments to add to the forward" },
 				),
+			),
+			include_attachments: t.Optional(
+				t.Union([t.Boolean(), t.Array(t.String())], {
+					description:
+						"Original attachments to include: true (default) for all, false for none, or a list of attachment IDs. Images embedded in the body are always included.",
+				}),
 			),
 		}),
 		response: {

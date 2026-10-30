@@ -19,10 +19,11 @@ export async function initInboundSubscriber() {
 		async (payload) => {
 			const raw = payload.rawMessage || "";
 			const match = raw.match(/Message-ID:\s*(<[^>]+>)/i);
-			const messageKey = match ? match[1].trim() : raw.substring(0, 300);
+			const messageKey = match?.[1]?.trim() ?? raw.substring(0, 300);
 
 			if (processedMessages.has(messageKey)) {
 				log.info(
+					"inbox",
 					`[INBOX] Deduplicated concurrent NATS event for message: ${messageKey}`,
 				);
 				return;

@@ -26,7 +26,10 @@ import {
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { extractBareEmail, formatRecipient } from "../../lib/email-address";
 import { plainToHtml } from "../../lib/plain-to-html";
 import { readAiTextStreamAfterThink } from "../../lib/read-ai-text-stream-after-think";
@@ -60,7 +63,10 @@ import { showEmailSentToast } from "./email-sent-toast";
 import { ScheduleSendPicker } from "./schedule-send-picker";
 import { showUndoSendToast } from "./undo-send-toast";
 
-const actionKbdOnNeutralClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
+const actionKbdOnNeutralClassName = cn(
+	actionKbdOnSolidClassName,
+	"w-auto min-w-4 px-1",
+);
 
 /** Portaled compose UI (recipient suggestions + React Email menus). */
 const isComposeFloatingUi = (target: EventTarget | null) =>
@@ -402,7 +408,7 @@ export const ComposeModal = ({
 							.map((a) => ({
 								id: a.id,
 								filename: a.name,
-								path: a.url || a.path,
+								path: a.path || a.url,
 								url: a.url,
 								content_type: a.content_type,
 								size: a.size,
@@ -512,7 +518,7 @@ export const ComposeModal = ({
 					.map((a) => ({
 						id: a.id,
 						filename: a.name,
-						path: a.url || a.path,
+						path: a.path || a.url,
 						url: a.url,
 						content_type: a.content_type,
 						size: a.size,

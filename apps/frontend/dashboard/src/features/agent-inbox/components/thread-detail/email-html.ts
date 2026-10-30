@@ -210,6 +210,14 @@ const adaptColorsForDarkMode = (doc: Document) => {
 	}
 };
 
+const safeDecode = (value: string): string => {
+	try {
+		return decodeURIComponent(value);
+	} catch {
+		return value;
+	}
+};
+
 /**
  * Apply image preferences + theme styles for Shadow DOM injection.
  */
@@ -217,10 +225,13 @@ export const processEmailHtmlForDisplay = ({
 	html,
 	shouldLoadImages,
 	theme,
+	inlineImages,
 }: {
 	html: string;
 	shouldLoadImages: boolean;
 	theme: EmailTheme;
+	/** Normalized Content-ID → URL for images embedded in the message. */
+	inlineImages?: Record<string, string>;
 }): { processedHtml: string; hasBlockedImages: boolean } => {
 	const preprocessed = preprocessEmailHtml(html);
 	const doc = new DOMParser().parseFromString(preprocessed, "text/html");
@@ -229,13 +240,29 @@ export const processEmailHtmlForDisplay = ({
 	if (!shouldLoadImages) {
 		for (const img of Array.from(doc.querySelectorAll("img"))) {
 			const src = img.getAttribute("src") || "";
-			if (src && !src.startsWith("cid:")) {
+			// cid:/data: images ship inside the message; only remote ones can track.
+			if (src && !/^(cid|data):/i.test(src)) {
 				hasBlockedImages = true;
 				const placeholder = doc.createElement("span");
 				placeholder.style.display = "none";
 				placeholder.textContent = `<!-- blocked image: ${src} -->`;
 				img.replaceWith(placeholder);
 			}
+		}
+	}
+
+	// Embedded images ship inside the message, so they are not remote
+	// trackers: resolve them even while remote images are blocked.
+	if (inlineImages) {
+		for (const img of Array.from(doc.querySelectorAll("img"))) {
+			const src = img.getAttribute("src") || "";
+			if (!/^cid:/i.test(src)) continue;
+			const cid = safeDecode(src.slice(4))
+				.trim()
+				.replace(/^<|>$/g, "")
+				.toLowerCase();
+			const url = inlineImages[cid];
+			if (url) img.setAttribute("src", url);
 		}
 	}
 
