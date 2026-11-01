@@ -14,7 +14,7 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"posthog-js": "^1.417.0"
+		"posthog-js": "^1.444.0"
 	},
 	"peerDependencies": {
 		"@types/react": "catalog:ui",
