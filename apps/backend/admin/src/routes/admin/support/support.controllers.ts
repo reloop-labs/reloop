@@ -10,7 +10,7 @@ import { and, count, desc, eq, gt, sql } from "drizzle-orm";
 import { createError } from "evlog";
 
 const MESSAGE_PREVIEW_LEN = 120;
-const DEFAULT_MESSAGE_LIMIT = 50;
+const DEFAULT_MESSAGE_LIMIT = 200;
 
 export type SupportConversationDto = {
 	id: string;
@@ -195,12 +195,14 @@ async function listMessagesForConversation(
 		.from(supportMessage)
 		.innerJoin(user, eq(supportMessage.senderUserId, user.id))
 		.where(eq(supportMessage.conversationId, conversationId))
-		.orderBy(supportMessage.createdAt)
+		// Newest first so the window always includes the latest messages
+		// (offset pages back in time), then flip to chronological for the UI.
+		.orderBy(desc(supportMessage.createdAt), desc(supportMessage.id))
 		.limit(limit)
 		.offset(offset);
 
 	return {
-		items: rows.map(mapMessage),
+		items: rows.reverse().map(mapMessage),
 		total: totalRow?.value ?? 0,
 	};
 }
