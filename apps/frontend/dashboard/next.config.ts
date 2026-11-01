@@ -10,6 +10,18 @@ const nextConfig: NextConfig = {
 	outputFileTracingRoot: path.resolve(appDirectory, "../../.."),
 	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
 	cacheComponents: true,
+	async headers() {
+		return [
+			{
+				// Block clickjacking: only our own origin may frame these pages
+				source: "/:path*",
+				headers: [
+					{ key: "X-Frame-Options", value: "SAMEORIGIN" },
+					{ key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+				],
+			},
+		];
+	},
 };
 
 export default nextConfig;
