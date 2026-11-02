@@ -1,3 +1,4 @@
+import { resolveAgentOnboardAuth } from "@reloop/auth/middleware/resolve/resolve-agent-onboard-auth";
 import { resolveApiKeyAuth } from "@reloop/auth/middleware/resolve/resolve-api-key-auth";
 import { resolveOAuthAuth } from "@reloop/auth/middleware/resolve/resolve-oauth-auth";
 import { resolveSessionAuth } from "@reloop/auth/middleware/resolve/resolve-session-auth";
@@ -18,5 +19,8 @@ export async function resolveSessionOrApiKey(
 	const session = await resolveSessionAuth(headers, deps, opts);
 	if (session) return session;
 
-	return resolveOAuthAuth(headers, deps, opts);
+	const oauth = await resolveOAuthAuth(headers, deps, opts);
+	if (oauth) return oauth;
+
+	return resolveAgentOnboardAuth(headers, deps, opts);
 }

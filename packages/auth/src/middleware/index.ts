@@ -67,6 +67,13 @@ export {
 	requireUserAgentPlugin,
 } from "./require-user-agent";
 export { extractApiKey } from "./resolve/extract-api-key";
+export {
+	type AgentAuthResolution,
+	extractAgentToken,
+	resolveAgentOnboardAuth,
+	resolveAgentOnboardAuthDetails,
+	resolveAudience,
+} from "./resolve/resolve-agent-onboard-auth";
 export { resolveApiKeyAuth } from "./resolve/resolve-api-key-auth";
 export { resolveApiKeyInternalOrSession } from "./resolve/resolve-api-key-internal-or-session";
 export { resolveApiKeyOrInternal } from "./resolve/resolve-api-key-or-internal";

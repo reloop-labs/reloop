@@ -1,0 +1,45 @@
+{
+	"name": "be-agent",
+	"version": "1.0.0",
+	"main": "src/index.ts",
+	"type": "module",
+	"scripts": {
+		"dev": "bun run --hot src/index.ts",
+		"start": "bun run dist/index.js",
+		"build": "tsdown",
+		"check-types": "tsc --noEmit",
+		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
+		"lint": "biome check .",
+		"fix-lint": "biome check --fix .",
+		"format": "biome format .",
+		"test": "bun test test/"
+	},
+	"dependencies": {
+		"@agentonboard/sdk": "^0.3.0",
+		"@elysia/opentelemetry": "catalog:backend",
+		"@elysiajs/cors": "catalog:backend",
+		"@elysiajs/openapi": "catalog:backend",
+		"@elysiajs/server-timing": "catalog:backend",
+		"@opentelemetry/exporter-trace-otlp-http": "catalog:backend",
+		"@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
+		"@opentelemetry/sdk-trace-node": "catalog:backend",
+		"@reloop/auth": "workspace:*",
+		"@reloop/bus": "workspace:*",
+		"@reloop/cache": "workspace:*",
+		"@reloop/db": "workspace:*",
+		"@reloop/email-validation": "workspace:*",
+		"dotenv": "catalog:backend",
+		"drizzle-orm": "catalog:db",
+		"elysia": "catalog:backend",
+		"evlog": "catalog:backend",
+		"jose": "catalog:",
+		"zod": "catalog:ui"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"@types/bun": "catalog:backend",
+		"@types/node": "catalog:",
+		"tsdown": "catalog:backend",
+		"typescript": "catalog:"
+	}
+}

@@ -144,6 +144,13 @@ local.reloop.sh, *.local.reloop.sh {
             header_up X-Forwarded-For {remote}
         }
     }
+    handle /api/agents* {
+        reverse_proxy host.docker.internal:8035 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
     # MCP server (streamable HTTP) + its OAuth protected-resource metadata
     handle /mcp* {
         reverse_proxy host.docker.internal:8029 {
@@ -327,6 +334,13 @@ setup.local.reloop.sh {
     }
     handle /api/inbox* {
         reverse_proxy host.docker.internal:8028 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/agents* {
+        reverse_proxy host.docker.internal:8035 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}
