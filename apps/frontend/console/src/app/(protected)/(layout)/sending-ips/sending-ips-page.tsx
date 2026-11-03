@@ -11,6 +11,7 @@ import { StatusPill } from "@fe/console/components/ui/status-pill";
 import {
 	adminErrorMessage,
 	adminGet,
+	adminPatch,
 	adminPost,
 } from "@fe/console/lib/admin-api";
 
@@ -106,6 +107,16 @@ export default function SendingIpsPage() {
 				limit: 200,
 			}),
 	);
+
+	async function setIpKind(ip: SendingIpItem, next: "shared" | "dedicated") {
+		try {
+			await adminPatch(`/sending-ips/${ip.id}`, { kind: next });
+			toast.success(`${ip.address} is now ${next}`);
+			mutate();
+		} catch (error) {
+			toast.error(adminErrorMessage(error));
+		}
+	}
 
 	const { data: searchData } = useSWR(
 		orgSearch.trim().length >= 1 ? ["sending-ip-org-search", orgSearch] : null,
@@ -419,14 +430,33 @@ export default function SendingIpsPage() {
 										</Button.Root>
 									</div>
 								) : (
-									<Button.Root
-										size="xsmall"
-										variant="primary"
-										onClick={() => setAssignTarget(ip)}
-									>
-										Assign
-									</Button.Root>
+									<div className="inline-flex items-center gap-2">
+										<Button.Root
+											size="xsmall"
+											variant="neutral"
+											mode="stroke"
+											onClick={() => setIpKind(ip, "shared")}
+										>
+											Make shared
+										</Button.Root>
+										<Button.Root
+											size="xsmall"
+											variant="primary"
+											onClick={() => setAssignTarget(ip)}
+										>
+											Assign
+										</Button.Root>
+									</div>
 								)
+							) : ip.kind === "shared" ? (
+								<Button.Root
+									size="xsmall"
+									variant="neutral"
+									mode="stroke"
+									onClick={() => setIpKind(ip, "dedicated")}
+								>
+									Make dedicated
+								</Button.Root>
 							) : null}
 						</td>
 					</tr>

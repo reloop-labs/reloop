@@ -849,6 +849,7 @@ export namespace AdminModel {
 
 	export const updateSendingIpBody = t.Object({
 		hostname: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+		kind: t.Optional(sendingIpKind),
 		status: t.Optional(sendingIpStatus),
 		notes: t.Optional(t.Union([t.String(), t.Null()])),
 	});

@@ -96,6 +96,7 @@ export const sendingIpsRoute = new Elysia()
 			updateSendingIpController({
 				sendingIpId: params.sendingIpId,
 				hostname: body.hostname,
+				kind: body.kind,
 				status: body.status,
 				notes: body.notes,
 				actorUserId: userId,
@@ -111,6 +112,8 @@ export const sendingIpsRoute = new Elysia()
 			detail: {
 				tags: ["Admin"],
 				summary: "Update a sending IP",
+				description:
+					"Change hostname, kind (shared or dedicated), status or notes. Kind cannot change while the IP is assigned to an organization.",
 			},
 		},
 	)

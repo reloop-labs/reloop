@@ -198,6 +198,7 @@ export async function createSendingIp(
 
 export type UpdateSendingIpInput = {
 	hostname?: string;
+	kind?: SendingIpKind;
 	status?: SendingIpStatus;
 	notes?: string | null;
 };
@@ -226,7 +227,12 @@ export async function updateSendingIp(
 		hostname = parsed;
 	}
 
-	if (input.status === "retired" || input.status === "disabled") {
+	const kindChanged = input.kind != null && input.kind !== ip.kind;
+	if (
+		kindChanged ||
+		input.status === "retired" ||
+		input.status === "disabled"
+	) {
 		const assigned = await client.query.organizationSendingIp.findFirst({
 			where: and(
 				eq(organizationSendingIp.sendingIpId, sendingIpId),
@@ -240,6 +246,7 @@ export async function updateSendingIp(
 		.update(sendingIp)
 		.set({
 			hostname,
+			kind: input.kind ?? ip.kind,
 			status: input.status ?? ip.status,
 			notes: input.notes === undefined ? ip.notes : input.notes,
 			updatedAt: new Date(),

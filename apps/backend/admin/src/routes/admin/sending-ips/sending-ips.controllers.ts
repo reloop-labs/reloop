@@ -230,12 +230,14 @@ export async function createSendingIpController(args: {
 export async function updateSendingIpController(args: {
 	sendingIpId: string;
 	hostname?: string;
+	kind?: "shared" | "dedicated";
 	status?: "active" | "disabled" | "retired";
 	notes?: string | null;
 	actorUserId: string;
 }) {
 	const result = await updateSendingIp(args.sendingIpId, {
 		hostname: args.hostname,
+		kind: args.kind,
 		status: args.status,
 		notes: args.notes,
 	});
@@ -252,7 +254,7 @@ export async function updateSendingIpController(args: {
 			throw createError({
 				status: 409,
 				message: "IP is assigned",
-				why: "An assigned dedicated IP cannot be disabled or retired",
+				why: "An assigned dedicated IP cannot change kind, or be disabled or retired",
 				fix: "Unassign the IP from its organization first",
 			});
 		}
@@ -266,6 +268,7 @@ export async function updateSendingIpController(args: {
 		resourceId: result.ip.id,
 		metadata: {
 			hostname: args.hostname,
+			kind: args.kind,
 			status: args.status,
 		},
 	});
