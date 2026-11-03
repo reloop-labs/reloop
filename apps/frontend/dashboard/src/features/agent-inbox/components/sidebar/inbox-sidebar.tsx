@@ -203,6 +203,18 @@ export const InboxSidebar = ({
 			href: `/inbox?mailboxId=${mailboxId}&folder=spam`,
 			iconName: "alert",
 		},
+		{
+			id: "archive",
+			label: "Archive",
+			href: `/inbox?mailboxId=${mailboxId}&folder=archive`,
+			iconName: "archive",
+		},
+		{
+			id: "trash",
+			label: "Trash",
+			href: `/inbox?mailboxId=${mailboxId}&folder=trash`,
+			iconName: "trash",
+		},
 	];
 
 	return (
@@ -248,7 +260,7 @@ export const InboxSidebar = ({
 										onClick={() => void setDeleteId(mailbox.id)}
 										title={`Delete ${mailbox.email}`}
 										aria-label={`Delete ${mailbox.email}`}
-										className="flex size-6 shrink-0 items-center justify-center rounded-md text-text-sub-600 opacity-0 transition-all hover:bg-red-500/10 hover:text-error-base focus:opacity-100 focus-visible:opacity-100 group-hover:opacity-100 [aside:hover_&]:opacity-100"
+										className="flex size-6 shrink-0 items-center justify-center rounded-md text-text-sub-600 opacity-0 transition-all hover:bg-red-500/10 hover:text-error-base focus:opacity-100 focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100 [aside:hover_&]:opacity-100"
 									>
 										<Trash2 className="size-3.5" />
 									</button>
