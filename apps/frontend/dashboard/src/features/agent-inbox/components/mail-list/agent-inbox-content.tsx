@@ -83,6 +83,7 @@ const isTypingTarget = (target: EventTarget | null) => {
 	return Boolean(target.closest("[contenteditable='true'], [role='textbox']"));
 };
 
+/** Inbox list and thread view for one mailbox folder, with search, tabs, bulk actions and keyboard shortcuts. */
 export const AgentInboxContent = ({
 	mailbox,
 	folder,
@@ -140,14 +141,15 @@ export const AgentInboxContent = ({
 		? "Label"
 		: (FOLDER_TITLES[folder] ?? "Inbox");
 
-	// Clear the bulk selection whenever the visible list changes (tab, search,
-	// filter). Otherwise bulk actions run on threads that are no longer shown.
-	// biome-ignore lint/correctness/useExhaustiveDependencies: reset when the visible list changes
+	// Clear the bulk selection whenever the view changes (mailbox, folder, tab,
+	// search, filter). Otherwise bulk actions run on threads that are no longer
+	// shown.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset when the view changes
 	useEffect(() => {
 		setMail((prev) =>
 			prev.bulkSelected.length === 0 ? prev : { ...prev, bulkSelected: [] },
 		);
-	}, [setMail, tabParam, searchQuery, filterParam]);
+	}, [setMail, mailbox.id, folder, tabParam, searchQuery, filterParam]);
 
 	const groupedThreads = useMemo(
 		() => groupThreadsByConversation(threads),
@@ -162,6 +164,18 @@ export const AgentInboxContent = ({
 		);
 		return showInboxTabs ? applyInboxViewFilter(searched, activeTab) : searched;
 	}, [groupedThreads, searchQuery, filterParam, showInboxTabs, activeTab]);
+
+	// Drop selected ids that left the visible list (archived elsewhere, refetch),
+	// so bulk actions never fall back to a stale list id.
+	useEffect(() => {
+		const visible = new Set(filteredThreads.map((t) => t.id));
+		setMail((prev) => {
+			const next = prev.bulkSelected.filter((id) => visible.has(id));
+			return next.length === prev.bulkSelected.length
+				? prev
+				: { ...prev, bulkSelected: next };
+		});
+	}, [filteredThreads, setMail]);
 
 	const tabCounts = useMemo(() => {
 		if (!showInboxTabs) return undefined;
