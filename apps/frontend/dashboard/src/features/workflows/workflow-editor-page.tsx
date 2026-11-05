@@ -1,7 +1,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+	type ReactElement,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
 import { WorkflowEditor } from "./components/workflow-editor";
@@ -18,7 +24,15 @@ import type {
 	WorkflowStatus,
 } from "./workflow-types";
 
-export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
+/**
+ * Automation editor route. Keeps name and graph edits locally, autosaves them
+ * for draft and paused automations, and saves before Start.
+ */
+export function WorkflowEditorPage({
+	workflowId,
+}: {
+	workflowId: string;
+}): ReactElement {
 	const { getWorkflow, updateWorkflow, setWorkflowStatus, isHydrated } =
 		useWorkflows();
 
@@ -42,6 +56,13 @@ export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
 	// (laid-out) graph, so merely opening an automation never triggers a save.
 	const savedSnapshotRef = useRef<string | null>(null);
 	const pendingSaveRef = useRef<(() => Promise<void>) | null>(null);
+	// Last snapshot whose save failed. Not retried until the edits change, so a
+	// rejected save doesn't loop with an error toast every second.
+	const failedSnapshotRef = useRef<string | null>(null);
+	// updateWorkflow changes identity with every mutation state change; calling
+	// it through a ref keeps that from re-running the autosave effect.
+	const updateWorkflowRef = useRef(updateWorkflow);
+	updateWorkflowRef.current = updateWorkflow;
 
 	// Reset local edits only when switching to a different automation. Resetting
 	// on every server update (updatedAt) discarded unsaved edits whenever an
@@ -53,6 +74,7 @@ export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
 			setLocalNodes(null);
 			setLocalEdges(null);
 			savedSnapshotRef.current = null;
+			failedSnapshotRef.current = null;
 		}
 	}, [workflow?.id]);
 
@@ -77,7 +99,11 @@ export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
 				edges: localEdges,
 			});
 		}
-		if (!canAutosave || snapshot === savedSnapshotRef.current) {
+		if (
+			!canAutosave ||
+			snapshot === savedSnapshotRef.current ||
+			snapshot === failedSnapshotRef.current
+		) {
 			pendingSaveRef.current = null;
 			return;
 		}
@@ -88,13 +114,15 @@ export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
 		const save = async () => {
 			pendingSaveRef.current = null;
 			try {
-				await updateWorkflow(id, {
+				await updateWorkflowRef.current(id, {
 					...(name ? { name } : {}),
 					nodes,
 					edges,
 				});
 				savedSnapshotRef.current = snapshot;
+				failedSnapshotRef.current = null;
 			} catch (e) {
+				failedSnapshotRef.current = snapshot;
 				toast.error(
 					e instanceof Error ? e.message : "Failed to save automation",
 				);
@@ -103,15 +131,7 @@ export function WorkflowEditorPage({ workflowId }: { workflowId: string }) {
 		pendingSaveRef.current = save;
 		const timer = setTimeout(() => void save(), 1000);
 		return () => clearTimeout(timer);
-	}, [
-		snapshot,
-		canAutosave,
-		workflow,
-		localName,
-		localNodes,
-		localEdges,
-		updateWorkflow,
-	]);
+	}, [snapshot, canAutosave, workflow, localName, localNodes, localEdges]);
 
 	// Flush a pending save when leaving the editor, and warn on hard unload.
 	useEffect(() => {
