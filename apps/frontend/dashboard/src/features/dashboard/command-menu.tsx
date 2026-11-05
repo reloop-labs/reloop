@@ -78,6 +78,7 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			p: "/contacts/properties",
 			g: "/contacts/groups",
 			h: "/contacts/channels",
+			x: "/contacts/suppression",
 			t: "/templates",
 			f: "/automation",
 			v: "/automation/triggers",
@@ -93,6 +94,8 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			u: "/settings",
 			b: "/settings/billing",
 			I: "/settings/dedicated-ip",
+			// Without an explicit entry, Shift+T fell back to "t" (/templates).
+			T: "/settings/teams",
 			W: "/settings/organization",
 			O: "/settings/organization",
 			A: "/settings/security/connected-apps",
@@ -229,8 +232,14 @@ export function CommandMenuGlobal() {
 	});
 
 	useHotkeys("t", (e) => {
-		e.preventDefault();
-		setTheme(resolvedTheme === "light" ? "dark" : "light");
+		// Some pages bind T to their own action (disable API key, send test
+		// webhook, toggle tracking) and call preventDefault. Listener order
+		// depends on mount order, so wait for the whole keydown dispatch to
+		// finish and only toggle the theme if no page claimed the key.
+		const next = resolvedTheme === "light" ? "dark" : "light";
+		setTimeout(() => {
+			if (!e.defaultPrevented) setTheme(next);
+		}, 0);
 	});
 
 	const handleCopyUrl = React.useCallback(() => {
