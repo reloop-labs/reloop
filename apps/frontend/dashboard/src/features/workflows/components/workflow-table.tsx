@@ -38,6 +38,7 @@ interface WorkflowTableProps {
 	onClearFilters?: () => void;
 }
 
+/** Paginated automations table with row actions, bulk status changes and an out-of-range page clamp. */
 export const WorkflowTable = ({
 	workflows,
 	columnVisibility = {},
@@ -173,17 +174,20 @@ export const WorkflowTable = ({
 		table.resetRowSelection();
 	}, [table]);
 
+	/** Updates each selected automation; returns the ids that failed so they stay selected. */
 	const handleBulkStatus = useCallback(
-		async (status: "active" | "paused") => {
+		async (status: "active" | "paused"): Promise<string[]> => {
 			let ok = 0;
 			let firstError: string | null = null;
 			const failed: string[] = [];
+			const failedIds: string[] = [];
 			for (const wf of selectedWorkflows) {
 				try {
 					await setWorkflowStatus(wf.id, status);
 					ok += 1;
 				} catch (e) {
 					failed.push(wf.name);
+					failedIds.push(wf.id);
 					firstError ??= e instanceof Error ? e.message : null;
 				}
 			}
@@ -196,9 +200,10 @@ export const WorkflowTable = ({
 				toast.error(
 					failed.length === 1
 						? `Couldn't update ${failed[0]}${firstError ? `: ${firstError}` : ""}`
-						: `Couldn't update ${failed.length} automations${firstError ? `: ${firstError}` : ""}`,
+						: `Couldn't update ${failed.length} automations (${failed.join(", ")})${firstError ? `: ${firstError}` : ""}`,
 				);
 			}
+			return failedIds;
 		},
 		[selectedWorkflows, setWorkflowStatus],
 	);
