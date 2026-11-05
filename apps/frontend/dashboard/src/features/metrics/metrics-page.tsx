@@ -23,6 +23,7 @@ import {
 import { queryKeys } from "#/lib/query-keys";
 import { MetricsListHeader } from "./metrics-list-header";
 
+/** Metrics route: deliverability, bounce and complaint charts for the selected date range and domain. */
 export function MetricsPage() {
 	const { activeOrganization } = useActiveOrganization();
 	const queryClient = useQueryClient();
@@ -54,12 +55,14 @@ export function MetricsPage() {
 
 			if (!start && !end) {
 				preset = datePreset || "15d";
+				// UTC days, matching the stats buckets. The current UTC day always
+				// contains now, so recent sends stay in range.
 				const now = new Date(defaultRangeAnchor);
 				const toDate = new Date(now);
-				toDate.setHours(23, 59, 59, 999);
+				toDate.setUTCHours(23, 59, 59, 999);
 				const fromDate = new Date(now);
-				fromDate.setDate(now.getDate() - 14); // 15 days inclusive
-				fromDate.setHours(0, 0, 0, 0);
+				fromDate.setUTCDate(now.getUTCDate() - 14); // 15 days inclusive
+				fromDate.setUTCHours(0, 0, 0, 0);
 
 				start = fromDate.toISOString();
 				end = toDate.toISOString();
@@ -80,6 +83,9 @@ export function MetricsPage() {
 		void setStartDate(newStartDate || "");
 		void setEndDate(newEndDate || "");
 		void setDatePreset(preset || "");
+		// Back to the default range: anchor it to now so it includes today, even
+		// if the page has been open since before midnight.
+		if (!newStartDate && !newEndDate) setDefaultRangeAnchor(Date.now());
 	};
 
 	const statsParams = {

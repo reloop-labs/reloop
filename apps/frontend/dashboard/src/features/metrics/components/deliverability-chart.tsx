@@ -26,6 +26,7 @@ interface DeliverabilityChartProps {
 	domain: string;
 }
 
+/** Deliverability chart (emails, rate, bounces) for the selected range and domain, by UTC day. */
 export function DeliverabilityChart({
 	startDate,
 	endDate,
