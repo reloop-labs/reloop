@@ -331,6 +331,18 @@ html.dark .template-editor-canvas [role="option"][aria-selected="true"] {
 	margin-right: auto;
 }
 
+/*
+ * A freshly inserted column is an empty paragraph: blank space nobody can
+ * find or aim at. Outline empty columns on the canvas only (not exported).
+ */
+.tiptap.ProseMirror
+.node-column:has(> p:only-child > br.ProseMirror-trailingBreak:only-child) {
+	outline: 1px dashed #d1d5db;
+	outline-offset: -1px;
+	border-radius: 4px;
+	min-height: 2.5em;
+}
+
 /* Multi-column layouts */
 .tiptap.ProseMirror .node-column:not([alignment]),
 .ProseMirror .node-column:not([alignment]) {
@@ -357,6 +369,27 @@ html.dark .template-editor-canvas [role="option"][aria-selected="true"] {
 	max-height: none !important;
 	min-height: 0 !important;
 	overflow: visible !important;
+}
+
+/* Body alignment (Page style), mirroring the sent email's container align. */
+/* Doubled attribute: (0,5,0) must outrank the centering rules below (0,4,1). */
+[data-email-align="left"][data-email-align]
+	.tiptap.ProseMirror
+	> .node-container,
+[data-email-align="left"][data-email-align]
+	.tiptap.ProseMirror
+	> [data-type="container"] {
+	margin-left: 0 !important;
+	margin-right: auto !important;
+}
+[data-email-align="right"][data-email-align]
+	.tiptap.ProseMirror
+	> .node-container,
+[data-email-align="right"][data-email-align]
+	.tiptap.ProseMirror
+	> [data-type="container"] {
+	margin-left: auto !important;
+	margin-right: 0 !important;
 }
 
 .tiptap.ProseMirror

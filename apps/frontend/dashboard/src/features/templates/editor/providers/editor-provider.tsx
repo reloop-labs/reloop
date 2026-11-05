@@ -13,6 +13,12 @@ import {
 	getGlobalStylesArray,
 	updateGlobalStyleValue,
 } from "#/features/templates/editor/utils/apply-pasted-email-theme";
+import { pinUnsetContainerAlignment } from "#/features/templates/editor/utils/global-style-value";
+import {
+	attachSourceUnlockOnEdit,
+	isComposedEmailHtml,
+	withoutSourceUnlock,
+} from "#/features/templates/editor/utils/html-source-lock";
 import {
 	isFullEmailHtml,
 	pickSavedEmailHtml,
@@ -340,7 +346,9 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 						"height",
 						undefined,
 					);
-					editor.commands.setGlobalContent("styles", styles);
+					withoutSourceUnlock(() => {
+						editor.commands.setGlobalContent("styles", styles);
+					});
 				}
 				return;
 			}
@@ -353,52 +361,60 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 				htmlStringToProcess = sourceToLoad.renderedHtml;
 			}
 
-			if (sourceToLoad?.content && sourceToLoad.content.length > 0) {
-				const rawContent = sourceToLoad.content;
-				if (Array.isArray(rawContent)) {
-					const firstItem = rawContent[0];
-					if (
-						firstItem &&
-						typeof firstItem === "object" &&
-						"html" in firstItem &&
-						typeof firstItem.html === "string"
-					) {
-						htmlStringToProcess = htmlStringToProcess || firstItem.html;
-						const safeHtml = sanitizeEmailHtml(firstItem.html);
-						if (editor) {
-							const extensions = editor.extensionManager.extensions;
-							try {
-								const jsonDoc = (generateJSON as any)(safeHtml, extensions);
-								editor.commands.setContent(jsonDoc);
-							} catch {
-								editor.commands.setContent(safeHtml);
+			// Hydrating saved content is not a canvas edit.
+			withoutSourceUnlock(() => {
+				if (sourceToLoad?.content && sourceToLoad.content.length > 0) {
+					const rawContent = sourceToLoad.content;
+					if (Array.isArray(rawContent)) {
+						const firstItem = rawContent[0];
+						if (
+							firstItem &&
+							typeof firstItem === "object" &&
+							"html" in firstItem &&
+							typeof firstItem.html === "string"
+						) {
+							htmlStringToProcess = htmlStringToProcess || firstItem.html;
+							const safeHtml = sanitizeEmailHtml(firstItem.html);
+							if (editor) {
+								const extensions = editor.extensionManager.extensions;
+								try {
+									const jsonDoc = (generateJSON as any)(safeHtml, extensions);
+									editor.commands.setContent(jsonDoc);
+								} catch {
+									editor.commands.setContent(safeHtml);
+								}
 							}
+						} else {
+							editor?.commands.setContent({
+								type: "doc",
+								content: rawContent as Record<string, unknown>[],
+							});
 						}
-					} else {
-						editor?.commands.setContent({
-							type: "doc",
-							content: rawContent as Record<string, unknown>[],
-						});
-					}
-				} else if (typeof rawContent === "string" && editor) {
-					htmlStringToProcess = htmlStringToProcess || rawContent;
-					const safeHtml = sanitizeEmailHtml(rawContent);
-					const extensions = editor.extensionManager.extensions;
-					try {
-						const jsonDoc = (generateJSON as any)(safeHtml, extensions);
-						editor.commands.setContent(jsonDoc);
-					} catch {
-						editor.commands.setContent(safeHtml);
+					} else if (typeof rawContent === "string" && editor) {
+						htmlStringToProcess = htmlStringToProcess || rawContent;
+						const safeHtml = sanitizeEmailHtml(rawContent);
+						const extensions = editor.extensionManager.extensions;
+						try {
+							const jsonDoc = (generateJSON as any)(safeHtml, extensions);
+							editor.commands.setContent(jsonDoc);
+						} catch {
+							editor.commands.setContent(safeHtml);
+						}
 					}
 				}
-			}
+			});
 
 			if (htmlStringToProcess && editor) {
 				try {
-					if (isFullEmailHtml(htmlStringToProcess)) {
+					// Only hand-pasted source stays authoritative. A saved render of
+					// our own document is recomposed by the code view on demand.
+					if (
+						isFullEmailHtml(htmlStringToProcess) &&
+						!isComposedEmailHtml(htmlStringToProcess)
+					) {
 						setHtmlLocked(true);
+						setCodeHtml(htmlStringToProcess);
 					}
-					setCodeHtml(htmlStringToProcess);
 					applyPastedEmailTheme(editor, htmlStringToProcess);
 				} catch (err) {
 					console.error(
@@ -444,6 +460,11 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	);
 
 	useEffect(() => {
+		if (!editor) return;
+		return attachSourceUnlockOnEdit(editor);
+	}, [editor]);
+
+	useEffect(() => {
 		if (
 			shouldInitialize &&
 			editor &&
@@ -456,8 +477,16 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 			const timer = setTimeout(() => {
 				initializeEditor(templateData as any, versions as any[]);
 			}, 0);
+			// After the pasted-theme pass (50ms), which rewrites global styles.
+			const alignTimer = setTimeout(() => {
+				if (editor.isDestroyed) return;
+				withoutSourceUnlock(() => pinUnsetContainerAlignment(editor));
+			}, 120);
 
-			return () => clearTimeout(timer);
+			return () => {
+				clearTimeout(timer);
+				clearTimeout(alignTimer);
+			};
 		}
 	}, [shouldInitialize, editor, templateData, versions, initializeEditor]);
 

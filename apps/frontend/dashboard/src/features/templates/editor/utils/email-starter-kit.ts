@@ -1,12 +1,16 @@
-import { StarterKit } from "@react-email/editor/extensions";
+import { EmailMark, EmailNode } from "@react-email/editor/core";
+import { StarterKit, TableHeader } from "@react-email/editor/extensions";
 import { Extension, Mark, mergeAttributes, Node } from "@tiptap/core";
+import type { Node as PMNode } from "@tiptap/pm/model";
 import {
+	type EditorState,
 	NodeSelection,
 	Plugin,
 	PluginKey,
 	TextSelection,
 } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import { createElement } from "react";
 import { EMAIL_DECORATION_ATTR } from "./preserve-email-link-underlines";
 
 export const EMAIL_FONT_COLOR_MARK = "emailFontColor";
@@ -95,20 +99,61 @@ export const EmailImage = Node.create({
 	},
 });
 
-/** Selection color so inspect can paint a word, not only the parent block. */
-const emailFontColor = Mark.create({
+/** Inline typography the inspector can apply to a selected run of text. */
+export const EMAIL_TEXT_STYLE_PROPS = [
+	"color",
+	"fontSize",
+	"fontFamily",
+	"fontWeight",
+	"letterSpacing",
+] as const;
+
+export type EmailTextStyleProp = (typeof EMAIL_TEXT_STYLE_PROPS)[number];
+
+function cssPropName(prop: string): string {
+	return prop.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+}
+
+export function parseInlineStyle(cssText: unknown): Record<string, string> {
+	const out: Record<string, string> = {};
+	if (typeof cssText !== "string") return out;
+	for (const part of cssText.split(";")) {
+		const colon = part.indexOf(":");
+		if (colon < 0) continue;
+		const key = part
+			.slice(0, colon)
+			.trim()
+			.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+		const value = part.slice(colon + 1).trim();
+		if (key && value) out[key] = value;
+	}
+	return out;
+}
+
+/**
+ * Typography on a selected run (a word, not the whole block). Kept under the
+ * original `emailFontColor` name so stored documents keep their colors. It is
+ * an EmailMark: plain marks are skipped by composeReactEmail, which used to
+ * drop these styles from the sent email.
+ */
+const emailFontColor = EmailMark.create({
 	name: EMAIL_FONT_COLOR_MARK,
 	addAttributes() {
-		return {
-			color: {
-				default: null,
-				parseHTML: (element) => element.style.color || null,
-				renderHTML: (attributes) => {
-					if (!attributes.color) return {};
-					return { style: `color: ${attributes.color}` };
+		return Object.fromEntries(
+			EMAIL_TEXT_STYLE_PROPS.map((prop) => [
+				prop,
+				{
+					default: null,
+					parseHTML: (element: HTMLElement) =>
+						element.style.getPropertyValue(cssPropName(prop)) || null,
+					renderHTML: (attributes: Record<string, unknown>) => {
+						const value = attributes[prop];
+						if (!value) return {};
+						return { style: `${cssPropName(prop)}: ${String(value)}` };
+					},
 				},
-			},
-		};
+			]),
+		);
 	},
 	parseHTML() {
 		return [{ tag: "span[data-email-font-color]" }];
@@ -116,7 +161,42 @@ const emailFontColor = Mark.create({
 	renderHTML({ HTMLAttributes }) {
 		return ["span", { "data-email-font-color": "", ...HTMLAttributes }, 0];
 	},
+	renderToReactEmail({ children, mark, style }) {
+		const own: Record<string, string> = {};
+		for (const prop of EMAIL_TEXT_STYLE_PROPS) {
+			const value = mark.attrs?.[prop];
+			if (value) own[prop] = String(value);
+		}
+		return createElement("span", { style: { ...style, ...own } }, children);
+	},
 });
+
+/**
+ * StarterKit's TableHeader is a plain Node, and composeReactEmail drops any
+ * node that is not an EmailNode, so `<th>` cells vanished from sent email.
+ */
+const EmailTableHeader = EmailNode.from(
+	TableHeader,
+	({ children, node, style }) => {
+		const attrs = (node.attrs ?? {}) as Record<string, unknown>;
+		const toSpan = (v: unknown) =>
+			v === null || v === undefined || v === "" ? undefined : Number(v);
+		return createElement(
+			"th",
+			{
+				className: (attrs.class as string) || undefined,
+				align:
+					(attrs.align as string) || (attrs.alignment as string) || undefined,
+				valign: (attrs.valign as string) || undefined,
+				colSpan: toSpan(attrs.colspan),
+				rowSpan: toSpan(attrs.rowspan),
+				scope: (attrs.scope as string) || undefined,
+				style: { ...style, ...parseInlineStyle(attrs.style) },
+			},
+			children,
+		);
+	},
+);
 
 const LAYOUT_STYLE_TYPES = [
 	"heading",
@@ -529,6 +609,11 @@ const emailSectionSelection = Extension.create({
 						);
 
 						if (!sectionEl) return false;
+						// Only a click on the layout block's own background selects it.
+						// Clicks on a child (a divider, an empty column, a list bullet)
+						// belong to that child; selecting the whole section there meant
+						// the next keystroke replaced the entire layout.
+						if (target !== sectionEl) return false;
 
 						const { doc, selection } = view.state;
 						let sectionPos: number | null = null;
@@ -618,11 +703,15 @@ const emailSectionSelection = Extension.create({
 const emailActiveTextBlock = Extension.create({
 	name: "emailActiveTextBlock",
 	addProseMirrorPlugins() {
+		const editor = this.editor;
 		return [
 			new Plugin({
 				key: new PluginKey("emailActiveTextBlockPlugin"),
 				props: {
 					decorations(state) {
+						// On blur the selection resets to the document start; without
+						// this the first block kept a "selected" outline.
+						if (!editor.isFocused) return DecorationSet.empty;
 						const { selection } = state;
 						if (!(selection instanceof TextSelection)) {
 							return DecorationSet.empty;
@@ -708,6 +797,125 @@ const emailScopedSelectAll = Extension.create({
 	},
 });
 
+function isWholeEmailNodeSelection(selection: unknown): boolean {
+	return (
+		selection instanceof NodeSelection &&
+		selection.node.type.name === "container"
+	);
+}
+
+/**
+ * Clicking the gap beside a block can node-select the email container. Any
+ * keystroke would then replace the entire email, so ignore typing and
+ * deletion there; select-all still clears the email deliberately.
+ */
+const emailProtectContainerSelection = Extension.create({
+	name: "emailProtectContainerSelection",
+	addKeyboardShortcuts() {
+		const guard = () => isWholeEmailNodeSelection(this.editor.state.selection);
+		return { Backspace: guard, Delete: guard, Enter: guard };
+	},
+	addProseMirrorPlugins() {
+		return [
+			new Plugin({
+				key: new PluginKey("emailProtectContainerSelection"),
+				props: {
+					handleTextInput: (view) =>
+						isWholeEmailNodeSelection(view.state.selection),
+				},
+			}),
+		];
+	},
+});
+
+/** True when `node` holds nothing visible: no text, image, divider or button. */
+/** Whitespace plus the zero-width / non-breaking spacers email HTML uses. */
+const INVISIBLE_TEXT = /[\s\u00a0\u200b-\u200d\u2060\ufeff]/g;
+
+/** A border or background makes a blank row visible (e.g. a divider line). */
+function drawsSomething(node: PMNode): boolean {
+	const style = String(node.attrs?.style ?? "").toLowerCase();
+	const background = String(
+		node.attrs?.backgroundColor ?? node.attrs?.bgcolor ?? "",
+	);
+	if (background && !/^(transparent|none|#fff(fff)?|white)$/i.test(background))
+		return true;
+	for (const match of style.matchAll(
+		/(?:^|;)\s*(border(?:-top|-bottom|-left|-right)?|background(?:-color)?)\s*:\s*([^;]+)/g,
+	)) {
+		const value = (match[2] ?? "").trim();
+		if (match[1]?.startsWith("background")) {
+			if (
+				!/^(transparent|none|#fff(fff)?|white|rgba?\([^)]*,\s*0\))$/.test(value)
+			)
+				return true;
+		} else if (
+			!/^(none|0(px)?)(\s|$)/.test(value) &&
+			!/\b0(px)?\s+(solid|dashed|dotted)/.test(value)
+		) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function isVisuallyEmpty(node: PMNode): boolean {
+	if (node.textContent.replace(INVISIBLE_TEXT, "") !== "") return false;
+	if (drawsSomething(node)) return false;
+	let empty = true;
+	node.descendants((child) => {
+		if (!empty) return false;
+		if (
+			(child.isLeaf && !child.isText && child.type.name !== "hardBreak") ||
+			drawsSomething(child)
+		)
+			empty = false;
+		return empty;
+	});
+	return empty;
+}
+
+/**
+ * Pasted HTML emails are built from layout tables. Once a row's content is
+ * deleted, the row and its padding stay behind as blank space that Backspace
+ * cannot remove (a table cell never merges with its neighbours). Backspace or
+ * Delete in an empty line removes the largest empty row or table around it.
+ */
+export function findEmptyLayoutAncestor(
+	state: EditorState,
+): { from: number; to: number } | null {
+	const { selection } = state;
+	if (!selection.empty) return null;
+	const { $from } = selection;
+	if (!$from.parent.isTextblock || !isVisuallyEmpty($from.parent)) return null;
+
+	let target: { from: number; to: number } | null = null;
+	for (let depth = $from.depth - 1; depth > 0; depth--) {
+		const node = $from.node(depth);
+		const name = node.type.name;
+		if (name !== "tableRow" && name !== "tableCell" && name !== "table") break;
+		if (!isVisuallyEmpty(node)) break;
+		if (name === "tableRow" || name === "table") {
+			const from = $from.before(depth);
+			target = { from, to: from + node.nodeSize };
+		}
+	}
+	return target;
+}
+
+const emailRemoveEmptyLayoutRow = Extension.create({
+	name: "emailRemoveEmptyLayoutRow",
+	priority: 1000,
+	addKeyboardShortcuts() {
+		const remove = () => {
+			const range = findEmptyLayoutAncestor(this.editor.state);
+			if (!range) return false;
+			return this.editor.commands.deleteRange(range);
+		};
+		return { Backspace: remove, Delete: remove };
+	},
+});
+
 /**
  * React Email's StyleAttribute list omits `container`, so pasted
  * padding / max-width / background on the email wrapper are dropped.
@@ -721,7 +929,9 @@ export function emailStarterKit() {
 					UndoRedo: false,
 					StyleAttribute: { types: LAYOUT_STYLE_TYPES },
 					ClassAttribute: { types: LAYOUT_STYLE_TYPES },
+					TableHeader: false,
 				}),
+				EmailTableHeader,
 				EmailImage,
 				emailLinkDecoration,
 				emailFontColor,
@@ -731,6 +941,8 @@ export function emailStarterKit() {
 				emailSectionSelection,
 				emailActiveTextBlock,
 				emailScopedSelectAll,
+				emailProtectContainerSelection,
+				emailRemoveEmptyLayoutRow,
 			];
 		},
 	});

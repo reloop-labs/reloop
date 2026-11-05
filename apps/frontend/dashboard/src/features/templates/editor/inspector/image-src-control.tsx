@@ -162,7 +162,9 @@ export function ImageSrcControl({
 						prefix="W"
 						placeholder="auto"
 						value={value.width}
-						onChange={(width) => onChange({ ...value, width })}
+						// The height shown is the rendered one; sending it back with a
+						// new width would squash the image. Let it follow the width.
+						onChange={(width) => onChange({ ...value, width, height: "" })}
 						suffix="px"
 						min={1}
 						max={2000}

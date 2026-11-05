@@ -1,5 +1,6 @@
 import * as decoding from "lib0/decoding";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { removeAwarenessStates } from "y-protocols/awareness";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
@@ -223,10 +224,31 @@ export function useCollaboration({
 
 		ydoc.on("update", handleUpdate);
 
+		// Reloading or closing the tab skips React cleanup, and y-websocket only
+		// handles Node's process exit, so without this the server shows a ghost
+		// cursor and avatar for this tab until its 30s awareness timeout.
+		const handlePageHide = () => {
+			removeAwarenessStates(provider.awareness, [ydoc.clientID], "page hidden");
+		};
+		// Back/forward cache restores the page without remounting.
+		const handlePageShow = (event: PageTransitionEvent) => {
+			if (!event.persisted) return;
+			provider.awareness.setLocalStateField("user", {
+				name: userRef.current.name,
+				color: userRef.current.color,
+				avatar: userRef.current.avatar,
+				email: userRef.current.email,
+			});
+		};
+		window.addEventListener("pagehide", handlePageHide);
+		window.addEventListener("pageshow", handlePageShow);
+
 		// ── Cleanup ───────────────────────────────────────────────────
 		return () => {
 			if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
 			ydoc.off("update", handleUpdate);
+			window.removeEventListener("pagehide", handlePageHide);
+			window.removeEventListener("pageshow", handlePageShow);
 			provider.off("status", handleStatus);
 			provider.off("status", attachWsListener);
 			provider.awareness.off("change", updateAwareness);

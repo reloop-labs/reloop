@@ -24,22 +24,28 @@ import {
 	normalizeTemplateVariableName,
 } from "#/features/templates/lib/template-variables";
 import { DeleteTemplateVariableModal } from "../components/panels/variables/delete-variable-modal";
+import { EMAIL_TEXT_STYLE_PROPS } from "../utils/email-starter-kit";
+import { getGlobalStyleValue } from "../utils/global-style-value";
 import {
 	cssHasPaintedBackground,
 	cssPaintedBackgroundValue,
 } from "../utils/preserve-email-link-underlines";
 import {
-	applySelectionFontColor,
+	applySelectionTextStyle,
 	applyTextAlignment,
 	displayLineHeightPercent,
 	fontSizePxFromRaw,
 	getActiveLinkCss,
 	getAncestorInlineStyleProp,
-	getComputedSelectionColor,
+	getComputedSelectionStyle,
+	getInlineSelectionStyle,
 	getResolvedAlignment,
 	getSelectionFontColor,
 	getSelectionMarkColor,
+	getSelectionTextStyle,
 	getThemeColorFallback,
+	inlineCssToRecord,
+	isEmailTextStyleProp,
 	normalizeColorToHex,
 	normalizeFontWeightDisplay,
 	numericPxFromCss,
@@ -670,6 +676,15 @@ function TextSection({
 			editor,
 			selector: ({ editor: ed }) => getResolvedAlignment(ed, alignment),
 		}) ?? alignment;
+	// Re-render when run-level styles (size/font on a selected word) change;
+	// none of the selectors above observe them.
+	useEditorState({
+		editor,
+		selector: ({ editor: ed }) =>
+			EMAIL_TEXT_STYLE_PROPS.map((prop) =>
+				getSelectionTextStyle(ed, prop),
+			).join("|"),
+	});
 
 	const handleSetAlignment = (align: string) => {
 		if (editor && applyTextAlignment(editor, align)) {
@@ -682,25 +697,41 @@ function TextSection({
 	 * Raw effective value: selection marks → link mark → parent block →
 	 * ancestor chain → theme globals → rendered canvas style.
 	 */
+	/**
+	 * Raw effective value: selection marks → link mark → inline style on the
+	 * block and its ancestors (units intact) → theme globals → rendered canvas.
+	 */
 	const rawEffectiveStyle = (
 		name: InspectorStyleProperty,
 	): string | number | undefined => {
 		if (name === "color" && selectionColor) return selectionColor;
-		const direct = resolveInspectorTextStyle({
-			prop: name,
-			parentValue: getStyle(name),
-			linkCss: linkCss || undefined,
-		});
-		if (direct !== undefined && direct !== "") return direct;
-		const inherited = getAncestorInlineStyleProp(editor, name);
-		if (inherited !== undefined && inherited !== "") return inherited;
+		if (isEmailTextStyleProp(name)) {
+			const fromRun = getSelectionTextStyle(editor, name);
+			if (fromRun) return fromRun;
+		}
+		if (linkCss) {
+			const fromLink = resolveInspectorTextStyle({
+				prop: name,
+				parentValue: undefined,
+				linkCss,
+			});
+			if (fromLink !== undefined && fromLink !== "") return fromLink;
+		}
+		const inline = getInlineSelectionStyle(editor, name);
+		if (inline) return inline;
+		// The rendered value is ground truth (theme, imported CSS, buttons'
+		// own colors); the theme text color is only a fallback without DOM.
+		if (name !== "fontFamily") {
+			const computed = getComputedSelectionStyle(editor, name, {
+				block: name === "lineHeight",
+			});
+			if (computed) return computed;
+		}
 		if (name === "color") {
 			const themed = getThemeColorFallback(editor);
 			if (themed) return themed;
-			const computed = getComputedSelectionColor(editor);
-			if (computed) return computed;
 		}
-		return direct;
+		return getStyle(name);
 	};
 
 	const resolvedGetStyle = (name: InspectorStyleProperty) => {
@@ -718,8 +749,15 @@ function TextSection({
 			if (raw === undefined || raw === "") return raw;
 			if (name === "color") return normalizeColorToHex(raw);
 			if (name === "fontWeight") return normalizeFontWeightDisplay(raw);
+			if (name === "fontFamily") return String(raw).replace(/^['"]|['"]$/g, "");
+			if (name === "fontSize" || name === "letterSpacing") {
+				return fontSizePxFromRaw(raw) ?? raw;
+			}
 			if (name === "lineHeight") {
-				const fontSizePx = fontSizePxFromRaw(rawEffectiveStyle("fontSize"));
+				const fontSizePx = fontSizePxFromRaw(
+					getInlineSelectionStyle(editor, "fontSize") ||
+						getComputedSelectionStyle(editor, "fontSize", { block: true }),
+				);
 				return displayLineHeightPercent(raw, fontSizePx);
 			}
 			return raw;
@@ -741,10 +779,18 @@ function TextSection({
 				: name === "letterSpacing" && typeof value === "number"
 					? `${value}px`
 					: value;
+		// A selected run gets its own style (like a word in a doc editor);
+		// a caret or node selection styles the whole block.
 		if (
-			name === "color" &&
 			editor &&
-			applySelectionFontColor(editor, String(normalizedValue))
+			isEmailTextStyleProp(name) &&
+			applySelectionTextStyle(
+				editor,
+				name,
+				typeof normalizedValue === "number"
+					? `${normalizedValue}px`
+					: String(normalizedValue),
+			)
 		) {
 			return;
 		}
@@ -761,7 +807,6 @@ function TextSection({
 			const next = setInlineCssProp(linkCss, name, normalizedValue);
 			editor
 				.chain()
-				.focus()
 				.extendMarkRange("link")
 				.updateAttributes("link", { style: next })
 				.run();
@@ -788,7 +833,6 @@ function TextSection({
 		const next = setInlineCssDeclaration(linkCss, "backgroundColor", color);
 		editor
 			.chain()
-			.focus()
 			.extendMarkRange("link")
 			.updateAttributes("link", { style: next })
 			.run();
@@ -916,7 +960,6 @@ function useFilledLinkBox() {
 		}
 		editor
 			.chain()
-			.focus()
 			.extendMarkRange("link")
 			.updateAttributes("link", { style: next })
 			.run();
@@ -948,22 +991,55 @@ function InspectorNodeStyles({
 	if (nodeType === "variable") return null;
 
 	if (nodeType === "horizontalRule") {
+		// The theme draws the rule, so getStyle reports stripped or default
+		// values (thickness 0). Read the node's own style, then the canvas.
+		const hrStyle = inlineCssToRecord(String(getAttr("style") ?? ""));
+		const hrDom =
+			nodeEditor && nodePos ? nodeEditor.view.nodeDOM(nodePos.pos) : null;
+		const hrEl =
+			hrDom instanceof HTMLElement
+				? hrDom.tagName === "HR"
+					? hrDom
+					: hrDom.querySelector("hr")
+				: null;
+		const hrComputed = hrEl ? window.getComputedStyle(hrEl) : null;
+		const hrValue = (prop: string, fallbackProp?: string): string =>
+			hrStyle[prop] ||
+			(fallbackProp ? hrStyle[fallbackProp] : "") ||
+			((hrComputed?.[prop as keyof CSSStyleDeclaration] as string) ?? "");
+		// setNodeMarkup on a leaf is a ReplaceStep, which the Divider's
+		// filterTransaction rejects while the divider is selected, so every
+		// change here was silently dropped. An attribute step is allowed.
+		const setHr = (
+			changes: Array<{ prop: string; value: string | number }>,
+		) => {
+			if (!nodeEditor || !nodePos) return;
+			const node = nodeEditor.state.doc.nodeAt(nodePos.pos);
+			if (node?.type.name !== "horizontalRule") return;
+			let style = String(node.attrs.style ?? "");
+			for (const { prop, value } of changes) {
+				style = setInlineCssDeclaration(
+					style,
+					prop,
+					typeof value === "number" ? `${value}px` : String(value),
+				);
+			}
+			nodeEditor.view.dispatch(
+				nodeEditor.state.tr.setNodeAttribute(nodePos.pos, "style", style),
+			);
+		};
 		return (
 			<InspectorSection>
 				<SectionHeader label="Divider" />
 				<ScrubRow
 					label="Thickness"
-					value={toPxNumber(
-						(getStyle("borderTopWidth") ?? getStyle("borderWidth") ?? 1) as
-							| string
-							| number,
-					)}
+					value={toPxNumber(hrValue("borderTopWidth", "borderWidth") || 1)}
 					onChange={(v) => {
-						batchSetStyle([
+						setHr([
 							{ prop: "borderTopWidth", value: v as number },
 							{
 								prop: "borderTopStyle",
-								value: (getStyle("borderTopStyle") as string) || "solid",
+								value: hrValue("borderTopStyle") || "solid",
 							},
 						]);
 					}}
@@ -974,8 +1050,8 @@ function InspectorNodeStyles({
 				<PropRow label="Style">
 					<div className="w-28">
 						<SelectField
-							value={String(getStyle("borderTopStyle") ?? "solid")}
-							onChange={(v) => setStyle("borderTopStyle", v)}
+							value={hrValue("borderTopStyle") || "solid"}
+							onChange={(v) => setHr([{ prop: "borderTopStyle", value: v }])}
 							options={[
 								{ label: "Solid", value: "solid" },
 								{ label: "Dashed", value: "dashed" },
@@ -986,12 +1062,12 @@ function InspectorNodeStyles({
 				</PropRow>
 				<ColorRow
 					label="Color"
-					value={String(
-						getStyle("borderTopColor") ?? getStyle("borderColor") ?? "#e5e7eb",
+					value={normalizeColorToHex(
+						hrValue("borderTopColor", "borderColor") || "#e5e7eb",
 					)}
 					onChange={(v) => {
 						const hex = v.trim() === "" ? "" : normalizeColorToHex(v) || v;
-						batchSetStyle([
+						setHr([
 							{ prop: "borderTopColor", value: hex },
 							{ prop: "borderColor", value: hex },
 						]);
@@ -1000,24 +1076,18 @@ function InspectorNodeStyles({
 				<SectionHeader label="Spacing" />
 				<ScrubRow
 					label="Top margin"
-					value={toPxNumber(
-						(getStyle("marginTop") ?? getStyle("margin") ?? 16) as
-							| string
-							| number,
-					)}
-					onChange={(v) => setStyle("marginTop", v as number)}
+					value={toPxNumber(hrValue("marginTop", "margin") || 16)}
+					onChange={(v) => setHr([{ prop: "marginTop", value: v as number }])}
 					min={0}
 					max={100}
 					suffix="px"
 				/>
 				<ScrubRow
 					label="Bottom margin"
-					value={toPxNumber(
-						(getStyle("marginBottom") ?? getStyle("margin") ?? 16) as
-							| string
-							| number,
-					)}
-					onChange={(v) => setStyle("marginBottom", v as number)}
+					value={toPxNumber(hrValue("marginBottom", "margin") || 16)}
+					onChange={(v) =>
+						setHr([{ prop: "marginBottom", value: v as number }])
+					}
 					min={0}
 					max={100}
 					suffix="px"
@@ -1625,7 +1695,6 @@ export const EmailInspector = () => {
 						const setLinkColor = (color: string) =>
 							editor
 								.chain()
-								.focus()
 								.extendMarkRange(linkMark)
 								.updateAttributes(linkMark, { color })
 								.run();
@@ -1666,7 +1735,17 @@ export const EmailInspector = () => {
 
 				{/* ── Document card ── */}
 				<Inspector.Document>
-					{({ findStyleValue, setGlobalStyle, batchSetGlobalStyle }) => {
+					{({ setGlobalStyle, batchSetGlobalStyle }) => {
+						// Show only values that render (saved or theme), never the
+						// generic control defaults react-email falls back to.
+						const findStyleValue = (
+							classReference: string,
+							prop: string,
+						): string | number | undefined =>
+							getGlobalStyleValue(editor, classReference, prop) as
+								| string
+								| number
+								| undefined;
 						const setColorGlobal = (
 							classReference: "body" | "container",
 							property: "backgroundColor" | "color" | "borderColor",
@@ -1785,14 +1864,6 @@ export const EmailInspector = () => {
 										onChange={(v) => setGlobalStyle("container", "width", v)}
 										min={200}
 										max={1200}
-										suffix="px"
-									/>
-									<ScrubRow
-										label="Height"
-										value={findStyleValue("container", "height")}
-										onChange={(v) => setGlobalStyle("container", "height", v)}
-										min={0}
-										max={2000}
 										suffix="px"
 									/>
 									<SpacingControl

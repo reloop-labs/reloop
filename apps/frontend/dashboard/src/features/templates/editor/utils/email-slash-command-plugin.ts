@@ -37,6 +37,10 @@ export function createSlashCommandPlugin({
 		// @tiptap/suggestion nests its own @tiptap/core copy.
 		editor: editor as never,
 		char: "/",
+		// Spaces so "/2 columns" filters; the menu bows out once a spaced
+		// query matches nothing (see EmailSlashCommand), so prose after a
+		// stray slash is not captured.
+		allowSpaces: true,
 		allowedPrefixes: null,
 		startOfLine: false,
 		allow: ({ editor: e }) => !e.isActive("codeBlock"),
@@ -80,7 +84,12 @@ export function createSlashCommandPlugin({
 	});
 }
 
-export const EMAIL_BUBBLE_HIDE_NODES = ["button", "image", "variable"] as const;
+export const EMAIL_BUBBLE_HIDE_NODES = [
+	"button",
+	"image",
+	"variable",
+	"horizontalRule",
+] as const;
 const EMAIL_TEXT_BUBBLE_BLOCK_NODES = ["image", "variable"] as const;
 
 export function emailTextBubbleShouldShow(options: {

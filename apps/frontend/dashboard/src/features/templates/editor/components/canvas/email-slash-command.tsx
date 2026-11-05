@@ -38,8 +38,14 @@ export function EmailSlashCommand() {
 	const commandRef = useRef<((item: SlashCommandItem) => void) | null>(null);
 	const itemsRef = useRef<SlashCommandItem[]>([]);
 	const selectedIndexRef = useRef(0);
-	itemsRef.current = state.items;
+	const scrollRef = useRef<HTMLDivElement | null>(null);
 	selectedIndexRef.current = selectedIndex;
+
+	// Grouping can reorder items; arrows and Enter follow the order shown.
+	const groups = state.query.trim()
+		? [{ category: "", items: state.items }]
+		: groupByCategory(state.items);
+	itemsRef.current = groups.flatMap((group) => group.items);
 
 	const { refs, floatingStyles } = useFloating({
 		open: state.active,
@@ -60,6 +66,19 @@ export function EmailSlashCommand() {
 	useEffect(() => {
 		setSelectedIndex(0);
 	}, [state.query, state.active]);
+
+	// Keep the highlighted item visible while moving with the arrow keys.
+	useEffect(() => {
+		const container = scrollRef.current;
+		if (!container || !state.active) return;
+		if (selectedIndex === 0) {
+			container.scrollTop = 0;
+			return;
+		}
+		container
+			.querySelector<HTMLElement>("[data-re-slash-command-item][data-selected]")
+			?.scrollIntoView({ block: "nearest" });
+	}, [selectedIndex, state.active, state.items]);
 
 	const onKeyDown = useCallback(({ event }: { event: KeyboardEvent }) => {
 		if (event.key === "Escape") {
@@ -102,6 +121,10 @@ export function EmailSlashCommand() {
 			},
 			onUpdate: (props) => {
 				commandRef.current = props.command;
+				if (props.items.length === 0 && props.query.includes(" ")) {
+					setState(INITIAL);
+					return;
+				}
 				setState({
 					active: true,
 					query: props.query,
@@ -130,16 +153,18 @@ export function EmailSlashCommand() {
 
 	if (!editor || !state.active) return null;
 
-	const groups = state.query.trim()
-		? [{ category: "", items: state.items }]
-		: groupByCategory(state.items);
-
 	let flatIndex = 0;
 
 	return createPortal(
-		<div ref={refs.setFloating} style={{ ...floatingStyles, zIndex: 9999 }}>
+		<div
+			ref={refs.setFloating}
+			style={{ ...floatingStyles, zIndex: 9999 }}
+			// Keep focus in the editor: a blur ends the suggestion and drops
+			// the command before the item's click handler runs.
+			onMouseDown={(event) => event.preventDefault()}
+		>
 			<div data-re-slash-command="">
-				<div data-re-slash-command-scroll="">
+				<div ref={scrollRef} data-re-slash-command-scroll="">
 					{state.items.length === 0 ? (
 						<div data-re-slash-command-empty="">No results</div>
 					) : (
@@ -157,6 +182,12 @@ export function EmailSlashCommand() {
 											type="button"
 											data-re-slash-command-item=""
 											data-selected={selected || undefined}
+											// mousemove, not mouseenter: scrolling the list under a
+											// still pointer must not steal the keyboard highlight.
+											onMouseMove={() => {
+												if (selectedIndexRef.current !== current)
+													setSelectedIndex(current);
+											}}
 											onClick={() => commandRef.current?.(item)}
 										>
 											{item.icon}

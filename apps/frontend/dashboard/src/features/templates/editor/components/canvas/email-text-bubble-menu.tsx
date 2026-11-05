@@ -135,6 +135,9 @@ export function EmailTextBubbleMenu() {
 	return (
 		<BubbleMenu
 			pluginKey={textBubblePluginKey}
+			// Above the selection so it never covers the lines being edited;
+			// flips below when there is no room.
+			placement="top"
 			hideWhenActiveNodes={[...EMAIL_BUBBLE_HIDE_NODES]}
 			trigger={emailTextBubbleTrigger}
 			onHide={() => {

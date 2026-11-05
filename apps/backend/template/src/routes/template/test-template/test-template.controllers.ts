@@ -76,6 +76,8 @@ export async function sendTestEmail(params: {
 		LAST_NAME: "Doe",
 		EMAIL: to,
 		UNSUBSCRIBE_URL: "https://reloop.sh/unsubscribe",
+		// What the editor's Footer and unsubscribe link insert.
+		unsubscribe_url: "https://reloop.sh/unsubscribe",
 	};
 	for (const [key, val] of Object.entries(RESERVED_VARIABLES)) {
 		mergedVariables[key] = val;

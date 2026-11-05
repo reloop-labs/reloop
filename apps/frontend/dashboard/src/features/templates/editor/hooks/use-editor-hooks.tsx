@@ -3,13 +3,14 @@ import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import Placeholder from "@tiptap/extension-placeholder";
 import { type Editor, useEditor } from "@tiptap/react";
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import type { WebsocketProvider } from "y-websocket";
 import type * as Y from "yjs";
 import { UnsubscribeLink } from "#/features/campaigns/editor/extensions/unsubscribe-link";
 import { Variable } from "../extensions/variable";
 import { VariableSuggestion } from "../extensions/variable-suggestion";
 import { emailStarterKit } from "../utils/email-starter-kit";
+import { withImageLayout } from "../utils/image-export";
 import { handleEmailHtmlPaste } from "../utils/load-html-into-editor";
 
 export interface CollabOptions {
@@ -90,7 +91,11 @@ export const useEditorHook = (collab: CollabOptions) => {
 		return { url: data.url };
 	}, []);
 
-	const imageExtension = useEditorImage({ uploadImage });
+	const uploadedImage = useEditorImage({ uploadImage });
+	const imageExtension = useMemo(
+		() => withImageLayout(uploadedImage),
+		[uploadedImage],
+	);
 	const editorRef = useRef<Editor | null>(null);
 
 	const editor = useEditor(

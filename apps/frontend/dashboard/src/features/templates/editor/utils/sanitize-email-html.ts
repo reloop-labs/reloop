@@ -29,6 +29,7 @@ import {
 	prepareEmailHtmlForParse,
 	stripEmailCentering,
 } from "#/features/templates/editor/utils/strip-email-centering";
+import { restoreComposedButtons } from "./restore-composed-buttons";
 
 /** Tags that must never appear in the editor content. */
 const FORBIDDEN_TAGS = new Set([
@@ -67,6 +68,7 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 		prepareEmailHtmlForParse(rawHtml),
 		"text/html",
 	);
+	restoreComposedButtons(doc.body);
 
 	// Copy class-based padding/margin onto inline styles before we drop <style>
 	// and unwrap the container table. Otherwise TipTap keeps the class names

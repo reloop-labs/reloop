@@ -40,9 +40,53 @@ export const footerSlashCommand: SlashCommandItem = {
 	},
 };
 
+const CONTAINER_BLOCKS = new Set([
+	"twoColumns",
+	"threeColumns",
+	"fourColumns",
+	"section",
+]);
+
+/**
+ * Put the caret in the first text block of the layout block just inserted
+ * at `from`. react-email's insertColumns looks for the caret inside the new
+ * block, but replaceSelectionWith leaves it after the block, so typing went
+ * into the paragraph below instead of the first column.
+ */
+export function focusInsertedContainer(editor: Editor, from: number): void {
+	const { doc } = editor.state;
+	let target: number | null = null;
+	doc.descendants((node, pos) => {
+		if (target !== null) return false;
+		if (pos + node.nodeSize < from - 1) return false;
+		if (!CONTAINER_BLOCKS.has(node.type.name) || pos < from - 2) return true;
+		node.descendants((child, childPos) => {
+			if (target !== null) return false;
+			if (child.isTextblock) {
+				target = pos + 1 + childPos + 1;
+				return false;
+			}
+			return true;
+		});
+		return false;
+	});
+	if (target !== null) editor.chain().focus().setTextSelection(target).run();
+}
+
+function withContainerFocus(item: SlashCommandItem): SlashCommandItem {
+	if (!/columns$|^Section$/.test(item.title)) return item;
+	return {
+		...item,
+		command: (props) => {
+			item.command(props);
+			focusInsertedContainer(props.editor as Editor, props.range.from);
+		},
+	};
+}
+
 /** Same blocks as the canvas `/` menu, plus Variable, Footer, and Image. */
 export const editorSlashCommands: SlashCommandItem[] = [
-	...defaultSlashCommands,
+	...defaultSlashCommands.map(withContainerFocus),
 	imageSlashCommand,
 	variableSlashCommand,
 	footerSlashCommand,

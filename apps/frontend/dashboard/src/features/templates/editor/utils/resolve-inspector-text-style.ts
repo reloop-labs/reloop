@@ -1,6 +1,10 @@
 import type { Editor } from "@tiptap/core";
 import { NodeSelection } from "@tiptap/pm/state";
-import { EMAIL_FONT_COLOR_MARK } from "./email-starter-kit";
+import {
+	EMAIL_FONT_COLOR_MARK,
+	EMAIL_TEXT_STYLE_PROPS,
+	type EmailTextStyleProp,
+} from "./email-starter-kit";
 
 export type InspectorTextStyleProp =
 	| "color"
@@ -384,26 +388,172 @@ export function getThemeColorFallback(
 export function getComputedSelectionColor(
 	editor: Editor | null | undefined,
 ): string {
-	const view = (editor as { view?: unknown } | null | undefined)?.view as
-		| {
-				domAtPos?: (pos: number) => Node | null;
-		  }
-		| undefined;
-	if (!editor || !view?.domAtPos || typeof window === "undefined") return "";
+	return getComputedSelectionStyle(editor, "color");
+}
+
+/** The canvas element that renders the current selection's text. */
+function getSelectionElement(
+	editor: Editor | null | undefined,
+): HTMLElement | null {
+	if (!editor || typeof window === "undefined") return null;
 	try {
-		const { from } = editor.state.selection;
-		const dom = view.domAtPos(from);
-		const el =
-			dom instanceof HTMLElement ? dom : (dom as Node | null)?.parentElement;
-		if (!el) return "";
-		const block = el.closest?.(
-			"p,h1,h2,h3,li,td,th,div,section,blockquote",
-		) as HTMLElement | null;
-		const c = window.getComputedStyle(block ?? el).color;
-		return typeof c === "string" ? c : "";
+		const { selection } = editor.state;
+		if (selection instanceof NodeSelection) {
+			const dom = editor.view.nodeDOM(selection.from);
+			if (!(dom instanceof HTMLElement)) return null;
+			// Node views wrap the element that renders the text (a button's
+			// <a> inside an alignment wrapper); measure that, not the wrapper.
+			const walker = document.createTreeWalker(dom, NodeFilter.SHOW_TEXT, {
+				acceptNode: (node) =>
+					node.textContent?.trim()
+						? NodeFilter.FILTER_ACCEPT
+						: NodeFilter.FILTER_SKIP,
+			});
+			return walker.nextNode()?.parentElement ?? dom;
+		}
+		// domAtPos returns { node, offset }; node is usually a text node.
+		const { node } = editor.view.domAtPos(selection.from);
+		return node instanceof HTMLElement ? node : node.parentElement;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Last-resort ground truth: the rendered value in the canvas. Covers theme
+ * CSS and imported stylesheets that live outside editor state.
+ */
+export function getComputedSelectionStyle(
+	editor: Editor | null | undefined,
+	prop: "color" | "fontSize" | "lineHeight" | "letterSpacing" | "fontWeight",
+	options?: { block?: boolean },
+): string {
+	const inner = getSelectionElement(editor);
+	// Line height belongs to the block; a styled word inside it would
+	// report its own size and skew the percentage.
+	const el = options?.block
+		? ((inner?.closest(
+				"p,h1,h2,h3,h4,h5,h6,li,td,th,blockquote,pre",
+			) as HTMLElement | null) ?? inner)
+		: inner;
+	if (!el) return "";
+	try {
+		const value = window.getComputedStyle(el)[prop];
+		return typeof value === "string" && value !== "normal" ? value : "";
 	} catch {
 		return "";
 	}
+}
+
+/**
+ * Raw inline value (units intact) from the selected node, then its ancestors.
+ * The react-email inspector strips `px`/`%` on read, which makes a `20px`
+ * line height indistinguishable from `20%`; this keeps the unit.
+ */
+export function getInlineSelectionStyle(
+	editor: Editor | null | undefined,
+	prop: InspectorTextStyleProp,
+): string | undefined {
+	if (!editor) return undefined;
+	try {
+		const { selection } = editor.state;
+		const styles: string[] = [];
+		if (selection instanceof NodeSelection) {
+			styles.push(String(selection.node.attrs?.style ?? ""));
+		}
+		const { $from } = selection;
+		for (let depth = $from.depth; depth > 0; depth--) {
+			styles.push(String($from.node(depth).attrs?.style ?? ""));
+		}
+		for (const style of styles) {
+			if (!style) continue;
+			const value = inlineCssToRecord(style)[prop];
+			if (value) return value;
+		}
+	} catch {
+		return undefined;
+	}
+	return undefined;
+}
+
+export function isEmailTextStyleProp(prop: string): prop is EmailTextStyleProp {
+	return (EMAIL_TEXT_STYLE_PROPS as readonly string[]).includes(prop);
+}
+
+/** True when the inspector should style the selected run, not the block. */
+export function hasStyleableTextRange(
+	editor: Editor | null | undefined,
+): boolean {
+	if (!editor) return false;
+	const { selection } = editor.state;
+	return !selection.empty && !(selection instanceof NodeSelection);
+}
+
+/**
+ * Value of a run-level style (emailFontColor mark) across the selection.
+ * Uniform value wins; mixed or unset → "".
+ */
+export function getSelectionTextStyle(
+	editor: Editor | null | undefined,
+	prop: EmailTextStyleProp,
+): string {
+	if (!editor) return "";
+	const type = editor.schema.marks[EMAIL_FONT_COLOR_MARK];
+	if (!type) return "";
+	const { selection } = editor.state;
+	if (selection.empty) {
+		const marks = editor.state.storedMarks ?? selection.$from.marks();
+		const value = type.isInSet(marks)?.attrs?.[prop];
+		return typeof value === "string" ? value : "";
+	}
+	const found = new Set<string>();
+	let unstyled = false;
+	editor.state.doc.nodesBetween(selection.from, selection.to, (node) => {
+		if (!node.isText) return;
+		const value = type.isInSet(node.marks)?.attrs?.[prop];
+		if (typeof value === "string" && value) found.add(value);
+		else unstyled = true;
+	});
+	if (found.size === 1 && !unstyled) return [...found][0] as string;
+	return "";
+}
+
+/**
+ * Style just the selected run. Merges into existing run styles so setting a
+ * size keeps the color, and drops the mark once nothing is left on it.
+ * Returns false when there is no text range (caller styles the block).
+ */
+export function applySelectionTextStyle(
+	editor: Editor,
+	prop: EmailTextStyleProp,
+	value: string,
+): boolean {
+	if (!hasStyleableTextRange(editor)) return false;
+	const type = editor.schema.marks[EMAIL_FONT_COLOR_MARK];
+	if (!type) return false;
+	const { state } = editor;
+	const { tr } = state;
+	for (const range of state.selection.ranges) {
+		const from = range.$from.pos;
+		const to = range.$to.pos;
+		state.doc.nodesBetween(from, to, (node, pos) => {
+			if (!node.isText) return;
+			const start = Math.max(from, pos);
+			const end = Math.min(to, pos + node.nodeSize);
+			const attrs = {
+				...(type.isInSet(node.marks)?.attrs ?? {}),
+				[prop]: value || null,
+			};
+			tr.removeMark(start, end, type);
+			if (Object.values(attrs).some((v) => v !== null && v !== "")) {
+				tr.addMark(start, end, type.create(attrs));
+			}
+		});
+	}
+	// No focus(): this runs from inspector inputs, and focusing the editor
+	// mid-typing sends the rest of the keystrokes into the email.
+	editor.view.dispatch(tr);
+	return true;
 }
 
 /** Paints the selected run. Returns false when there is no range. */
@@ -411,8 +561,7 @@ export function applySelectionFontColor(
 	editor: Editor,
 	color: string,
 ): boolean {
-	if (editor.state.selection.empty) return false;
-	return editor.chain().focus().setMark(EMAIL_FONT_COLOR_MARK, { color }).run();
+	return applySelectionTextStyle(editor, "color", color);
 }
 
 /** Resolves effective alignment by prioritizing inline CSS style over node attribute */

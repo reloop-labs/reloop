@@ -41,10 +41,22 @@ export const VariableSuggestion = Extension.create({
 								: props.clientRect;
 
 						if (rect) {
-							component.element.style.position = "fixed";
-							component.element.style.zIndex = "9999";
-							component.element.style.top = `${rect.bottom + 8}px`;
-							component.element.style.left = `${rect.left}px`;
+							const el = component.element as HTMLElement;
+							el.style.position = "fixed";
+							el.style.zIndex = "9999";
+							// Flip above the cursor when the menu would run off the
+							// bottom of the window, and keep it inside horizontally.
+							const gap = 8;
+							const height = el.offsetHeight;
+							const width = el.offsetWidth;
+							const below = rect.bottom + gap;
+							const fitsBelow = below + height <= window.innerHeight - gap;
+							const above = rect.top - gap - height;
+							el.style.top = `${fitsBelow || above < gap ? below : above}px`;
+							el.style.left = `${Math.max(
+								gap,
+								Math.min(rect.left, window.innerWidth - width - gap),
+							)}px`;
 						}
 					};
 
@@ -55,9 +67,10 @@ export const VariableSuggestion = Extension.create({
 								editor: props.editor as any,
 							});
 
-							updatePosition(props);
-
 							document.body.appendChild(component.element);
+							updatePosition(props);
+							// Measure again once React has rendered the items.
+							requestAnimationFrame(() => updatePosition(props));
 						},
 
 						onUpdate(props) {

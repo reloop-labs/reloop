@@ -8,6 +8,7 @@ import { useActiveOrganization } from "#/features/dashboard/page-header/use-acti
 import { getRandomColor } from "#/features/templates/editor/collobration/hooks/useCollaboration";
 import { EmailSlashCommand } from "#/features/templates/editor/components/canvas/email-slash-command";
 import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
+import { pinUnsetContainerAlignment } from "#/features/templates/editor/utils/global-style-value";
 
 import { updateCampaignRequest } from "../campaigns-api";
 import { useCampaignQuery } from "../campaigns-provider";
@@ -78,16 +79,20 @@ export function CampaignEditorProvider({
 	useEffect(() => {
 		if (!editor || !campaign || !campaignReady || hasHydratedEditorRef.current)
 			return;
-		if (!editor.isEmpty) {
-			hasHydratedEditorRef.current = true;
-			return;
-		}
-		try {
-			hydrateCampaignEditor(editor, campaign);
-		} catch (err) {
-			console.error("Failed to populate initial editor content:", err);
+		if (editor.isEmpty) {
+			try {
+				hydrateCampaignEditor(editor, campaign);
+			} catch (err) {
+				console.error("Failed to populate initial editor content:", err);
+			}
 		}
 		hasHydratedEditorRef.current = true;
+		// A campaign that never chose a body alignment inherits the theme's
+		// `left`; pin it to `center`, the layout the canvas always showed, so
+		// the canvas and the sent email agree (same as the template editor).
+		if (isEditableStatus(campaign.status)) {
+			pinUnsetContainerAlignment(editor);
+		}
 	}, [editor, campaign, campaignReady]);
 
 	// Autosave logic

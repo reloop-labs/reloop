@@ -1,6 +1,7 @@
 import type { Editor } from "@tiptap/react";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
+import { withoutSourceUnlock } from "#/features/templates/editor/utils/html-source-lock";
 import {
 	absolutizeEmailAssetUrls,
 	inlineEmailStylesheet,
@@ -705,116 +706,121 @@ export function parseGlobalStylesFromHtml(html: string) {
 /** Same theme pass the HTML editor runs after a full-email paste. */
 export function applyPastedEmailTheme(editor: Editor, rawHtml: string): void {
 	window.setTimeout(() => {
-		try {
-			const parsed = parseGlobalStylesFromHtml(rawHtml);
-			const existingAfterSeed = getGlobalStylesArray(editor);
+		withoutSourceUnlock(() => applyPastedEmailThemeNow(editor, rawHtml));
+	}, 50);
+}
 
-			if (parsed.css) {
-				applyImportedEmailCss(parsed.css);
-				useEditorStore.getState().setImportedEmailCss(parsed.css);
-			}
+function applyPastedEmailThemeNow(editor: Editor, rawHtml: string): void {
+	try {
+		const parsed = parseGlobalStylesFromHtml(rawHtml);
+		const existingAfterSeed = getGlobalStylesArray(editor);
 
-			const parsedBodyAndContainer = extractThemingStylesFromHtml(rawHtml);
+		if (parsed.css) {
+			applyImportedEmailCss(parsed.css);
+			useEditorStore.getState().setImportedEmailCss(parsed.css);
+		}
 
-			let mergedStyles = mergeParsedStyles(
-				existingAfterSeed,
-				parsedBodyAndContainer,
+		const parsedBodyAndContainer = extractThemingStylesFromHtml(rawHtml);
+
+		let mergedStyles = mergeParsedStyles(
+			existingAfterSeed,
+			parsedBodyAndContainer,
+		);
+
+		if (parsed.bodyBg) {
+			mergedStyles = updateGlobalStyleValue(
+				mergedStyles,
+				"body",
+				"backgroundColor",
+				parsed.bodyBg,
 			);
+		}
 
-			if (parsed.bodyBg) {
-				mergedStyles = updateGlobalStyleValue(
-					mergedStyles,
-					"body",
-					"backgroundColor",
-					parsed.bodyBg,
+		const containerBg =
+			parsed.bodyBg ||
+			findStyleInputValue(mergedStyles, "container", "backgroundColor");
+		const extractedColor = findStyleInputValue(
+			mergedStyles,
+			"container",
+			"color",
+		);
+		const mixedSurfaces = emailHasMixedBackgrounds(
+			new DOMParser().parseFromString(rawHtml, "text/html").body,
+		);
+		const textColor = mixedSurfaces
+			? undefined
+			: readableTextColor(
+					typeof containerBg === "string" ? containerBg : undefined,
+					typeof extractedColor === "string" ? extractedColor : undefined,
 				);
-			}
-
-			const containerBg =
-				parsed.bodyBg ||
-				findStyleInputValue(mergedStyles, "container", "backgroundColor");
-			const extractedColor = findStyleInputValue(
+		if (textColor) {
+			mergedStyles = updateGlobalStyleValue(
 				mergedStyles,
 				"container",
 				"color",
+				textColor,
 			);
-			const mixedSurfaces = emailHasMixedBackgrounds(
-				new DOMParser().parseFromString(rawHtml, "text/html").body,
+			mergedStyles = updateGlobalStyleValue(
+				mergedStyles,
+				"body",
+				"color",
+				textColor,
 			);
-			const textColor = mixedSurfaces
-				? undefined
-				: readableTextColor(
-						typeof containerBg === "string" ? containerBg : undefined,
-						typeof extractedColor === "string" ? extractedColor : undefined,
-					);
-			if (textColor) {
-				mergedStyles = updateGlobalStyleValue(
-					mergedStyles,
-					"container",
-					"color",
-					textColor,
-				);
-				mergedStyles = updateGlobalStyleValue(
-					mergedStyles,
-					"body",
-					"color",
-					textColor,
-				);
-			}
+		}
 
+		mergedStyles = updateGlobalStyleValue(
+			mergedStyles,
+			"container",
+			"height",
+			undefined,
+		);
+		mergedStyles = updateGlobalStyleValue(
+			mergedStyles,
+			"container",
+			"borderWidth",
+			0,
+		);
+
+		const baseFontFamily =
+			findStyleInputValue(mergedStyles, "body", "fontFamily") ||
+			findStyleInputValue(mergedStyles, "typography", "fontFamily") ||
+			"Arial, Helvetica, sans-serif";
+		if (baseFontFamily) {
 			mergedStyles = updateGlobalStyleValue(
 				mergedStyles,
-				"container",
-				"height",
-				undefined,
+				"body",
+				"fontFamily",
+				baseFontFamily,
 			);
 			mergedStyles = updateGlobalStyleValue(
 				mergedStyles,
-				"container",
-				"borderWidth",
+				"typography",
+				"fontFamily",
+				baseFontFamily,
+			);
+			mergedStyles = updateGlobalStyleValue(
+				mergedStyles,
+				"text",
+				"fontFamily",
+				baseFontFamily,
+			);
+			mergedStyles = updateGlobalStyleValue(
+				mergedStyles,
+				"text",
+				"paddingTop",
 				0,
 			);
+			mergedStyles = updateGlobalStyleValue(
+				mergedStyles,
+				"text",
+				"paddingBottom",
+				0,
+			);
+		}
 
-			const baseFontFamily =
-				findStyleInputValue(mergedStyles, "body", "fontFamily") ||
-				findStyleInputValue(mergedStyles, "typography", "fontFamily") ||
-				"Arial, Helvetica, sans-serif";
-			if (baseFontFamily) {
-				mergedStyles = updateGlobalStyleValue(
-					mergedStyles,
-					"body",
-					"fontFamily",
-					baseFontFamily,
-				);
-				mergedStyles = updateGlobalStyleValue(
-					mergedStyles,
-					"typography",
-					"fontFamily",
-					baseFontFamily,
-				);
-				mergedStyles = updateGlobalStyleValue(
-					mergedStyles,
-					"text",
-					"fontFamily",
-					baseFontFamily,
-				);
-				mergedStyles = updateGlobalStyleValue(
-					mergedStyles,
-					"text",
-					"paddingTop",
-					0,
-				);
-				mergedStyles = updateGlobalStyleValue(
-					mergedStyles,
-					"text",
-					"paddingBottom",
-					0,
-				);
-			}
+		editor.commands.setGlobalContent("styles", mergedStyles);
 
-			editor.commands.setGlobalContent("styles", mergedStyles);
-
-			const emailBaseCss = `
+		const emailBaseCss = `
 body, table, td, p, a, li, blockquote {
 	font-family: ${baseFontFamily};
 }
@@ -825,15 +831,14 @@ table, td {
 	border-collapse: separate;
 }
 `;
-			try {
-				editor.commands.setGlobalContent("css", emailBaseCss.trim());
-			} catch {
-				// command might not be registered in tests without theme extension
-			}
-		} catch (err) {
-			console.error("Failed to apply pasted email theme:", err);
+		try {
+			editor.commands.setGlobalContent("css", emailBaseCss.trim());
+		} catch {
+			// command might not be registered in tests without theme extension
 		}
-	}, 50);
+	} catch (err) {
+		console.error("Failed to apply pasted email theme:", err);
+	}
 }
 
 // Helper to retrieve the current styles array from the Tiptap document

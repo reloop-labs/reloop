@@ -343,7 +343,8 @@ describe("resolveInspectorTextStyle", () => {
 		editor.commands.setTextSelection({ from: 1, to: 5 });
 		expect(getSelectionMarkColor(editor)).toBe("");
 		expect(getThemeColorFallback(editor)).toBeUndefined();
-		expect(getComputedSelectionColor(editor)).toBe("");
+		// Falls back to the rendered color of the selected text.
+		expect(getComputedSelectionColor(editor)).toMatch(/^rgb/);
 		editor.destroy();
 	});
 

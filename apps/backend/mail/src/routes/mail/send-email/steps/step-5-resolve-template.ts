@@ -1,5 +1,10 @@
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { htmlToText } from "@reloop/be-mail/lib/html-to-text";
+import {
+	type RecipientVars,
+	resolveRecipientVars,
+	usesRecipientVars,
+} from "@reloop/be-mail/lib/recipient-vars";
 import { db } from "@reloop/db/client";
 import { fillTripleBraceVars } from "@reloop/db/template-vars";
 
@@ -9,6 +14,7 @@ export async function resolveTemplate_step5({
 	subject,
 	html,
 	text,
+	recipient,
 }: {
 	organizationId: string;
 	template?: {
@@ -19,10 +25,31 @@ export async function resolveTemplate_step5({
 	subject: string;
 	html?: string;
 	text?: string;
+	/** Who the email goes to, for the reserved per-recipient variables. */
+	recipient?: {
+		from: string;
+		to: string | string[];
+		replyTo?: string | string[];
+	};
 }) {
 	let finalSubject = subject;
 	let finalHtml = html;
 	let finalText = text;
+
+	// FIRST_NAME, EMAIL, UNSUBSCRIBE_URL, ... — only looked up when the email
+	// actually uses one.
+	let resolved: RecipientVars | null = null;
+	const resolveReserved = async (): Promise<RecipientVars | null> => {
+		if (resolved || !recipient) return resolved;
+		const parts = [finalSubject, finalHtml, finalText];
+		if (!usesRecipientVars(parts)) return null;
+		resolved = await resolveRecipientVars({
+			organizationId,
+			...recipient,
+			parts,
+		});
+		return resolved;
+	};
 
 	if (template && !template.id && !template.slug) {
 		throw MailErrors.templateRefRequired();
@@ -65,14 +92,21 @@ export async function resolveTemplate_step5({
 			}
 		}
 
-		// 2. Override with request-specific variables
+		// 2. Per-recipient values (contact name, unsubscribe link) beat the
+		// template's defaults, but an empty one keeps the default.
+		const reserved = await resolveReserved();
+		for (const [key, value] of Object.entries(reserved?.vars ?? {})) {
+			if (value) finalVariables[key] = value;
+		}
+
+		// 3. Override with request-specific variables
 		if (template.variables) {
 			for (const [key, value] of Object.entries(template.variables)) {
 				finalVariables[key] = value;
 			}
 		}
 
-		// 3. Substitute placeholders. Values are HTML-escaped in the HTML body
+		// 4. Substitute placeholders. Values are HTML-escaped in the HTML body
 		// only; subject and text are not HTML.
 		if (finalSubject)
 			finalSubject = fillTripleBraceVars(finalSubject, finalVariables, {
@@ -84,6 +118,24 @@ export async function resolveTemplate_step5({
 			});
 		if (finalText)
 			finalText = fillTripleBraceVars(finalText, finalVariables, {
+				html: false,
+			});
+	}
+
+	// Reserved placeholders still left (raw HTML sends, or empty values) get
+	// the recipient's values, so no `{{{unsubscribe_url}}}` goes out as-is.
+	const reserved = await resolveReserved();
+	if (reserved) {
+		if (finalSubject)
+			finalSubject = fillTripleBraceVars(finalSubject, reserved.vars, {
+				html: false,
+			});
+		if (finalHtml)
+			finalHtml = fillTripleBraceVars(finalHtml, reserved.vars, {
+				html: true,
+			});
+		if (finalText)
+			finalText = fillTripleBraceVars(finalText, reserved.vars, {
 				html: false,
 			});
 	}
@@ -100,5 +152,11 @@ export async function resolveTemplate_step5({
 		finalText = htmlToText(finalHtml) || undefined;
 	}
 
-	return { finalSubject, finalHtml, finalText };
+	return {
+		finalSubject,
+		finalHtml,
+		finalText,
+		/** List-Unsubscribe headers for an email with an unsubscribe link. */
+		recipientHeaders: reserved?.headers ?? {},
+	};
 }

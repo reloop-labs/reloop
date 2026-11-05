@@ -92,7 +92,18 @@ interface CollabPresenceProps {
 
 export function CollabPresence({ status, isSynced }: CollabPresenceProps) {
 	const self = usePresenceSelf();
-	const others = usePresenceOthers() ?? [];
+	const connections = usePresenceOthers() ?? [];
+	// One avatar per person: the same user in a second tab is a separate
+	// awareness client but not another collaborator.
+	const others = connections.filter((user, index) => {
+		const key = user.email || user.name;
+		if (!key) return true;
+		if (self && key === (self.email || self.name)) return false;
+		return (
+			connections.findIndex((other) => (other.email || other.name) === key) ===
+			index
+		);
+	});
 
 	const totalOthers = others.length;
 	const visibleOthers = others.slice(0, MAX_AVATARS);

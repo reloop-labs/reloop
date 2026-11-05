@@ -6,6 +6,26 @@
  * Single-brace `{name}` is not supported.
  */
 
+/**
+ * Filled by Reloop for every recipient at send time (from the contact), so
+ * they need no template variable or default value. The unsubscribe link has
+ * its own block (Footer) and link option, so it is not listed here.
+ */
+export const BUILT_IN_TEMPLATE_VARIABLES = [
+	"FIRST_NAME",
+	"LAST_NAME",
+	"EMAIL",
+] as const;
+
+export function isBuiltInTemplateVariable(name: string): boolean {
+	const key = normalizeTemplateVariableName(name);
+	return (
+		(BUILT_IN_TEMPLATE_VARIABLES as readonly string[]).includes(key) ||
+		key === "UNSUBSCRIBE_URL" ||
+		key === "unsubscribe_url"
+	);
+}
+
 /** Strip a supported placeholder (or repair a legacy corrupted stored key) to a bare name. */
 export function normalizeTemplateVariableName(raw: string): string {
 	const trimmed = raw.trim();

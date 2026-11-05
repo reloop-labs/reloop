@@ -18,6 +18,7 @@ import {
 } from "@be/campaigns/lib/campaign/unsubscribe";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { mailtoUnsubscribeUrl } from "@reloop/db/unsubscribe";
 import { and, eq, isNotNull, or, sql } from "drizzle-orm";
 import { log } from "evlog";
 
@@ -73,7 +74,8 @@ export async function sendCampaignRecipient(
 		);
 
 	// Per-recipient unsubscribe URLs. Only contacts on the main list carry a
-	// signed token — CSV recipients without a contactId keep today's behavior.
+	// signed token; CSV recipients without a contactId get a mailto link to
+	// the sender so their unsubscribe link is never empty.
 	// The base is the sender's tracking domain when enabled, else the Reloop
 	// links host, so the unsubscribe domain matches the sender family.
 	let unsubscribeUrl: string | null = null;
@@ -90,6 +92,10 @@ export async function sendCampaignRecipient(
 		unsubscribeUrl = unsubscribePageUrl(token, base);
 		oneClickUrl = oneClickUnsubscribeUrl(token, base);
 	}
+	unsubscribeUrl ??= mailtoUnsubscribeUrl({
+		from: campaign.fromEmail,
+		replyTo: campaign.replyTo,
+	});
 
 	const vars = campaignMergeVars({
 		email: recipient.email,

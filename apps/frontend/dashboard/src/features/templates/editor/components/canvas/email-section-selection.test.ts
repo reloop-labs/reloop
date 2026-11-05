@@ -197,6 +197,8 @@ describe("Email Section Selection", () => {
 			h1Pos + 1,
 			h1Pos + 12,
 		);
+		// The outline only shows while the editor has focus.
+		editor.isFocused = true;
 		editor.view.dispatch(editor.state.tr.setSelection(textSel));
 
 		// Verify that decoration produces the class
@@ -209,6 +211,13 @@ describe("Email Section Selection", () => {
 		// Also check DOM rendering
 		const h1El = editor.view.dom.querySelector("h1");
 		expect(h1El?.classList.contains("email-selected-text-node")).toBe(true);
+
+		// Blurred: the selection resets to the document start, which must not
+		// leave a "selected" outline on the first block.
+		editor.isFocused = false;
+		editor.view.dispatch(editor.state.tr.setMeta("blur", true));
+		const blurred = editor.view.someProp("decorations", (f) => f(editor.state));
+		expect((blurred as any)?.find()?.length ?? 0).toBe(0);
 
 		editor.destroy();
 	});

@@ -1,6 +1,7 @@
 import { composeReactEmail } from "@react-email/editor/core";
 import type { Editor } from "@tiptap/react";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { injectWebFontLinks } from "#/features/templates/editor/utils/web-fonts";
 
 /**
  * Pasted source HTML, when the code editor is the source of truth.
@@ -28,5 +29,5 @@ export async function getRenderedEmailHtml(
 		editor,
 		preview: previewText || undefined,
 	});
-	return result.html;
+	return injectWebFontLinks(result.html);
 }

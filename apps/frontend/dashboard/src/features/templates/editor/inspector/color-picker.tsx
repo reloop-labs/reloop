@@ -3,10 +3,30 @@
 import { EditorFocusScope } from "@react-email/editor/ui";
 import * as Popover from "@reloop/ui/popover";
 import { useCurrentEditor } from "@tiptap/react";
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import { HexAlphaColorPicker } from "react-colorful";
 import { normalizeColorToHex } from "../utils/resolve-inspector-text-style";
 import { inspectorFieldClassName } from "./scrub-field";
+
+const HEX_COLOR = /^#?([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
+const SHORT_HEX = /^#?([0-9a-f]{3}|[0-9a-f]{4})$/i;
+
+function isCompleteColor(raw: string): boolean {
+	const value = raw.trim();
+	if (!value) return false;
+	if (HEX_COLOR.test(value)) return true;
+	if (/^(rgb|hsl)a?\(.+\)$/i.test(value) || /^[a-z]+$/i.test(value)) {
+		return typeof CSS !== "undefined" && CSS.supports("color", value);
+	}
+	return false;
+}
+
+function normalizeTypedColor(raw: string): string {
+	const value = raw.trim();
+	if (HEX_COLOR.test(value) && !value.startsWith("#")) return `#${value}`;
+	return value;
+}
 
 /* ------------------------------------------------------------------ */
 /* Color picker: swatch trigger + HexAlphaColorPicker + doc colors   */
@@ -19,6 +39,9 @@ export function ColorPicker({
 	onChange: (v: string) => void;
 }) {
 	const { editor } = useCurrentEditor();
+	const [draft, setDraft] = useState<string | null>(null);
+	const cancelDraftRef = useRef(false);
+	const valueOnFocusRef = useRef(value);
 
 	const normalizedValue = (() => {
 		if (!value) return "#ffffff";
@@ -152,10 +175,53 @@ export function ColorPicker({
 				</EditorFocusScope>
 			</Popover.Root>
 			<input
-				value={value}
+				value={draft ?? value}
 				placeholder="#000000"
 				aria-label="Hex color"
-				onChange={(e) => onChange(e.target.value)}
+				spellCheck={false}
+				onFocus={() => {
+					valueOnFocusRef.current = value;
+					setDraft(value);
+				}}
+				onChange={(e) => {
+					const next = e.target.value;
+					setDraft(next);
+					// Apply as soon as the text is a complete color; partial input
+					// like "#ff" would otherwise paint the selection mid-typing.
+					if (isCompleteColor(next) && !SHORT_HEX.test(next.trim())) {
+						onChange(normalizeTypedColor(next));
+					}
+				}}
+				onBlur={() => {
+					const cancelled = cancelDraftRef.current;
+					cancelDraftRef.current = false;
+					if (draft !== null && !cancelled) {
+						const typed = draft.trim();
+						if (typed === "" && value) onChange("");
+						else if (isCompleteColor(typed) && typed !== value) {
+							onChange(normalizeTypedColor(typed));
+						}
+					}
+					setDraft(null);
+				}}
+				onKeyDown={(e) => {
+					// Never let Enter/Escape reach the canvas (Enter splits the block).
+					e.stopPropagation();
+					// Hand focus back to the canvas rather than blurring to <body>,
+					// which would clear the editor selection.
+					if (e.key === "Enter") {
+						e.preventDefault();
+						editor?.commands.focus();
+					} else if (e.key === "Escape") {
+						e.preventDefault();
+						cancelDraftRef.current = true;
+						setDraft(null);
+						if (value !== valueOnFocusRef.current) {
+							onChange(valueOnFocusRef.current);
+						}
+						editor?.commands.focus();
+					}
+				}}
 				className="min-w-0 flex-1 bg-transparent text-sm text-text-strong-950 tabular-nums outline-none placeholder:text-text-soft-400"
 			/>
 		</div>

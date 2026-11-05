@@ -24,6 +24,13 @@ export const mailConfig = {
 		process.env.TRACKING_SECRET || "reloop_tracking_secret_default_123",
 	RELOOP_INTERNAL_SECRET:
 		process.env.RELOOP_INTERNAL_SECRET || "reloop_internal_secret_default_123",
+	/**
+	 * Shared with the contacts service — signs the per-recipient token in
+	 * `{{{unsubscribe_url}}}`. Must match contacts PREFERENCES_SECRET.
+	 */
+	PREFERENCES_SECRET:
+		process.env.PREFERENCES_SECRET ||
+		"reloop-preferences-secret-key-change-in-prod",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 

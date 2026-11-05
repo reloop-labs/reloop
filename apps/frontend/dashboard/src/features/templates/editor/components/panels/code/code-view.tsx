@@ -1,6 +1,5 @@
 import { html } from "@codemirror/lang-html";
 import { EditorView } from "@codemirror/view";
-import { composeReactEmail } from "@react-email/editor/core";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
@@ -12,6 +11,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { applyPastedEmailTheme } from "#/features/templates/editor/utils/apply-pasted-email-theme";
+import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
+import { withoutSourceUnlock } from "#/features/templates/editor/utils/html-source-lock";
+import { isFullEmailHtml } from "#/features/templates/editor/utils/pick-pasted-email-html";
 import { prettyPrintHtml } from "#/features/templates/editor/utils/pretty-print-html";
 import { sanitizeEmailHtml } from "#/features/templates/editor/utils/sanitize-email-html";
 
@@ -22,18 +24,20 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 	const setHtmlLocked = useEditorStore((s) => s.setHtmlLocked);
 	const [isLoading, setIsLoading] = useState(false);
 	const [copied, setCopied] = useState(false);
-	const isSelfUpdatingRef = useRef(false);
-	const skipNextCodeChangeRef = useRef(false);
+	const applyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const pendingCodeRef = useRef<string | null>(null);
 
-	const updateHtmlCode = useCallback(async () => {
-		if (!editor || isSelfUpdatingRef.current) return;
+	// Visual → code. While the canvas is the source of truth (not locked),
+	// the code view always mirrors it, including edits made after the view
+	// was first opened.
+	const composeFromCanvas = useCallback(async () => {
+		if (!editor) return;
 		if (useEditorStore.getState().htmlLocked) return;
 		setIsLoading(true);
 		try {
-			const result = await composeReactEmail({ editor });
-			if (!isSelfUpdatingRef.current && !useEditorStore.getState().htmlLocked) {
-				setHtmlCode(result.html);
-			}
+			const html = await getRenderedEmailHtml(editor);
+			// The user may have started typing code while this was composing.
+			if (!useEditorStore.getState().htmlLocked) setHtmlCode(html);
 		} catch (err) {
 			console.error("Failed to compose React Email HTML:", err);
 			toast.error("Failed to generate email HTML");
@@ -44,69 +48,72 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 
 	useEffect(() => {
 		if (!editor) return;
-		if (useEditorStore.getState().htmlLocked) return;
-		if (useEditorStore.getState().codeHtml) return;
-		void updateHtmlCode();
-	}, [editor, updateHtmlCode]);
+		void composeFromCanvas();
+		let timer: ReturnType<typeof setTimeout> | null = null;
+		const onUpdate = () => {
+			if (timer) clearTimeout(timer);
+			timer = setTimeout(() => void composeFromCanvas(), 250);
+		};
+		editor.on("update", onUpdate);
+		return () => {
+			if (timer) clearTimeout(timer);
+			editor.off("update", onUpdate);
+		};
+	}, [editor, composeFromCanvas]);
 
-	// 3. Sync code changes (Code -> Visual)
+	// Code → visual. The code is authoritative once typed in (locked), and is
+	// parsed into the canvas after a pause rather than on every keystroke, so
+	// half-typed tags never tear the document apart. `emitUpdate` stays on so
+	// autosave and the unsaved-changes indicator see the change.
 	//
-	// We use `generateJSON` from `@tiptap/html`, the exact same function that
-	// the editor's internal paste handler uses (see createPasteHandler.ts in
-	// @react-email/editor source). It runs the HTML through the editor's own
-	// extension schema (parseHTML rules) which correctly maps:
-	//   - table[role="presentation"] + max-width  →  container node
-	//   - a[data-id="react-email-button"]         →  button node
-	//   - img[src]                                →  image node
-	//   - a[href] / a[target]                     →  link mark
-	//   - span[style]                             →  preserved-style mark
-	//   - body                                    →  body node
+	// `generateJSON` runs the HTML through the editor's own schema (the same
+	// path TipTap paste uses), mapping presentation tables to containers,
+	// react-email buttons, images, links and styled spans to their nodes.
+	const applyCodeToCanvas = useCallback(() => {
+		if (applyTimerRef.current) {
+			clearTimeout(applyTimerRef.current);
+			applyTimerRef.current = null;
+		}
+		const code = pendingCodeRef.current;
+		pendingCodeRef.current = null;
+		if (code === null || !editor || editor.isDestroyed) return;
+		try {
+			const isFullHtml = isFullEmailHtml(code);
+			const content = isFullHtml
+				? generateJSON(
+						sanitizeEmailHtml(code),
+						editor.extensionManager.extensions as never,
+					)
+				: code;
+			withoutSourceUnlock(() => {
+				editor.commands.setContent(content);
+			});
+			if (isFullHtml) applyPastedEmailTheme(editor, code);
+		} catch (err) {
+			console.error("Failed to set content from HTML code editor:", err);
+		}
+	}, [editor]);
+
+	// Flush on close so leaving the code view never drops the last edit.
+	useEffect(() => applyCodeToCanvas, [applyCodeToCanvas]);
+
 	const handleCodeChange = useCallback(
 		(newVal: string) => {
-			if (skipNextCodeChangeRef.current) {
-				skipNextCodeChangeRef.current = false;
-				setHtmlCode(newVal);
-				return;
-			}
 			setHtmlLocked(true);
 			setHtmlCode(newVal);
-			if (editor) {
-				isSelfUpdatingRef.current = true;
-				try {
-					let contentToSet: any = newVal;
-					const lowerVal = newVal.toLowerCase();
-					const isFullHtml =
-						lowerVal.includes("<table") ||
-						lowerVal.includes("<html") ||
-						lowerVal.includes("<!doctype");
-
-					if (isFullHtml) {
-						const safeHtml = sanitizeEmailHtml(newVal);
-						const extensions = editor.extensionManager.extensions as any;
-						contentToSet = generateJSON(safeHtml, extensions);
-					}
-					editor.commands.setContent(contentToSet, { emitUpdate: false });
-
-					// Defer style extraction and settings application until the editor has settled
-					// and automatically seeded the globalContent node/styles array.
-					if (isFullHtml) {
-						applyPastedEmailTheme(editor, newVal);
-					}
-				} catch (err) {
-					console.error("Failed to set content from HTML code editor:", err);
-				}
-				isSelfUpdatingRef.current = false;
-			}
+			pendingCodeRef.current = newVal;
+			if (applyTimerRef.current) clearTimeout(applyTimerRef.current);
+			applyTimerRef.current = setTimeout(applyCodeToCanvas, 600);
 		},
-		[editor, setHtmlCode, setHtmlLocked],
+		[applyCodeToCanvas, setHtmlCode, setHtmlLocked],
 	);
 
+	// Formatting only changes whitespace, so it does not touch the canvas or
+	// the lock. CodeMirror does not fire onChange for this external update.
 	const handleFormat = useCallback(() => {
-		skipNextCodeChangeRef.current = true;
-		setHtmlLocked(true);
 		setHtmlCode(prettyPrintHtml(htmlCode));
 		toast.success("HTML formatted");
-	}, [htmlCode, setHtmlCode, setHtmlLocked]);
+	}, [htmlCode, setHtmlCode]);
 
 	// Copy to clipboard
 	const handleCopy = useCallback(() => {

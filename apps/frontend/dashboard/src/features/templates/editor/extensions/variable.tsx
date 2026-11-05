@@ -6,7 +6,10 @@ import type React from "react";
 import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
-import { normalizeTemplateVariableName } from "#/features/templates/lib/template-variables";
+import {
+	isBuiltInTemplateVariable,
+	normalizeTemplateVariableName,
+} from "#/features/templates/lib/template-variables";
 
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((r) => r.json());
@@ -31,7 +34,10 @@ export function VariableNodeView({
 
 	let hasDefaultValue = false;
 
-	if (templateId) {
+	if (isBuiltInTemplateVariable(name)) {
+		// Filled from the contact at send time.
+		hasDefaultValue = true;
+	} else if (templateId) {
 		const variables = templateData?.variables ?? [];
 		const matchedVar = variables.find((v: any) => {
 			if (typeof v === "string") {

@@ -5,7 +5,10 @@ import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-qu
 import { useAddVariableModal } from "#/features/templates/editor/hooks/use-add-variable-modal";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
-import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
+import {
+	BUILT_IN_TEMPLATE_VARIABLES,
+	mapTemplateVariables,
+} from "#/features/templates/lib/template-variables";
 
 interface VariablesDropdownProps {
 	query: string;
@@ -30,9 +33,18 @@ export const VariablesDropdown = forwardRef(
 
 		const { data: propertiesData } = useAllPropertiesQuery(!templateId);
 
-		const variables = templateId
+		const custom = templateId
 			? mapTemplateVariables(templateData?.variables).map((v) => v.name)
 			: (propertiesData?.properties ?? []).map((p) => p.propertyName);
+		// Contact fields Reloop fills per recipient, after the template's own.
+		const variables = templateId
+			? [
+					...custom,
+					...BUILT_IN_TEMPLATE_VARIABLES.filter(
+						(name) => !custom.includes(name),
+					),
+				]
+			: custom;
 
 		const [selectedIndex, setSelectedIndex] = useState(0);
 

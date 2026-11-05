@@ -7,6 +7,7 @@ import {
 import { assertNotDuplicateBurst } from "@reloop/be-mail/lib/duplicate-guard";
 import { IdempotentReplayError, MailErrors } from "@reloop/be-mail/lib/errors";
 import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
+import { mergeMissingHeaders } from "@reloop/be-mail/lib/recipient-vars";
 import { assertReputationAllowed } from "@reloop/be-mail/lib/reputation-guard";
 import {
 	assertAttachmentsWithinPlan,
@@ -525,13 +526,18 @@ async function sendReservedEmail({
 		idempotencyKey,
 	});
 
-	const { finalSubject, finalHtml, finalText } = await resolveTemplate_step5({
-		organizationId,
-		template: body.template,
-		subject: body.subject,
-		html: body.html,
-		text: body.text,
-	});
+	const { finalSubject, finalHtml, finalText, recipientHeaders } =
+		await resolveTemplate_step5({
+			organizationId,
+			template: body.template,
+			subject: body.subject,
+			html: body.html,
+			text: body.text,
+			recipient: { from: body.from, to: body.to, replyTo: body.reply_to },
+		});
+	// One-click unsubscribe (Gmail/Yahoo) for emails with an unsubscribe link,
+	// unless the caller set their own List-Unsubscribe.
+	body.headers = mergeMissingHeaders(body.headers, recipientHeaders);
 
 	// Step 5b/c: Rewrite links and inject open pixel based on domain tracking flags
 	let trackedHtml = finalHtml;
