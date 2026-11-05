@@ -519,7 +519,7 @@ export function ApiSection() {
 								</li>
 								<li>
 									<a
-										href="/docs/setup/backend/tools"
+										href="/docs/api/tools/post-api-tools-v1lookalike-watch"
 										className="group flex items-center gap-2 text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 									>
 										<Icon
