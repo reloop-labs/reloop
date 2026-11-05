@@ -140,11 +140,14 @@ export const AgentInboxContent = ({
 		? "Label"
 		: (FOLDER_TITLES[folder] ?? "Inbox");
 
+	// Clear the bulk selection whenever the visible list changes (tab, search,
+	// filter). Otherwise bulk actions run on threads that are no longer shown.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset when the visible list changes
 	useEffect(() => {
 		setMail((prev) =>
 			prev.bulkSelected.length === 0 ? prev : { ...prev, bulkSelected: [] },
 		);
-	}, [setMail]);
+	}, [setMail, tabParam, searchQuery, filterParam]);
 
 	const groupedThreads = useMemo(
 		() => groupThreadsByConversation(threads),
@@ -278,7 +281,7 @@ export const AgentInboxContent = ({
 
 	const allVisibleSelected =
 		filteredThreads.length > 0 &&
-		mail.bulkSelected.length === filteredThreads.length;
+		filteredThreads.every((t) => mail.bulkSelected.includes(t.id));
 
 	const handleToggleSelectAll = useCallback(() => {
 		setMail((prev) => ({
