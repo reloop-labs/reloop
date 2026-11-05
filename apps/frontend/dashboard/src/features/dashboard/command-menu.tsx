@@ -109,10 +109,29 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			if (e.metaKey || e.ctrlKey || e.altKey) return;
 			if (isEditable(e.target)) return;
 
-			const key = e.key;
+			// Pressing Shift (for the "G Shift+X" settings shortcuts) fires its own
+			// keydown; it must not cancel the pending G.
+			if (
+				e.key === "Shift" ||
+				e.key === "Meta" ||
+				e.key === "Control" ||
+				e.key === "Alt"
+			) {
+				return;
+			}
+
+			// Normalise letters by the Shift state so "Shift+t" and "T" resolve
+			// the same way, and never fall back from a shifted key to the
+			// unshifted route (G Shift+T used to open /templates).
+			const key =
+				e.key.length === 1 && /[a-z]/i.test(e.key)
+					? e.shiftKey
+						? e.key.toUpperCase()
+						: e.key.toLowerCase()
+					: e.key;
 
 			if (gPressed) {
-				const path = routeMap[key] || routeMap[key.toLowerCase()];
+				const path = routeMap[key];
 				if (path) {
 					e.preventDefault();
 					e.stopPropagation();
