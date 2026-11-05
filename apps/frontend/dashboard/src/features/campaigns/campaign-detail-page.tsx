@@ -295,6 +295,7 @@ function CampaignDetailContent() {
 	);
 }
 
+/** Campaign detail route: header actions, metrics, recipients and preview for one campaign. */
 export function CampaignDetailPage() {
 	return (
 		<CampaignsProvider>

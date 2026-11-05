@@ -50,6 +50,7 @@ interface CampaignsContextValue {
 
 const CampaignsContext = createContext<CampaignsContextValue | null>(null);
 
+/** Provides campaign actions (create, send, schedule, duplicate, delete) for the active organization and refreshes the affected queries. */
 export function CampaignsProvider({ children }: { children: ReactNode }) {
 	const { activeOrganization } = useActiveOrganization();
 	const orgId = activeOrganization?.id ?? "default_org";
@@ -215,6 +216,7 @@ export function useCampaignsListQuery(params: CampaignListParams) {
 	});
 }
 
+/** Campaign actions from the nearest CampaignsProvider. Throws when used outside one. */
 export function useCampaigns() {
 	const context = useContext(CampaignsContext);
 	if (!context) {
@@ -223,12 +225,14 @@ export function useCampaigns() {
 	return context;
 }
 
+/** Returns a function that invalidates every cached campaign query. */
 export function useInvalidateCampaigns() {
 	const queryClient = useQueryClient();
 	return () =>
 		queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
 }
 
+/** Loads one campaign by id, using the cached list row as placeholder data. */
 export function useCampaignQuery(id: string | undefined) {
 	const { activeOrganization } = useActiveOrganization();
 	const orgId = activeOrganization?.id ?? "default_org";
@@ -242,6 +246,7 @@ export function useCampaignQuery(id: string | undefined) {
 	});
 }
 
+/** Loads the first page of recipients for a campaign. */
 export function useCampaignRecipientsQuery(id: string | undefined) {
 	const { activeOrganization } = useActiveOrganization();
 	return useQuery({

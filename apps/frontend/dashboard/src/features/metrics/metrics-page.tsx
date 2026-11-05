@@ -20,6 +20,7 @@ import {
 import { queryKeys } from "#/lib/query-keys";
 import { MetricsListHeader } from "./metrics-list-header";
 
+/** Metrics route: deliverability, bounce and complaint charts for the selected date range and domain. */
 export function MetricsPage() {
 	const { activeOrganization } = useActiveOrganization();
 	const queryClient = useQueryClient();

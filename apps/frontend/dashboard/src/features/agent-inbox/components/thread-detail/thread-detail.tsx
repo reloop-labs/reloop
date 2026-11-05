@@ -136,6 +136,7 @@ const EmptyState = () => (
 // Main component
 // ---------------------------------------------------------------------------
 
+/** Reading pane for the selected inbox thread: messages, actions and composers. Marks the thread read once when opened. */
 export const ThreadDetail = ({
 	thread,
 	mailbox,

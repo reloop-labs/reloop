@@ -35,6 +35,7 @@ interface RateChartProps {
 	riskValue?: number;
 }
 
+/** Rate card for the metrics page: headline rate, trend chart against a risk line, and a per-category breakdown. */
 export const RateChart = ({
 	title,
 	rate,

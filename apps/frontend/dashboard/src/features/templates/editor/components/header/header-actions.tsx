@@ -32,6 +32,7 @@ interface HeaderActionsProps {
 	isSynced: boolean;
 }
 
+/** Template editor header actions: discard draft, test email and publish, plus their modals. */
 export const HeaderActions = ({
 	connectionStatus,
 	isSynced,

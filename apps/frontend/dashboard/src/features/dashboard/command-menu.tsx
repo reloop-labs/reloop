@@ -46,7 +46,8 @@ settingsNavigation.forEach((section) => {
 	});
 });
 
-function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
+/** Two-key G navigation (e.g. G E, G Shift+T). Ignores typing in inputs and modifier-only keydowns. */
+function useNavigationShortcuts(router: ReturnType<typeof useRouter>): void {
 	React.useEffect(() => {
 		let gTimeout: ReturnType<typeof setTimeout> | null = null;
 		let gPressed = false;
@@ -205,6 +206,7 @@ function KbdBadge({ label }: { label: string }) {
 	);
 }
 
+/** Global command palette (mod+K) plus app-wide shortcuts: G navigation, T theme toggle and copy URL. */
 export function CommandMenuGlobal() {
 	const [open, setOpen] = React.useState(false);
 	const [search, setSearch] = React.useState("");
