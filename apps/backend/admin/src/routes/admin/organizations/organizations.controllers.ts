@@ -211,9 +211,11 @@ export async function getOrganizationController(organizationId: string) {
 		});
 	}
 
-	// Active reputation pause (bounce/complaint cooldown), if any.
+	// Active reputation pause (bounce/complaint cooldown on a sending
+	// domain), latest-expiring first, if any.
 	const [sendingBlock] = await db
 		.select({
+			domain: domain.domain,
 			reason: orgSendingBlock.reason,
 			bounceRate: orgSendingBlock.bounceRate,
 			complaintRate: orgSendingBlock.complaintRate,
@@ -221,6 +223,7 @@ export async function getOrganizationController(organizationId: string) {
 			createdAt: orgSendingBlock.createdAt,
 		})
 		.from(orgSendingBlock)
+		.leftJoin(domain, eq(domain.id, orgSendingBlock.domainId))
 		.where(
 			and(
 				eq(orgSendingBlock.organizationId, organizationId),

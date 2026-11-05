@@ -73,6 +73,7 @@ export async function initReputationSubscribers() {
 							React.createElement(ReputationNoticeEmail, {
 								fullName: recipient.name,
 								organizationName: org.name,
+								domain: payload.domain,
 								level: payload.level,
 								reason: payload.reason,
 								sent: payload.sent,
@@ -82,7 +83,6 @@ export async function initReputationSubscribers() {
 								complaintRate: payload.complaintRate,
 								bounceBlockRate: payload.bounceBlockRate,
 								complaintBlockRate: payload.complaintBlockRate,
-								topBouncingDomains: payload.topBouncingDomains,
 								pausedUntil: payload.pausedUntil
 									? formatPausedUntil(payload.pausedUntil)
 									: null,

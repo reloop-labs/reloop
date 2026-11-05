@@ -241,17 +241,19 @@ export const KumoMtaErrors = {
 			fix: "Contact support to review the suspension",
 		}),
 	sendingPaused: ({
+		domainName,
 		reason,
 		retryAfterSeconds,
 	}: {
+		domainName: string;
 		reason: string;
 		retryAfterSeconds: number;
 	}) =>
 		createError({
 			status: 403,
 			message: "Sending temporarily paused",
-			why: `Sending is paused for this organization (${reason}): bounce/complaint rate is above the delivery threshold`,
-			fix: `Wait ${retryAfterSeconds}s for the cooldown to expire, clean your recipient list, then retry. Contact support if you need an early review`,
+			why: `Sending is paused for ${domainName} (${reason}): its bounce/complaint rate is above the delivery threshold`,
+			fix: `Wait ${retryAfterSeconds}s for the cooldown to expire, clean your recipient list, then retry. Your other domains can still send. Contact support if you need an early review`,
 		}),
 	domainAgeDailyCapExceeded: ({
 		domainName,

@@ -187,21 +187,17 @@ export async function sendEmailController({
 		await releaseFailedIdempotencyKey({ organizationId, idempotencyKey });
 	}
 
-	// ── Suspension, reputation + duplicate burst guards ─────────────────
-	// Suspended org (admin spam block) → 403. Reputation next (org is
-	// paused → 403 with cooldown, no quota burned).
-	// Duplicate second (identical re-send within 10 min, or >3/min to the
-	// same address → 429). Both run before credits/log/KumoMTA so abusive
-	// bursts never consume quota or damage shared IP reputation.
+	// ── Suspension + duplicate burst guards ─────────────────────────────
+	// Suspended org (admin spam block) → 403. Duplicate next (identical
+	// re-send within 10 min, or >3/min to the same address → 429). Both run
+	// before credits/log/KumoMTA so abusive bursts never consume quota or
+	// damage shared IP reputation. The per-domain reputation pause is checked
+	// once the From domain resolves, below.
 	const { redis } = await import("@reloop/be-mail/utils/loader");
-	const senderBlock = await findSenderBlock(organizationId);
+	const senderBlock = await findSenderBlock({ organizationId });
 	if (senderBlock?.kind === "organization_status") {
 		throw MailErrors.organizationSuspended(senderBlock.status);
 	}
-	await assertReputationAllowed(
-		{ redisGet: (key: string) => redis.get(key) },
-		{ organizationId },
-	);
 	const duplicateGuard = await assertNotDuplicateBurst(redis, {
 		organizationId,
 		from: rawBody.from,
@@ -268,6 +264,14 @@ export async function sendEmailController({
 
 		const { currentDomain } = await verifyDomainAuth_step2({
 			organizationId,
+			domainName,
+		});
+
+		// ── Reputation: this domain is paused → 403 with cooldown ─────────
+		// Per sending domain, so one domain's bounces don't stop the others.
+		await assertReputationAllowed({
+			organizationId,
+			domainId: currentDomain.id,
 			domainName,
 		});
 

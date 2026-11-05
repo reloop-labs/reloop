@@ -266,14 +266,21 @@ export async function logIncomingController({
 		});
 	}
 
-	// ── Sender gate: admin suspension or reputation pause ───────────────
+	// ── Sender gate: admin suspension or this domain's reputation pause ──
 	// The mail API checks these itself; SMTP submissions only pass here.
-	const senderBlock = await findSenderBlock(finalOrgId);
+	const senderBlock = await findSenderBlock({
+		organizationId: finalOrgId,
+		domainId: domainRecord.id,
+	});
 	if (senderBlock?.kind === "organization_status") {
 		throw KumoMtaErrors.organizationSuspended(senderBlock.status);
 	}
 	if (senderBlock?.kind === "sending_block") {
-		throw KumoMtaErrors.sendingPaused(senderBlock);
+		throw KumoMtaErrors.sendingPaused({
+			domainName: senderBlock.domainName ?? body.domainName,
+			reason: senderBlock.reason,
+			retryAfterSeconds: senderBlock.retryAfterSeconds,
+		});
 	}
 
 	const abuse = await checkOutboundSpam({

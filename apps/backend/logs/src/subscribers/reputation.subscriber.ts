@@ -4,21 +4,26 @@
  * Async delivery-reputation aggregator. Listens to kumomta.event on NATS
  * (own queue group so logs + contacts + reputation each receive every event).
  *
+ * Reputation is scored per sending domain, so one domain with a bad list
+ * pauses only itself; the org's other domains keep sending.
+ *
  * On each bounce / spam-complaint signal:
- *  1. Resolve org (X-Org-ID header, fallback to emailLog lookup).
- *  2. Skip if an active block already exists for the org.
- *  3. Aggregate last-24h sends / bounces / complaints from email_log.
+ *  1. Resolve org + sending domain (X-Org-ID / X-Domain-ID headers,
+ *     fallback to emailLog lookup).
+ *  2. Skip if an active block already covers the domain.
+ *  3. Aggregate the domain's last-24h sends / bounces / complaints.
  *  4. evaluateReputation():
- *     - blocked → insert org_sending_block, flag organization.isSuspect,
- *       set Redis fast-path key for the mail guard, publish ABUSE_SUSPECTED
- *       (severity high, action blocked) → Slack alert via admin service.
+ *     - blocked → insert org_sending_block for the domain (the send paths
+ *       check it via sender-gate), flag organization.isSuspect, publish
+ *       ABUSE_SUSPECTED (severity high, action blocked) → Slack alert via
+ *       admin service.
  *     - warned  → publish ABUSE_SUSPECTED (medium, allowed).
  *  5. Tell the customer: REPUTATION_NOTICE → email to owners/admins.
- *     Warnings escalate 1 → 2 → 3 as the rate climbs toward the block
- *     threshold (each level at most once per 24h); level 4 = paused.
+ *     Warnings escalate 1 → 2 → 3 as the domain's rate climbs toward the
+ *     block threshold (each level at most once per 24h per domain);
+ *     level 4 = paused.
  *
- * DB is the source of truth for counts (survives Redis restarts, no extra
- * counter infra). Signal events are low-volume, so one aggregate query per
+ * DB is the source of truth for counts and blocks (no extra counter infra). Signal events are low-volume, so one aggregate query per
  * bounce/complaint is cheap against the indexed email_log table.
  */
 
@@ -35,8 +40,8 @@ import {
 	reputationNoticeLevel,
 } from "@reloop/db/reputation";
 import * as schema from "@reloop/db/schema";
-import { redis } from "@reloop/logs/utils/loader";
-import { and, desc, eq, gt, gte, isNull, lte, sql } from "drizzle-orm";
+import { findDomainSendingBlock } from "@reloop/db/sender-gate";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
 import { log } from "evlog";
 
 type SignalKind = "bounced" | "complaint" | null;
@@ -99,7 +104,7 @@ async function resolveOrgContext(event: KumomtaLogRecordPayload): Promise<{
 		return { organizationId: null, domainId: null, emailLogId: null };
 	}
 
-	if (headerOrg) {
+	if (headerOrg && (headerDomain || !emailLogId)) {
 		return { organizationId: headerOrg, domainId: headerDomain, emailLogId };
 	}
 
@@ -110,31 +115,19 @@ async function resolveOrgContext(event: KumomtaLogRecordPayload): Promise<{
 		});
 		if (row) {
 			return {
-				organizationId: row.organizationId,
+				organizationId: headerOrg ?? row.organizationId,
 				domainId: row.domainId,
 				emailLogId,
 			};
 		}
 	}
-	return { organizationId: null, domainId: headerDomain, emailLogId };
+	return { organizationId: headerOrg, domainId: headerDomain, emailLogId };
 }
 
-async function hasActiveBlock(organizationId: string): Promise<boolean> {
-	const rows = await db
-		.select({ id: schema.orgSendingBlock.id })
-		.from(schema.orgSendingBlock)
-		.where(
-			and(
-				eq(schema.orgSendingBlock.organizationId, organizationId),
-				isNull(schema.orgSendingBlock.releasedAt),
-				gt(schema.orgSendingBlock.expiresAt, new Date()),
-			),
-		)
-		.limit(1);
-	return rows.length > 0;
-}
-
-async function windowCounts(organizationId: string): Promise<{
+async function windowCounts(
+	organizationId: string,
+	domainId: string,
+): Promise<{
 	sent: number;
 	bounced: number;
 	complaint: number;
@@ -150,6 +143,7 @@ async function windowCounts(organizationId: string): Promise<{
 		.where(
 			and(
 				eq(schema.emailLog.organizationId, organizationId),
+				eq(schema.emailLog.domainId, domainId),
 				gte(schema.emailLog.createdAt, since),
 			),
 		);
@@ -165,11 +159,13 @@ const PAUSED_NOTICE_LEVEL = 4;
 
 /**
  * Record a warning notice unless one at this level or higher already went
- * out in the repeat window. Advisory lock serializes the burst of bounce
- * events that arrive together so only one email is sent per level.
+ * out for this domain in the repeat window. Advisory lock serializes the
+ * burst of bounce events that arrive together so only one email is sent per
+ * level.
  */
 async function claimWarningNotice(
 	organizationId: string,
+	domainId: string,
 	level: number,
 	reason: ReputationReason,
 	counts: ReputationCounts,
@@ -177,7 +173,7 @@ async function claimWarningNotice(
 ): Promise<string | null> {
 	return db.transaction(async (tx) => {
 		await tx.execute(
-			sql`select pg_advisory_xact_lock(hashtext(${`${organizationId}:reputation_notice`}))`,
+			sql`select pg_advisory_xact_lock(hashtext(${`${domainId}:reputation_notice`}))`,
 		);
 		const since = new Date(
 			Date.now() - REPUTATION_NOTICE_REPEAT_SECONDS * 1000,
@@ -188,6 +184,7 @@ async function claimWarningNotice(
 			.where(
 				and(
 					eq(schema.orgReputationNotice.organizationId, organizationId),
+					eq(schema.orgReputationNotice.domainId, domainId),
 					gte(schema.orgReputationNotice.createdAt, since),
 					gte(schema.orgReputationNotice.level, level),
 					// The pause email doesn't silence warnings after the pause lifts.
@@ -198,7 +195,9 @@ async function claimWarningNotice(
 		if (recent) return null;
 		const [row] = await tx
 			.insert(schema.orgReputationNotice)
-			.values(noticeValues(organizationId, level, reason, counts, verdict))
+			.values(
+				noticeValues(organizationId, domainId, level, reason, counts, verdict),
+			)
 			.returning({ id: schema.orgReputationNotice.id });
 		return row?.id ?? null;
 	});
@@ -206,6 +205,7 @@ async function claimWarningNotice(
 
 function noticeValues(
 	organizationId: string,
+	domainId: string,
 	level: number,
 	reason: ReputationReason,
 	counts: ReputationCounts,
@@ -213,6 +213,7 @@ function noticeValues(
 ) {
 	return {
 		organizationId,
+		domainId,
 		level,
 		reason,
 		sentCount: counts.sent,
@@ -223,49 +224,22 @@ function noticeValues(
 	};
 }
 
-async function topBouncingDomains(
-	organizationId: string,
-): Promise<{ domain: string; sent: number; bounced: number }[]> {
-	const since = new Date(Date.now() - 24 * 3600 * 1000);
-	const bounced = sql<number>`count(*) filter (where ${schema.emailLog.status} = 'bounced')`;
-	const rows = await db
-		.select({
-			domain: schema.domain.domain,
-			sent: sql<number>`count(*) filter (where ${schema.emailLog.status} != 'pending')`,
-			bounced,
-		})
-		.from(schema.emailLog)
-		.innerJoin(schema.domain, eq(schema.domain.id, schema.emailLog.domainId))
-		.where(
-			and(
-				eq(schema.emailLog.organizationId, organizationId),
-				gte(schema.emailLog.createdAt, since),
-			),
-		)
-		.groupBy(schema.domain.domain)
-		.having(sql`${bounced} > 0`)
-		.orderBy(desc(bounced))
-		.limit(3);
-	return rows.map((r) => ({
-		domain: r.domain,
-		sent: Number(r.sent),
-		bounced: Number(r.bounced),
-	}));
-}
-
 async function publishNotice(args: {
 	noticeId: string;
 	organizationId: string;
+	domainId: string;
+	domainName: string;
 	level: 1 | 2 | 3 | 4;
 	reason: ReputationReason;
 	counts: ReputationCounts;
 	verdict: ReputationVerdict;
 	pausedUntil: Date | null;
 }): Promise<void> {
-	const domains = await topBouncingDomains(args.organizationId).catch(() => []);
 	await bus.publish(BusEvent.REPUTATION_NOTICE, {
 		noticeId: args.noticeId,
 		organizationId: args.organizationId,
+		domainId: args.domainId,
+		domain: args.domainName,
 		level: args.level,
 		reason: args.reason,
 		window: "24h",
@@ -276,7 +250,6 @@ async function publishNotice(args: {
 		complaintRate: args.verdict.complaintRate,
 		bounceBlockRate: REPUTATION_THRESHOLDS.bounceBlockRate,
 		complaintBlockRate: REPUTATION_THRESHOLDS.complaintBlockRate,
-		topBouncingDomains: domains,
 		pausedUntil: args.pausedUntil?.toISOString() ?? null,
 	});
 }
@@ -301,15 +274,34 @@ export async function initReputationSubscriber() {
 					return;
 				}
 
-				if (await hasActiveBlock(organizationId)) return; // already paused
+				if (!domainId) {
+					log.warn({
+						kumomtaId: event.id,
+						type: event.type,
+						organizationId,
+						message:
+							"[reputation] Cannot resolve sending domain for signal event — skipping",
+					});
+					return;
+				}
 
-				const counts = await windowCounts(organizationId);
+				if (await findDomainSendingBlock({ organizationId, domainId })) {
+					return; // already paused
+				}
+
+				const counts = await windowCounts(organizationId, domainId);
 				const verdict = evaluateReputation(counts);
 				if (!verdict.warned && !verdict.blocked) return;
 
+				const domainRow = await db.query.domain.findFirst({
+					where: eq(schema.domain.id, domainId),
+					columns: { domain: true },
+				});
+				const domainName = domainRow?.domain ?? domainId;
+
 				const pct = (r: number) => `${(r * 100).toFixed(2)}%`;
 				const summary =
-					`${counts.sent} sent / 24h, ${counts.bounced} bounced ` +
+					`${domainName}: ${counts.sent} sent / 24h, ${counts.bounced} bounced ` +
 					`(${pct(verdict.bounceRate)}), ${counts.complaint} complaints ` +
 					`(${pct(verdict.complaintRate)})`;
 
@@ -340,6 +332,7 @@ export async function initReputationSubscriber() {
 					const reason = verdict.reason ?? "bounce_rate";
 					const noticeId = await claimWarningNotice(
 						organizationId,
+						domainId,
 						level,
 						reason,
 						counts,
@@ -349,6 +342,8 @@ export async function initReputationSubscriber() {
 					await publishNotice({
 						noticeId,
 						organizationId,
+						domainId,
+						domainName,
 						level,
 						reason,
 						counts,
@@ -356,25 +351,26 @@ export async function initReputationSubscriber() {
 						pausedUntil: null,
 					});
 					log.info({
-						message: `[reputation] Sent level ${level} warning to org ${organizationId}`,
+						message: `[reputation] Sent level ${level} warning to org ${organizationId} for ${domainName}`,
 						organizationId,
+						domainId,
 						level,
 					});
 					return;
 				}
 
-				// ── Block: escalating cooldown based on block history ──
+				// ── Block: escalating cooldown based on the domain's history ──
 				const prior = await db
 					.select({ id: schema.orgSendingBlock.id })
 					.from(schema.orgSendingBlock)
-					.where(eq(schema.orgSendingBlock.organizationId, organizationId));
+					.where(eq(schema.orgSendingBlock.domainId, domainId));
 				const ttlSeconds = blockTtlSeconds(prior.length);
 				const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
 
 				const reason = verdict.reason ?? "bounce_rate";
 				await db.insert(schema.orgSendingBlock).values({
 					organizationId,
-					domainId: domainId ?? undefined,
+					domainId,
 					reason,
 					window: "24h",
 					sentCount: counts.sent,
@@ -396,7 +392,7 @@ export async function initReputationSubscriber() {
 					.update(schema.organization)
 					.set({
 						isSuspect: true,
-						suspectReason: `Sending paused: ${verdict.reason} over threshold (${summary}). Cooldown until ${expiresAt.toISOString()}`,
+						suspectReason: `Sending paused for ${domainName}: ${verdict.reason} over threshold (${summary}). Cooldown until ${expiresAt.toISOString()}`,
 						suspectSeverity: "high",
 						suspectCategory: "reputation",
 						suspectUpdatedAt: new Date(),
@@ -409,18 +405,6 @@ export async function initReputationSubscriber() {
 							error: error instanceof Error ? error.message : String(error),
 						});
 					});
-
-				// Redis fast-path for the mail-service sync guard.
-				await redis.set(
-					`block:org:${organizationId}`,
-					{
-						reason: verdict.reason,
-						bounceRate: verdict.bounceRate,
-						complaintRate: verdict.complaintRate,
-						retryAfterSeconds: ttlSeconds,
-					},
-					ttlSeconds,
-				);
 
 				await bus
 					.publish(BusEvent.ABUSE_SUSPECTED, {
@@ -446,6 +430,7 @@ export async function initReputationSubscriber() {
 						.values(
 							noticeValues(
 								organizationId,
+								domainId,
 								PAUSED_NOTICE_LEVEL,
 								reason,
 								counts,
@@ -457,6 +442,8 @@ export async function initReputationSubscriber() {
 						await publishNotice({
 							noticeId: notice.id,
 							organizationId,
+							domainId,
+							domainName,
 							level: PAUSED_NOTICE_LEVEL,
 							reason,
 							counts,
@@ -474,9 +461,10 @@ export async function initReputationSubscriber() {
 
 				log.warn({
 					message:
-						`[reputation] Sending paused for org ${organizationId} ` +
+						`[reputation] Sending paused for ${domainName} (org ${organizationId}) ` +
 						`(${verdict.reason}, cooldown ${ttlSeconds}s): ${summary}`,
 					organizationId,
+					domainId,
 					reason: verdict.reason,
 				});
 			} catch (error) {

@@ -287,6 +287,8 @@ export namespace AdminModel {
 		suspectUpdatedAt: t.Union([t.Date(), t.Null()]),
 		sendingBlock: t.Union([
 			t.Object({
+				/** Paused sending domain; null for a legacy org-wide pause. */
+				domain: t.Union([t.String(), t.Null()]),
 				reason: t.String(),
 				bounceRate: t.Number(),
 				complaintRate: t.Number(),

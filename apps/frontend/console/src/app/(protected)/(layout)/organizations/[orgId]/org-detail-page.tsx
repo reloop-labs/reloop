@@ -66,6 +66,7 @@ type OrgDetail = {
 	suspectCategory?: "spam" | "phishing" | "fraud" | "abuse" | "other" | null;
 	suspectUpdatedAt?: string | null;
 	sendingBlock?: {
+		domain: string | null;
 		reason: string;
 		bounceRate: number;
 		complaintRate: number;
@@ -332,7 +333,14 @@ export default function OrganizationDetailPage() {
 							/>
 						) : null}
 						{data.sendingBlock ? (
-							<StatusPill status="Sending paused" tone="orange" />
+							<StatusPill
+								status={
+									data.sendingBlock.domain
+										? `Sending paused: ${data.sendingBlock.domain}`
+										: "Sending paused"
+								}
+								tone="orange"
+							/>
 						) : null}
 						<StatusPill
 							status={planLabel(data.plan?.planId)}
