@@ -19,6 +19,7 @@ import {
 	CampaignRecipientIssuesCard,
 	type CategoryTab,
 } from "./components/campaign-recipient-issues-card";
+import { ConfirmSendCampaignModal } from "./components/confirm-send-campaign-modal";
 import { DeleteCampaignModal } from "./components/delete-campaign";
 import { isEditableStatus } from "./utils";
 
@@ -32,6 +33,7 @@ function CampaignDetailContent() {
 	const campaignQuery = useCampaignQuery(campaignId);
 
 	const [actionPending, setActionPending] = useState(false);
+	const [confirmSendOpen, setConfirmSendOpen] = useState(false);
 	const [recipientTab, setRecipientTab] = useState<CategoryTab>("clicked");
 
 	const campaign = campaignQuery.data;
@@ -90,6 +92,11 @@ function CampaignDetailContent() {
 		setActionPending(true);
 		try {
 			await sendCampaign(campaign.id);
+			setConfirmSendOpen(false);
+		} catch (err) {
+			toast.error(
+				err instanceof Error ? err.message : "Failed to send campaign",
+			);
 		} finally {
 			setActionPending(false);
 		}
@@ -152,7 +159,7 @@ function CampaignDetailContent() {
 			if (!campaign?.id || campaign?.status !== "draft" || actionPending)
 				return;
 			e.preventDefault();
-			void handleSend();
+			setConfirmSendOpen(true);
 		},
 		{ enableOnFormTags: false, preventDefault: true },
 	);
@@ -237,7 +244,7 @@ function CampaignDetailContent() {
 					isFailed={campaignQuery.isError}
 					onRetry={() => void campaignQuery.refetch()}
 					onDuplicate={() => void handleDuplicate()}
-					onSend={() => void handleSend()}
+					onSend={() => setConfirmSendOpen(true)}
 					onDelete={handleDelete}
 					onUnschedule={() => void handleUnschedule()}
 					actionPending={actionPending}
@@ -272,6 +279,18 @@ function CampaignDetailContent() {
 			</div>
 
 			<DeleteCampaignModal campaigns={campaign ? [campaign] : []} />
+			<ConfirmSendCampaignModal
+				open={confirmSendOpen}
+				onOpenChange={setConfirmSendOpen}
+				campaignName={campaign.name}
+				audienceLabel={
+					audienceInfo
+						? `${audienceInfo.name} (${audienceInfo.countLabel})`
+						: "all recipients"
+				}
+				isSending={actionPending}
+				onConfirm={() => void handleSend()}
+			/>
 		</>
 	);
 }

@@ -61,6 +61,20 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 		});
 	}, [orgId, queryClient]);
 
+	// Status-changing actions must also refresh the open detail page; the
+	// list-only invalidation left it showing the old status for up to 30s.
+	const invalidateWithDetail = useCallback(
+		async (id: string) => {
+			await Promise.all([
+				invalidate(),
+				queryClient.invalidateQueries({
+					queryKey: queryKeys.campaigns.detail(id),
+				}),
+			]);
+		},
+		[invalidate, queryClient],
+	);
+
 	const createCampaign = useCallback(
 		async (input: CreateCampaignInput, _recipientCount: number) => {
 			const created = await createCampaignRequest(input);
@@ -86,34 +100,34 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 		async (id: string) => {
 			const existing = findCachedCampaign(queryClient, orgId, id);
 			await sendCampaignRequest(id);
-			await invalidate();
+			await invalidateWithDetail(id);
 			toast.success(
 				existing
 					? `Campaign "${existing.name}" is sending`
 					: "Campaign is sending",
 			);
 		},
-		[invalidate, orgId, queryClient],
+		[invalidateWithDetail, orgId, queryClient],
 	);
 
 	const scheduleCampaign = useCallback(
 		async (id: string, scheduledAt: string) => {
 			await scheduleCampaignRequest(id, scheduledAt);
-			await invalidate();
+			await invalidateWithDetail(id);
 			toast.success(
 				`Campaign scheduled for ${new Date(scheduledAt).toLocaleString()}`,
 			);
 		},
-		[invalidate],
+		[invalidateWithDetail],
 	);
 
 	const unscheduleCampaign = useCallback(
 		async (id: string) => {
 			await unscheduleCampaignRequest(id);
-			await invalidate();
+			await invalidateWithDetail(id);
 			toast.success("Schedule removed. The campaign is a draft again.");
 		},
-		[invalidate],
+		[invalidateWithDetail],
 	);
 
 	const duplicateCampaign = useCallback(
