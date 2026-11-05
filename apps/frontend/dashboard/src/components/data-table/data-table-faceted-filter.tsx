@@ -99,6 +99,12 @@ export function DataTableFacetedFilter({
 								event.stopPropagation();
 								onReset();
 							}}
+							// The trigger toggles on click, not pointerdown; stop it too or
+							// clearing the filter also opens the popover.
+							onClick={(event) => {
+								event.preventDefault();
+								event.stopPropagation();
+							}}
 						>
 							<XCircle className="size-4" />
 						</span>

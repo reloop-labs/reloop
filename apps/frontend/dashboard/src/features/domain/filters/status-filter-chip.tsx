@@ -59,7 +59,9 @@ export function DomainStatusFilterChip({
 	return (
 		<DataTableFacetedFilter
 			title="Status"
-			multiple
+			// The list API filters by a single status; multi-select silently
+			// showed every domain once a second status was ticked.
+			multiple={false}
 			options={[...statusOptions]}
 			selectedValues={normalizeStatusValues(value)}
 			onSelectedValuesChange={(values) => {

@@ -66,6 +66,13 @@ function deliveryOutcomeLabel(
 	}
 }
 
+/** Display label: like `deliveryOutcomeLabel`, but calls out active retries. */
+function deliveryStatusLabel(
+	status: string,
+): "Delivered" | "Pending" | "Retrying" | "Error" {
+	return status === "retrying" ? "Retrying" : deliveryOutcomeLabel(status);
+}
+
 function statusIcon(status: string): { name: string; className: string } {
 	switch (deliveryOutcomeLabel(status)) {
 		case "Delivered":
@@ -256,7 +263,7 @@ function statusBadgePresentation(delivery: Delivery): {
 
 	if (label === "Pending") {
 		return {
-			label: "Pending",
+			label: deliveryStatusLabel(delivery.status),
 			icon: delivery.status === "retrying" ? "rotate-cw" : "clock",
 			className: "bg-warning-lighter text-warning-base",
 			httpHint,
@@ -749,7 +756,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 					</Input.Root>
 				</div>
 				<div className="flex w-fit flex-wrap items-center gap-1.5">
-					{["all", "success", "failed", "retrying"].map((s) => (
+					{["all", "success", "failed", "pending", "retrying"].map((s) => (
 						<button
 							key={s}
 							type="button"
@@ -770,7 +777,9 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 									? "Delivered"
 									: s === "failed"
 										? "Error"
-										: "Pending"}
+										: s === "pending"
+											? "Pending"
+											: "Retrying"}
 						</button>
 					))}
 				</div>
@@ -861,7 +870,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 													</Tooltip.Trigger>
 													<Tooltip.Content side="top" size="small">
 														<span>
-															{deliveryOutcomeLabel(delivery.status)}
+															{deliveryStatusLabel(delivery.status)}
 															{delivery.responseStatus != null
 																? ` · HTTP ${delivery.responseStatus}`
 																: ""}
@@ -881,7 +890,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 														: undefined
 												}
 											>
-												{deliveryOutcomeLabel(delivery.status)}
+												{deliveryStatusLabel(delivery.status)}
 											</span>
 
 											<div className="min-w-0 truncate font-medium font-mono text-label-sm text-text-strong-950">
@@ -889,7 +898,9 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 											</div>
 
 											<div className="text-right font-medium text-[13px] text-text-sub-600 tabular-nums">
-												{dayjs(delivery.createdAt).format("HH:mm:ss")}
+												{dayjs(delivery.createdAt).isSame(dayjs(), "day")
+													? dayjs(delivery.createdAt).format("HH:mm:ss")
+													: dayjs(delivery.createdAt).format("MMM D, HH:mm")}
 											</div>
 										</button>
 									);

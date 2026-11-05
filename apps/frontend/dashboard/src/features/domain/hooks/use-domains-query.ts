@@ -9,7 +9,7 @@ import type {
 export type DomainsListParams = {
 	page: number;
 	limit: number;
-	/** Selected status values. Exactly one applies a filter (matches API keys). */
+	/** Selected status values. The chip is single-select; the API takes one status. */
 	status: string[];
 	q: string;
 	enabled?: boolean;
