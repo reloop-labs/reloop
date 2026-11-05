@@ -74,6 +74,7 @@ const DATE_PRESETS: DatePreset[] = [
 	},
 ];
 
+/** Current from/to range for a preset value (e.g. `1h`, `7d`), or null if unknown. */
 export const getPresetRange = (
 	value: string | null | undefined,
 ): { from: Date; to: Date } | null => {
@@ -137,6 +138,7 @@ const useIsNarrowViewport = () => {
 	return isNarrow;
 };
 
+/** Date range picker with rolling presets and a custom calendar range. */
 export const DateRangeFilter = ({
 	startDate,
 	endDate,

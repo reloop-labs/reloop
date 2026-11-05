@@ -31,6 +31,7 @@ import { EmptyState } from "./empty-state";
 import { TableFooter } from "./table-footer";
 import { TableSkeleton } from "./table-skeleton";
 
+/** Paginated API keys table with row actions, selection and an out-of-range page clamp. */
 export function ApiKeyTable({
 	apiKeys,
 	total,

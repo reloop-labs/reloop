@@ -640,6 +640,7 @@ const DeliveryDetail = ({
 	);
 };
 
+/** Delivery attempts for a webhook, filterable by outcome and event type, with request and response details. */
 export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 	const [statusFilter, setStatusFilter] = useState("all");
 	const [searchQuery, setSearchQuery] = useState("");

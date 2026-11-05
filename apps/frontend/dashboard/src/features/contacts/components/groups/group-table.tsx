@@ -33,6 +33,7 @@ interface GroupTableProps {
 	onClearSearch?: () => void;
 }
 
+/** Paginated contact groups table with row actions and an out-of-range page clamp. */
 export const GroupTable = ({
 	groups,
 	total = 0,

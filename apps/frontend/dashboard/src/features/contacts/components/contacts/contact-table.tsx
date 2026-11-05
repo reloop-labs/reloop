@@ -43,6 +43,7 @@ interface ContactTableProps {
 	emptyStateDocsLink?: string;
 }
 
+/** Paginated contacts table with inline edit, row actions, selection and an out-of-range page clamp. */
 export const ContactTable = ({
 	contacts,
 	total,

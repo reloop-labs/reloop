@@ -310,6 +310,7 @@ function StepItem({
 	);
 }
 
+/** API usage section for the deliverability tester tool page: example requests, prerequisites and docs links. */
 export function ApiSection() {
 	const [activeSlug, setActiveSlug] = useState("nodejs");
 	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");

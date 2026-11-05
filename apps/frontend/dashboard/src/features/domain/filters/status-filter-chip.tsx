@@ -49,6 +49,7 @@ function normalizeStatusValues(values: string[]) {
 	return STATUS_VALUES.filter((value) => values.includes(value));
 }
 
+/** Single-select status filter for the domains list (the API filters by one status). */
 export function DomainStatusFilterChip({
 	value,
 	onChange,

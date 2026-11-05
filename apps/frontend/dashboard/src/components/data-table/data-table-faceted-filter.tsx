@@ -38,6 +38,7 @@ type DataTableFacetedFilterProps = {
 	showSearch?: boolean;
 };
 
+/** Toolbar filter chip with a popover of options; single- or multi-select, with a clear icon on the chip. */
 export function DataTableFacetedFilter({
 	title,
 	options,

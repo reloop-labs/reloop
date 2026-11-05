@@ -358,6 +358,7 @@ function EditContactFields({
 	);
 }
 
+/** Form for editing a contact (name, status, channels, groups, custom properties). Resets only when the contact changes. */
 export function EditContactForm({
 	contact,
 	onCancel,

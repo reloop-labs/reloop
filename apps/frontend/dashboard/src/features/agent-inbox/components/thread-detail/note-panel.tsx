@@ -33,6 +33,7 @@ const colorClass = (color: string) => {
 	return map[color] ?? "border-l-neutral-500";
 };
 
+/** Collapsible panel of private notes on a thread: add, edit, pin, recolor and delete. */
 export const NotesPanel = ({
 	threadId,
 	open: controlledOpen,

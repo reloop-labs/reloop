@@ -31,6 +31,7 @@ interface MappedVariable {
 	defaultValue: string | null;
 }
 
+/** Template editor panel listing detected variables, with edit and delete for each. */
 export function VariablesPanel({}: PanelProps = {}) {
 	const templateId = useTemplateId();
 

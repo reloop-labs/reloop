@@ -15,6 +15,7 @@ import { useSidebarCollapse } from "./use-sidebar-collapse";
 const PEEK_OPEN_DELAY_MS = 60;
 const PEEK_CLOSE_DELAY_MS = 120;
 
+/** Primary dashboard sidebar with navigation and footer controls. */
 export function MainSidebar() {
 	const { isCollapsed, toggle } = useSidebarCollapse();
 	const [isHoverOpen, setIsHoverOpen] = useState(false);
@@ -386,6 +387,7 @@ export function MainSidebar() {
 	);
 }
 
+/** Theme toggle for the collapsed sidebar. Its label and icon render after mount to avoid a hydration mismatch. */
 export function CollapsedThemeToggle() {
 	const { setTheme, resolvedTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);

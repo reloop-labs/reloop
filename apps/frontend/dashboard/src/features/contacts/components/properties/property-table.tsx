@@ -37,6 +37,7 @@ interface PropertyTableProps {
 	onClearFilters?: () => void;
 }
 
+/** Paginated custom properties table with row actions and an out-of-range page clamp. */
 export const PropertyTable = ({
 	properties,
 	total = 0,
