@@ -2,6 +2,7 @@ import { apiError } from "@reloop/auth/middleware/api-errors";
 import { resolveInternalBaseUrl } from "@reloop/auth/middleware/internal-base-url";
 import { sanitizeInternalSecret } from "@reloop/auth/middleware/internal-secret";
 import { resolveAuthRedis } from "@reloop/auth/middleware/redis/resolve-auth-redis";
+import { resolveAgentOnboardAuthDetails } from "@reloop/auth/middleware/resolve/resolve-agent-onboard-auth";
 import { resolveApiKeyAuth } from "@reloop/auth/middleware/resolve/resolve-api-key-auth";
 import { resolveApiKeyOrInternal } from "@reloop/auth/middleware/resolve/resolve-api-key-or-internal";
 import { resolveCollabAuth } from "@reloop/auth/middleware/resolve/resolve-collab-auth";
@@ -39,6 +40,7 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 		ttl,
 		internalSecret,
 		oauthResource: config.oauthResource,
+		agentAudience: config.agentAudience,
 	};
 
 	return new Elysia({ name: "reloop-auth-middleware" }).macro({
@@ -229,6 +231,70 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 			},
 			detail: {
 				security: [{ apiKey: [] }],
+			},
+		},
+
+		authAgent: {
+			async resolve({ status, request: { headers } }) {
+				const resolution = await resolveAgentOnboardAuthDetails(headers, deps, {
+					requireOrg: true,
+				});
+				if (!resolution.ok) {
+					return status(
+						resolution.status,
+						apiError(resolution.status, {
+							code: resolution.code,
+							message: resolution.message,
+							why: resolution.why,
+							fix: resolution.fix,
+							link: resolution.link,
+						}),
+					);
+				}
+				return {
+					userId: resolution.ctx.userId,
+					organizationId: resolution.ctx.organizationId,
+					platformRole: resolution.ctx.platformRole,
+					authType: resolution.ctx.authType,
+					...(resolution.ctx.agentEmail
+						? { agentEmail: resolution.ctx.agentEmail }
+						: {}),
+				};
+			},
+			detail: {
+				security: [{ bearerAuth: [] }],
+			},
+		},
+
+		authAgentNoOrg: {
+			async resolve({ status, request: { headers } }) {
+				const resolution = await resolveAgentOnboardAuthDetails(headers, deps, {
+					requireOrg: false,
+				});
+				if (!resolution.ok) {
+					return status(
+						resolution.status,
+						apiError(resolution.status, {
+							code: resolution.code,
+							message: resolution.message,
+							why: resolution.why,
+							fix: resolution.fix,
+							link: resolution.link,
+						}),
+					);
+				}
+				return {
+					userId: resolution.ctx.userId,
+					organizationId: resolution.ctx.organizationId,
+					platformRole: resolution.ctx.platformRole,
+					authType: resolution.ctx.authType,
+					...(resolution.ctx.agentEmail
+						? { agentEmail: resolution.ctx.agentEmail }
+						: {}),
+				};
+			},
+			detail: {
+				security: [{ bearerAuth: [] }],
 			},
 		},
 	});

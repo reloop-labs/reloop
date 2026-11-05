@@ -57,6 +57,9 @@
 	handle /api/inbox* {
 		reverse_proxy inbox:8028
 	}
+	handle /api/agents* {
+		reverse_proxy agent:8035
+	}
 	handle /api/email* {
 		reverse_proxy email:8022
 	}

@@ -7,4 +7,6 @@ export type ResolverDeps = {
 	internalSecret?: string;
 	/** Expected OAuth access-token audience. Defaults to `<baseUrl>/mcp`. */
 	oauthResource?: string;
+	/** Expected AgentOnboard audience. Defaults to host of `<baseUrl>`. */
+	agentAudience?: string;
 };
