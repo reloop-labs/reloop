@@ -26,6 +26,7 @@ const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
+/** Type-to-confirm delete for one API key or a bulk selection; reports keys that failed to delete. */
 export function DeleteApiKeyModal({
 	apiKeys,
 	selectedKeys = [],
@@ -101,6 +102,7 @@ export function DeleteApiKeyModal({
 			if (isBulk) {
 				let ok = 0;
 				let failed = 0;
+				const failedNames: string[] = [];
 				for (const key of bulkKeysToDelete) {
 					try {
 						await axios.delete(`/api/api-key/v1/${key.id}`, {
@@ -109,21 +111,25 @@ export function DeleteApiKeyModal({
 						ok += 1;
 					} catch {
 						failed += 1;
+						failedNames.push(key.name || key.start || key.prefix || key.id);
 					}
 				}
+				const failedList =
+					failedNames.slice(0, 3).join(", ") +
+					(failedNames.length > 3 ? ` and ${failedNames.length - 3} more` : "");
 				if (ok === 0) {
 					await invalidate();
 					toast.error(
 						failed === 1
-							? "Failed to delete API key"
-							: `Failed to delete ${failed} API keys`,
+							? `Failed to delete ${failedList}`
+							: `Failed to delete ${failed} API keys: ${failedList}`,
 					);
 					setDeleteState("idle");
 					return;
 				}
 				if (failed > 0) {
 					toast.error(
-						`${failed} of ${ok + failed} API keys couldn't be deleted`,
+						`${failed} of ${ok + failed} API keys couldn't be deleted: ${failedList}`,
 					);
 				}
 				setDeleteState("success");
