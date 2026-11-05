@@ -4,6 +4,7 @@ import type { LogsModel } from "@reloop/logs/model/logs.model";
 import { and, eq, gte, lte, or, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
+/** Daily (or hourly) send, delivery, bounce, complaint and open counts for the org, bucketed by UTC day or hour. */
 export async function getEmailStatsController({
 	query,
 	organizationId,
@@ -45,12 +46,17 @@ export async function getEmailStatsController({
 		// Group by date/hour
 		const dateTrunc = interval === "hour" ? "hour" : "day";
 		const groupBySql = sql`date_trunc(${sql.raw(`'${dateTrunc}'`)}, ${emailLog.createdAt})`;
+		// email_log.created_at has no time zone and holds UTC wall time. Format
+		// the bucket in SQL as a UTC ISO string so it doesn't depend on the Node
+		// process time zone when the driver parses the timestamp (the webhook and
+		// contacts stats also bucket in UTC).
+		const bucketIsoSql = sql<string>`to_char(${groupBySql}, 'YYYY-MM-DD"T"HH24:MI:SS".000Z"')`;
 
 		// We need to count different statuses
 		// Delivered, Bounced, Spam (Complaints)
 		const stats = await db
 			.select({
-				date: groupBySql,
+				date: bucketIsoSql,
 				sent: sql<number>`count(*) filter (where ${emailLog.status} != 'pending')`,
 				delivered: sql<number>`count(*) filter (where ${emailLog.status} = 'delivered')`,
 				bounced: sql<number>`count(*) filter (where ${emailLog.status} = 'bounced')`,
