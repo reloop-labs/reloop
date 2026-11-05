@@ -12,6 +12,7 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { useClampPage } from "#/components/data-table/use-clamp-page";
 import type { Workflow } from "../workflow-types";
 import { workflowColumns } from "./columns";
 import { getWorkflowTableGridStyle } from "./constants";
@@ -56,6 +57,7 @@ export const WorkflowTable = ({
 	const limit = pageSize ?? 10;
 	const page = currentPage ?? 1;
 	const totalPages = Math.max(1, Math.ceil(workflows.length / limit));
+	useClampPage(totalPages, !isLoading);
 
 	const paginatedWorkflows = useMemo(() => {
 		const start = (page - 1) * limit;
@@ -173,12 +175,30 @@ export const WorkflowTable = ({
 
 	const handleBulkStatus = useCallback(
 		async (status: "active" | "paused") => {
+			let ok = 0;
+			let firstError: string | null = null;
+			const failed: string[] = [];
 			for (const wf of selectedWorkflows) {
-				await setWorkflowStatus(wf.id, status);
+				try {
+					await setWorkflowStatus(wf.id, status);
+					ok += 1;
+				} catch (e) {
+					failed.push(wf.name);
+					firstError ??= e instanceof Error ? e.message : null;
+				}
 			}
-			toast.success(
-				`${status === "active" ? "Activated" : "Paused"} ${selectedWorkflows.length} automation${selectedWorkflows.length === 1 ? "" : "s"}`,
-			);
+			if (ok > 0) {
+				toast.success(
+					`${status === "active" ? "Activated" : "Paused"} ${ok} automation${ok === 1 ? "" : "s"}`,
+				);
+			}
+			if (failed.length > 0) {
+				toast.error(
+					failed.length === 1
+						? `Couldn't update ${failed[0]}${firstError ? `: ${firstError}` : ""}`
+						: `Couldn't update ${failed.length} automations${firstError ? `: ${firstError}` : ""}`,
+				);
+			}
 		},
 		[selectedWorkflows, setWorkflowStatus],
 	);

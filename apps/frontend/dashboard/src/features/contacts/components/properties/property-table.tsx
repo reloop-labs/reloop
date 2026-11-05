@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useClampPage } from "#/components/data-table/use-clamp-page";
 import type { Property } from "../../hooks/use-contacts-query";
 import { type PropertyTableMeta, propertyColumns } from "./columns";
 import { getPropertyTableGridStyle } from "./constants";
@@ -59,6 +60,7 @@ export const PropertyTable = ({
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
 	const totalPages = Math.max(1, Math.ceil(total / (pageSize ?? 10)));
+	useClampPage(totalPages, !isLoading, "propertyPage");
 
 	const handleEdit = useCallback((property: Property) => {
 		setEditingPropertyId((prev) => (prev === property.id ? null : property.id));

@@ -12,7 +12,7 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useHotkeys } from "react-hotkeys-hook";
-
+import { useClampPage } from "#/components/data-table/use-clamp-page";
 import type { ApiKeysListParams } from "../hooks/use-api-keys-query";
 import { useToggleApiKey } from "../hooks/use-toggle-api-key";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";
@@ -63,6 +63,7 @@ export function ApiKeyTable({
 	const { togglingId, toggleEnabled } = useToggleApiKey(listParams);
 
 	const totalPages = Math.max(1, Math.ceil(total / (pageSize ?? 10)));
+	useClampPage(totalPages, !isLoading);
 
 	const handleRotateKey = useCallback(
 		(key: ApiKeyData) => {

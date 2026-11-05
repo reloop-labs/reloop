@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useClampPage } from "#/components/data-table/use-clamp-page";
 import type { Contact } from "../../hooks/use-contacts-query";
 import { type ContactTableMeta, contactColumns } from "./columns";
 import { getContactTableGridStyle } from "./constants";
@@ -67,6 +68,7 @@ export const ContactTable = ({
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
 	const totalPages = Math.max(1, Math.ceil(total / (pageSize ?? 10)));
+	useClampPage(totalPages, !isLoading);
 
 	const handleEdit = useCallback((contact: Contact) => {
 		setEditingContactId((prev) => (prev === contact.id ? null : contact.id));
