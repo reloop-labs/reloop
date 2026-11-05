@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useClampPage } from "#/components/data-table/use-clamp-page";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
@@ -44,6 +45,7 @@ const useMediaQuery = (query: string) => {
 	return matches;
 };
 
+/** API request logs list with outcome tabs, filters, search, pagination and a detail drawer. */
 export function LogList({
 	actorId,
 }: {
@@ -124,6 +126,8 @@ export function LogList({
 
 	const totalLogs = data?.count || 0;
 	const totalPages = Math.ceil(totalLogs / (pageSize ?? 25)) || 1;
+	// A re-anchored rolling range (or new data) can leave ?page= past the end.
+	useClampPage(totalPages, !isLoading && !error);
 	const startIndex = ((currentPage ?? 1) - 1) * (pageSize ?? 25) + 1;
 	const endIndex = Math.min((currentPage ?? 1) * (pageSize ?? 25), totalLogs);
 

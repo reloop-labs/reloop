@@ -8,6 +8,7 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useCallback, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { dataTableToolbarControlClassName } from "#/components/data-table/toolbar-control";
+import { useClampPage } from "#/components/data-table/use-clamp-page";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useSentEmailsQuery } from "#/features/emails/hooks/use-emails-query";
@@ -24,6 +25,7 @@ import { StatusSelector } from "./status-selector";
 
 const SEARCH_INPUT_ID = "sent-emails-search-input";
 
+/** Sent emails list with date, status, domain and API key filters, search and pagination. */
 export function EmailList() {
 	const { activeOrganization } = useActiveOrganization();
 	const queryClient = useQueryClient();
@@ -89,6 +91,11 @@ export function EmailList() {
 
 	const isLoading = isPending || (isFetching && !data);
 	const totalLogs = data?.total || 0;
+	// A re-anchored rolling range (or new data) can leave ?page= past the end.
+	useClampPage(
+		Math.max(1, Math.ceil(totalLogs / (pageSize ?? 10))),
+		!isLoading && !error,
+	);
 
 	const handleDateChange = (
 		newStartDate: string | null,
