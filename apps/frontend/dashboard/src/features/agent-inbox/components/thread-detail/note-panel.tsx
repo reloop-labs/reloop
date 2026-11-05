@@ -2,7 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Copy, MoreVertical, StickyNote } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
@@ -59,6 +59,10 @@ export const NotesPanel = ({
 	const [selectedColor, setSelectedColor] = useState("default");
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [editContent, setEditContent] = useState("");
+	const [isSaving, setIsSaving] = useState(false);
+	// Synchronous guard so a double click can't fire two requests before the
+	// isSaving re-render lands.
+	const savingRef = useRef(false);
 	const [searchQuery, setSearchQuery] = useState("");
 
 	const { data: notes = [], mutate } = useSWR<ThreadNote[]>(
@@ -85,32 +89,39 @@ export const NotesPanel = ({
 
 	const createNote = useCallback(async () => {
 		const content = newContent.trim();
-		if (!content) return;
-		const res = await apiFetch("/api/inbox/v1/notes", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				threadId,
-				content,
-				color: selectedColor === "default" ? undefined : selectedColor,
-			}),
-		});
-		if (!res.ok) {
-			toast.error("Failed to create note");
-			return;
+		if (!content || savingRef.current) return;
+		savingRef.current = true;
+		setIsSaving(true);
+		try {
+			const res = await apiFetch("/api/inbox/v1/notes", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					threadId,
+					content,
+					color: selectedColor === "default" ? undefined : selectedColor,
+				}),
+			});
+			if (!res.ok) {
+				toast.error("Failed to create note");
+				return;
+			}
+			setNewContent("");
+			setSelectedColor("default");
+			setIsAdding(false);
+			await mutate();
+			toast.success("Note added");
+		} finally {
+			savingRef.current = false;
+			setIsSaving(false);
 		}
-		setNewContent("");
-		setSelectedColor("default");
-		setIsAdding(false);
-		await mutate();
-		toast.success("Note added");
 	}, [newContent, selectedColor, threadId, mutate]);
 
 	const updateNote = useCallback(
 		async (
 			id: string,
 			data: Partial<{ content: string; color: string; isPinned: boolean }>,
-		) => {
+		): Promise<boolean> => {
 			const res = await apiFetch(`/api/inbox/v1/notes/${id}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
@@ -118,9 +129,10 @@ export const NotesPanel = ({
 			});
 			if (!res.ok) {
 				toast.error("Failed to update note");
-				return;
+				return false;
 			}
 			await mutate();
+			return true;
 		},
 		[mutate],
 	);
@@ -155,7 +167,7 @@ export const NotesPanel = ({
 					>
 						<StickyNote className="h-3.5 w-3.5" />
 						{notes.length > 0 && (
-							<span className="-top-1 -right-1 absolute flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-amber-500 px-0.5 font-semibold text-[9px] text-black">
+							<span className="absolute -top-1 -right-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-amber-500 px-0.5 font-semibold text-[9px] text-black">
 								{notes.length}
 							</span>
 						)}
@@ -238,12 +250,22 @@ export const NotesPanel = ({
 											</button>
 											<button
 												type="button"
-												className="rounded-md bg-mail-primary px-2 py-1 text-panel-light text-xs"
+												className="rounded-md bg-mail-primary px-2 py-1 text-panel-light text-xs disabled:opacity-40"
+												disabled={!editContent.trim() || isSaving}
 												onClick={async () => {
-													await updateNote(note.id, {
-														content: editContent.trim(),
-													});
-													setEditingId(null);
+													if (savingRef.current) return;
+													savingRef.current = true;
+													setIsSaving(true);
+													try {
+														const ok = await updateNote(note.id, {
+															content: editContent.trim(),
+														});
+														// Keep the editor open on failure so the text isn't lost.
+														if (ok) setEditingId(null);
+													} finally {
+														savingRef.current = false;
+														setIsSaving(false);
+													}
 												}}
 											>
 												Save
@@ -260,6 +282,7 @@ export const NotesPanel = ({
 												<Dropdown.Trigger asChild>
 													<button
 														type="button"
+														aria-label="Note actions"
 														className="shrink-0 rounded p-0.5 text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 													>
 														<MoreVertical className="h-3.5 w-3.5" />
@@ -371,7 +394,7 @@ export const NotesPanel = ({
 									<button
 										type="button"
 										className="rounded-md bg-mail-primary px-2 py-1 text-panel-light text-xs disabled:opacity-40"
-										disabled={!newContent.trim()}
+										disabled={!newContent.trim() || isSaving}
 										onClick={createNote}
 									>
 										Save

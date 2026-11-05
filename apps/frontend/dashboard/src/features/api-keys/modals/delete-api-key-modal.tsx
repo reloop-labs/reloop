@@ -111,6 +111,21 @@ export function DeleteApiKeyModal({
 						failed += 1;
 					}
 				}
+				if (ok === 0) {
+					await invalidate();
+					toast.error(
+						failed === 1
+							? "Failed to delete API key"
+							: `Failed to delete ${failed} API keys`,
+					);
+					setDeleteState("idle");
+					return;
+				}
+				if (failed > 0) {
+					toast.error(
+						`${failed} of ${ok + failed} API keys couldn't be deleted`,
+					);
+				}
 				setDeleteState("success");
 				await invalidate();
 

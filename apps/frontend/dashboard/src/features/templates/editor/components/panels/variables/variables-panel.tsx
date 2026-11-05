@@ -177,8 +177,6 @@ export function VariablesPanel({}: PanelProps = {}) {
 
 			toast.success(`Updated variable properties for ${updatedVar.name}`);
 			mutate();
-		} catch (error: any) {
-			toast.error(error.message || "Something went wrong");
 		} finally {
 			setIsSavingConfig(false);
 		}
@@ -213,6 +211,8 @@ export function VariablesPanel({}: PanelProps = {}) {
 		} catch (error) {
 			const err = error as Error;
 			toast.error(err.message || "Something went wrong");
+			// Rethrow so the delete modal stays open instead of showing success.
+			throw error;
 		} finally {
 			setIsSavingConfig(false);
 		}
