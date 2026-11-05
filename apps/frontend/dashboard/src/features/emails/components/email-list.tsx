@@ -11,7 +11,10 @@ import { dataTableToolbarControlClassName } from "#/components/data-table/toolba
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useSentEmailsQuery } from "#/features/emails/hooks/use-emails-query";
-import { DateRangeFilter } from "#/features/logs/date-range-filter";
+import {
+	DateRangeFilter,
+	useRollingPresetRange,
+} from "#/features/logs/date-range-filter";
 import { queryKeys } from "#/lib/query-keys";
 import { ApiKeySelector } from "./api-key-selector";
 import { DomainSelector } from "./domain-selector";
@@ -119,11 +122,17 @@ export function EmailList() {
 		void setCurrentPage(1);
 	};
 
+	const reanchorPreset = useRollingPresetRange(datePreset, (start, end) => {
+		void setStartDate(start);
+		void setEndDate(end);
+	});
+
 	const handleRefresh = useCallback(() => {
+		reanchorPreset();
 		void queryClient.invalidateQueries({
 			queryKey: [...queryKeys.emails.all, "sent"],
 		});
-	}, [queryClient]);
+	}, [queryClient, reanchorPreset]);
 
 	useHotkeys(
 		"r",

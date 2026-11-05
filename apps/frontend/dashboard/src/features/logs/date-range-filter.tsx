@@ -3,7 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Popover from "@reloop/ui/popover";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { DateRange, Matcher } from "react-day-picker";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
@@ -73,6 +73,38 @@ const DATE_PRESETS: DatePreset[] = [
 		}),
 	},
 ];
+
+export const getPresetRange = (
+	value: string | null | undefined,
+): { from: Date; to: Date } | null => {
+	const preset = DATE_PRESETS.find((p) => p.value === value);
+	return preset ? preset.getRange() : null;
+};
+
+/**
+ * Presets are stored in the URL as absolute ISO dates, which go stale: a
+ * "Last 1 hour" range picked earlier never includes newer rows. Re-anchor the
+ * range to now on mount and whenever the returned function is called (wire it
+ * into Refresh).
+ */
+export const useRollingPresetRange = (
+	preset: string | null | undefined,
+	setRange: (startDate: string, endDate: string) => void,
+): (() => void) => {
+	const reanchor = useCallback(() => {
+		const range = getPresetRange(preset);
+		if (range) setRange(range.from.toISOString(), range.to.toISOString());
+	}, [preset, setRange]);
+
+	const didMountRef = useRef(false);
+	useEffect(() => {
+		if (didMountRef.current) return;
+		didMountRef.current = true;
+		reanchor();
+	}, [reanchor]);
+
+	return reanchor;
+};
 
 interface DateRangeFilterProps {
 	startDate: string | null;

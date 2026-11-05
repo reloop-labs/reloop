@@ -12,7 +12,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
-import { DateRangeFilter } from "./date-range-filter";
+import { DateRangeFilter, useRollingPresetRange } from "./date-range-filter";
 import { useLogsQuery } from "./hooks/use-logs-query";
 import { LogDetailPanel } from "./log-detail-panel";
 import { LogDrawer } from "./log-drawer";
@@ -151,7 +151,13 @@ export function LogList({
 	const hasAnyFilter =
 		searchQuery || statusCode || startDate || endDate || outcomeTab !== "all";
 
+	const reanchorPreset = useRollingPresetRange(datePreset, (start, end) => {
+		void setStartDate(start);
+		void setEndDate(end);
+	});
+
 	const handleRefresh = () => {
+		reanchorPreset();
 		void queryClient.invalidateQueries({
 			queryKey: [...queryKeys.logs.all, "list"],
 		});

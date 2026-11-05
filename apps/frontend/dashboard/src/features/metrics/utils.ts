@@ -21,10 +21,15 @@ export const getYearMonthDayKey = (date: Date) => {
 	return `${y}-${m}-${d}`;
 };
 
-export const getLocalKey = (dStr: string) => {
+/**
+ * Day key for a stats bucket. The stats API buckets by UTC day
+ * (`YYYY-MM-DDT00:00:00.000Z`), so the key must use the UTC date; the local
+ * date shifts every bucket back a day for viewers west of UTC.
+ */
+export const getBucketDayKey = (dStr: string) => {
 	const d = new Date(dStr);
 	if (Number.isNaN(d.getTime())) return "";
-	return getYearMonthDayKey(d);
+	return d.toISOString().slice(0, 10);
 };
 
 export const formatDateLabel = (date: Date) => {

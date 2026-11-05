@@ -14,7 +14,7 @@ import { useEmailStatsQuery } from "#/features/metrics/hooks/use-email-stats-que
 import {
 	formatDateLabel,
 	generateContinuousDateList,
-	getLocalKey,
+	getBucketDayKey,
 	getYearMonthDayKey,
 } from "#/features/metrics/utils";
 import { CustomTooltip } from "./custom-tooltip";
@@ -65,7 +65,7 @@ export function DeliverabilityChart({
 		for (let i = 0; i < data.dates.length; i++) {
 			const dateStr = data.dates[i];
 			if (!dateStr) continue;
-			const key = getLocalKey(dateStr);
+			const key = getBucketDayKey(dateStr);
 			if (key) {
 				statsMap.set(key, {
 					sent: data.sent[i] ?? 0,
