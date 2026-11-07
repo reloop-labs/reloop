@@ -75,6 +75,25 @@ const FOLDER_TITLES: Record<string, string> = {
 	needs_approval: "Needs approval",
 };
 
+// Empty-state copy per folder. The old fallback, "Choose an email to view
+// details", read as if there were mail to pick.
+const FOLDER_EMPTY_DESCRIPTIONS: Record<string, string> = {
+	agent: "Threads your agent is handling will show up here.",
+	archive: "Archived conversations will show up here.",
+	archived: "Archived conversations will show up here.",
+	spam: "Mail marked as spam will show up here.",
+	trash: "Deleted conversations will show up here.",
+	drafts: "Drafts you save will show up here.",
+	starred: "Star a thread to keep it here.",
+	needs_approval: "Agent drafts that need your approval will show up here.",
+};
+
+const folderEmptyDescription = (folder: string): string =>
+	FOLDER_EMPTY_DESCRIPTIONS[folder] ??
+	(folder.startsWith("label:")
+		? "Threads with this label will show up here."
+		: "Nothing here yet.");
+
 const isTypingTarget = (target: EventTarget | null) => {
 	if (!(target instanceof HTMLElement)) return false;
 	const tag = target.tagName;
@@ -747,7 +766,7 @@ export const AgentInboxContent = ({
 										? "Inbox shows emails sent to this address. Outbound mail lives in Sent."
 										: folder === "sent"
 											? "Emails you send from this address will show up here."
-											: "Choose an email to view details"
+											: folderEmptyDescription(folder)
 							}
 							onCompose={openCompose}
 						/>

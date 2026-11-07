@@ -180,7 +180,7 @@ export function DeleteGroupConfirmModal({
 				if (!open) {
 					if (deleteStateRef.current === "success") {
 						const name = isBulk
-							? `${targetBulkGroupsRef.current.length || bulkGroupsToDelete.length} groups`
+							? `${targetBulkGroupsRef.current.length || bulkGroupsToDelete.length} group${(targetBulkGroupsRef.current.length || bulkGroupsToDelete.length) === 1 ? "" : "s"}`
 							: targetGroupRef.current?.name || "Unnamed group";
 						onDeleteSuccess?.(name);
 						if (isBulk) onClearSelection?.();
@@ -206,7 +206,7 @@ export function DeleteGroupConfirmModal({
 				<div>
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						{isBulk
-							? `Delete ${bulkGroupsToDelete.length || "selected"} groups`
+							? `Delete ${bulkGroupsToDelete.length || "selected"} ${bulkGroupsToDelete.length === 1 ? "group" : "groups"}`
 							: "Delete group"}
 					</Modal.Title>
 					<Modal.Description className="text-sm text-text-sub-600 leading-relaxed">

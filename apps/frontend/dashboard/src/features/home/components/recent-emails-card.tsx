@@ -128,7 +128,9 @@ export function RecentEmailsCard({
 						<p className="mt-1.5 max-w-[260px] text-paragraph-sm text-text-sub-600">
 							{readyDomainName
 								? `${readyDomainName} is ready. One click sends a test email from hello@${readyDomainName}.`
-								: "One click sends a test email to you from your verified domain."}
+								: canSendFirstEmail
+									? "One click sends a test email to you from your verified domain."
+									: "Add and verify a domain to send your first email."}
 						</p>
 						{canSendFirstEmail ? (
 							<div className="mt-5">
