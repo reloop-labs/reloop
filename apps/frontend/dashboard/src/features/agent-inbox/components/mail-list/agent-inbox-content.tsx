@@ -39,6 +39,7 @@ import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const INBOX_VIEW_IDS = new Set<string>(INBOX_VIEWS.map((view) => view.id));
 
+/** Reads the tab URL param, falling back to the all view for unknown values. */
 function parseInboxView(value: string): InboxView {
 	return INBOX_VIEW_IDS.has(value) ? (value as InboxView) : "all";
 }
@@ -74,6 +75,26 @@ const FOLDER_TITLES: Record<string, string> = {
 	starred: "Starred",
 	needs_approval: "Needs approval",
 };
+
+// Empty-state copy per folder. The old fallback, "Choose an email to view
+// details", read as if there were mail to pick.
+const FOLDER_EMPTY_DESCRIPTIONS: Record<string, string> = {
+	agent: "Threads your agent is handling will show up here.",
+	archive: "Archived conversations will show up here.",
+	archived: "Archived conversations will show up here.",
+	spam: "Mail marked as spam will show up here.",
+	trash: "Deleted conversations will show up here.",
+	drafts: "Drafts you save will show up here.",
+	starred: "Star a thread to keep it here.",
+	needs_approval: "Agent drafts that need your approval will show up here.",
+};
+
+/** Empty-state description for a folder that has no threads. */
+const folderEmptyDescription = (folder: string): string =>
+	FOLDER_EMPTY_DESCRIPTIONS[folder] ??
+	(folder.startsWith("label:")
+		? "Threads with this label will show up here."
+		: "Nothing here yet.");
 
 const isTypingTarget = (target: EventTarget | null) => {
 	if (!(target instanceof HTMLElement)) return false;
@@ -135,6 +156,7 @@ export const AgentInboxContent = ({
 		parseAsString.withDefault(""),
 	);
 	const activeTab = parseInboxView(tabParam);
+	const hasListFilters = searchQuery !== "" || activeFilterCount > 0;
 	const showInboxTabs = folder === "inbox";
 
 	const folderTitle = folder.startsWith("label:")
@@ -730,7 +752,9 @@ export const AgentInboxContent = ({
 				) : (listLoading || isLoadingMailboxes) &&
 					filteredThreads.length === 0 ? (
 					<MailListSkeleton />
-				) : filteredThreads.length === 0 && !threadsError ? (
+				) : filteredThreads.length === 0 && !threadsError && !hasListFilters ? (
+					// Folder or tab is empty. When search or filters hide every
+					// thread, ThreadList shows its no-matches state with clear filters.
 					<div className="flex min-h-0 flex-1 items-center justify-center p-6">
 						<InboxEmptyState
 							title={
@@ -747,7 +771,7 @@ export const AgentInboxContent = ({
 										? "Inbox shows emails sent to this address. Outbound mail lives in Sent."
 										: folder === "sent"
 											? "Emails you send from this address will show up here."
-											: "Choose an email to view details"
+											: folderEmptyDescription(folder)
 							}
 							onCompose={openCompose}
 						/>
@@ -760,7 +784,7 @@ export const AgentInboxContent = ({
 						selectedId={selectedThreadId}
 						onSelect={handleSelectThread}
 						isLoading={listLoading}
-						hasFilters={searchQuery !== "" || activeFilterCount > 0}
+						hasFilters={hasListFilters}
 						onClearFilters={() => {
 							setSearchQuery(null);
 							setFilterParam(null);

@@ -33,6 +33,7 @@ const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
+/** Confirms and deletes one or more contacts. */
 export function DeleteContactConfirmModal({
 	contacts,
 	selectedContacts = [],
@@ -195,7 +196,7 @@ export function DeleteContactConfirmModal({
 				if (!open) {
 					if (deleteStateRef.current === "success") {
 						const name = isBulk
-							? `${targetBulkContactsRef.current.length || bulkContactsToDelete.length} contacts`
+							? `${targetBulkContactsRef.current.length || bulkContactsToDelete.length} contact${(targetBulkContactsRef.current.length || bulkContactsToDelete.length) === 1 ? "" : "s"}`
 							: targetContactRef.current?.email || "Unnamed contact";
 						onDeleteSuccess?.(name);
 						if (isBulk) onClearSelection?.();
@@ -223,7 +224,7 @@ export function DeleteContactConfirmModal({
 				<div>
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						{isBulk
-							? `Delete ${bulkContactsToDelete.length || "selected"} contacts`
+							? `Delete ${bulkContactsToDelete.length || "selected"} ${bulkContactsToDelete.length === 1 ? "contact" : "contacts"}`
 							: "Delete contact"}
 					</Modal.Title>
 					<Modal.Description className="text-sm text-text-sub-600 leading-relaxed">

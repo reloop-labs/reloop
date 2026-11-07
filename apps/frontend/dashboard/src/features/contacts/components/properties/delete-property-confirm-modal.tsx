@@ -39,6 +39,7 @@ const getBadgeColor = (type: string) => {
 	}
 };
 
+/** Confirms and deletes one or more contact properties. */
 export function DeletePropertyConfirmModal({
 	properties,
 	selectedProperties = [],
@@ -225,7 +226,7 @@ export function DeletePropertyConfirmModal({
 				<div>
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						{isBulk
-							? `Delete ${bulkPropertiesToDelete.length || "selected"} properties`
+							? `Delete ${bulkPropertiesToDelete.length || "selected"} ${bulkPropertiesToDelete.length === 1 ? "property" : "properties"}`
 							: "Delete property"}
 					</Modal.Title>
 					<Modal.Description className="text-sm text-text-sub-600 leading-relaxed">

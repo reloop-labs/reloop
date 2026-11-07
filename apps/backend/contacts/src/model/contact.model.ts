@@ -365,7 +365,10 @@ export namespace ContactModel {
 			updatedAt: t.Date(),
 			contacts: t.Array(groupContactItem),
 		}),
-		total: t.Number(),
+		total: t.Number({
+			description:
+				"Members matching search and status (every member when neither is set)",
+		}),
 		subscribedContacts: t.Number({
 			description: "Members with subscribed status",
 		}),
