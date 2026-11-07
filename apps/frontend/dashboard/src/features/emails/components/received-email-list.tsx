@@ -12,6 +12,7 @@ import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useReceivedEmailsQuery } from "#/features/emails/hooks/use-emails-query";
 import { queryKeys } from "#/lib/query-keys";
+import { EmailListError } from "./email-list-error";
 import { RefreshButton } from "./email-refresh-button";
 import { InboundStatusSelector } from "./inbound-status-selector";
 import { MailboxSelector } from "./mailbox-selector";
@@ -121,17 +122,6 @@ export function ReceivedEmailList() {
 		{ enableOnFormTags: false, preventDefault: true },
 	);
 
-	if (error) {
-		return (
-			<div className="flex flex-col items-center justify-center gap-2 p-4">
-				<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
-				<p className="text-center text-sm text-text-sub-600">
-					Failed to load received emails
-				</p>
-			</div>
-		);
-	}
-
 	return (
 		<div>
 			<div className="space-y-2">
@@ -233,21 +223,29 @@ export function ReceivedEmailList() {
 			</div>
 
 			<div className="mt-4">
-				<ReceivedEmailTable
-					logs={paginatedLogs}
-					isLoading={isLoading}
-					loadingRows={pageSize ?? 10}
-					currentPage={currentPage ?? 1}
-					pageSize={pageSize ?? 10}
-					totalLogs={totalLogs}
-					onPageChange={(page) => void setCurrentPage(page)}
-					onPageSizeChange={(value) => {
-						void setPageSize(value);
-						void setCurrentPage(1);
-					}}
-					hasFilters={hasAnyFilter}
-					onClearFilters={handleClearAll}
-				/>
+				{/* Keep the toolbar on errors so filters and search can be changed. */}
+				{error ? (
+					<EmailListError
+						message="Failed to load received emails"
+						onRetry={handleRefresh}
+					/>
+				) : (
+					<ReceivedEmailTable
+						logs={paginatedLogs}
+						isLoading={isLoading}
+						loadingRows={pageSize ?? 10}
+						currentPage={currentPage ?? 1}
+						pageSize={pageSize ?? 10}
+						totalLogs={totalLogs}
+						onPageChange={(page) => void setCurrentPage(page)}
+						onPageSizeChange={(value) => {
+							void setPageSize(value);
+							void setCurrentPage(1);
+						}}
+						hasFilters={hasAnyFilter}
+						onClearFilters={handleClearAll}
+					/>
+				)}
 			</div>
 		</div>
 	);

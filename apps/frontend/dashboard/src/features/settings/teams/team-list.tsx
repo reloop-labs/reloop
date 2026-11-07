@@ -161,29 +161,40 @@ export function TeamList({
 
 	const orgId = activeOrganization?.id;
 
-	const { data: membersData, isPending: membersLoading } = useQuery({
+	// The auth client returns { data, error } instead of throwing. Throw on
+	// error so a failed load shows an error state, not an empty team (API
+	// error) or a skeleton that never ends (network error).
+	const membersQuery = useQuery({
 		queryKey: queryKeys.organization.members(orgId ?? ""),
 		queryFn: async (): Promise<{ members: Member[] }> => {
 			if (!orgId) return { members: [] };
 			const result = await authClient.organization.listMembers({
 				query: { organizationId: orgId },
 			});
+			if (result.error) {
+				throw new Error(result.error.message || "Failed to load members");
+			}
 			return (result.data as { members: Member[] }) ?? { members: [] };
 		},
 		enabled: !!orgId,
 	});
+	const { data: membersData, isPending: membersLoading } = membersQuery;
 
-	const { data: invites, isPending: invitesLoading } = useQuery({
+	const invitesQuery = useQuery({
 		queryKey: queryKeys.organization.invitations(orgId ?? ""),
 		queryFn: async (): Promise<Invite[]> => {
 			if (!orgId) return [];
 			const result = await authClient.organization.listInvitations({
 				query: { organizationId: orgId },
 			});
+			if (result.error) {
+				throw new Error(result.error.message || "Failed to load invitations");
+			}
 			return (result.data as Invite[]) ?? [];
 		},
 		enabled: !!orgId,
 	});
+	const { data: invites, isPending: invitesLoading } = invitesQuery;
 
 	const invalidateMembers = () =>
 		queryClient.invalidateQueries({
@@ -423,6 +434,34 @@ export function TeamList({
 		if (!inviteToRevoke) return;
 		await handleCancelInvite(inviteToRevoke.id);
 	};
+
+	const loadError = membersQuery.error ?? invitesQuery.error;
+	if (loadError && (!membersData || !invites)) {
+		return (
+			<TableCard>
+				<TableHeader />
+				<div className="-mt-2.5 flex flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 py-16 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:border-stroke-soft-100/70 dark:bg-black">
+					<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
+					<p className="font-medium text-text-strong-950">
+						Couldn't load your team
+					</p>
+					<p className="max-w-full truncate px-4 text-sm text-text-sub-600">
+						{loadError.message}
+					</p>
+					<button
+						type="button"
+						onClick={() => {
+							if (membersQuery.isError) void membersQuery.refetch();
+							if (invitesQuery.isError) void invitesQuery.refetch();
+						}}
+						className="mt-2 font-medium text-sm text-text-strong-950 underline-offset-2 hover:underline"
+					>
+						Try again
+					</button>
+				</div>
+			</TableCard>
+		);
+	}
 
 	const isLoading = membersLoading || invitesLoading || !membersData;
 
