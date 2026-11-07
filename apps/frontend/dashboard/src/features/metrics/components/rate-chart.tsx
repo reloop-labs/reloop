@@ -35,6 +35,7 @@ interface RateChartProps {
 	riskValue?: number;
 }
 
+/** Rate card for the metrics page: headline rate, trend chart against a risk line, and a per-category breakdown. */
 export const RateChart = ({
 	title,
 	rate,
@@ -158,7 +159,7 @@ export const RateChart = ({
 						key={item.label}
 						className={`flex items-center justify-between py-2 ${
 							i !== breakdown.length - 1
-								? "border-bottom border-stroke-soft-100 dark:border-stroke-soft-100/50"
+								? "border-stroke-soft-100 border-b dark:border-stroke-soft-100/50"
 								: ""
 						}`}
 					>
@@ -173,7 +174,9 @@ export const RateChart = ({
 							<span className="text-right text-text-disabled-300 text-xs">
 								{item.count}
 							</span>
-							<span className="w-8 text-right text-xs">{item.percentage}%</span>
+							<span className="w-14 text-right text-xs tabular-nums">
+								{item.percentage}%
+							</span>
 						</div>
 					</div>
 				))}

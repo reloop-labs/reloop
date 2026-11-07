@@ -20,6 +20,7 @@ import {
 import { queryKeys } from "#/lib/query-keys";
 import { MetricsListHeader } from "./metrics-list-header";
 
+/** Metrics route: deliverability, bounce and complaint charts for the selected date range and domain. */
 export function MetricsPage() {
 	const { activeOrganization } = useActiveOrganization();
 	const queryClient = useQueryClient();
@@ -269,11 +270,9 @@ export function MetricsPage() {
 						label: "Complained",
 						color: "#FDB022",
 						count: totalComplaint,
-						percentage:
-							totalComplaint > 0
-								? Math.round((totalComplaint / totalComplaint) * 100 * 100) /
-									100
-								: 0,
+						// Share of sent emails; a single-row "share of complaints"
+						// was always 100%.
+						percentage: Math.round(complaintRate * 100) / 100,
 					},
 				],
 			},

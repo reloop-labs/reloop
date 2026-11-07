@@ -325,9 +325,9 @@ const SelectContent = React.forwardRef<
 					// base
 					"relative z-50 overflow-hidden rounded-2xl bg-bg-white-0 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100",
 					// widths
-					"min-w-[--radix-select-trigger-width] max-w-[max(var(--radix-select-trigger-width),320px)]",
+					"min-w-(--radix-select-trigger-width) max-w-[max(var(--radix-select-trigger-width),320px)]",
 					// heights
-					"max-h-[--radix-select-content-available-height]",
+					"max-h-(--radix-select-content-available-height)",
 					// animation
 					"data-[state=open]:fade-in-0 data-[state=open]:animate-in",
 					"data-[state=closed]:fade-out-0 data-[state=closed]:animate-out",

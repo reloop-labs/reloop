@@ -7,7 +7,12 @@ import { useTemplateId } from "./use-template-id";
 const AUTOSAVE_MS = 1500;
 const SKIP_HYDRATE_MS = 2500;
 
-export function useAutoSaveDraft() {
+/**
+ * Debounced autosave of the template draft (content and email meta) while the
+ * editor is open. Saves are skipped during publishing or AI generation and
+ * replayed once that ends, and flushed when the tab is hidden.
+ */
+export function useAutoSaveDraft(): void {
 	const templateId = useTemplateId();
 	const { editor } = useCurrentEditor();
 	const skipUntilRef = useRef(Date.now() + SKIP_HYDRATE_MS);
@@ -16,11 +21,17 @@ export function useAutoSaveDraft() {
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const saveRef = useRef<() => Promise<void>>(async () => {});
 	const skipNextMetaRef = useRef(true);
+	// Set when a save was skipped because a publish/generation was running, so
+	// it can be replayed afterwards instead of being dropped.
+	const skippedWhileBusyRef = useRef(false);
 
 	saveRef.current = async () => {
 		if (!editor || !templateId) return;
 		const state = useEditorStore.getState();
-		if (state.isGenerating || state.isPublishing) return;
+		if (state.isGenerating || state.isPublishing) {
+			skippedWhileBusyRef.current = true;
+			return;
+		}
 		if (Date.now() < skipUntilRef.current) return;
 
 		if (inFlightRef.current) {
@@ -68,6 +79,7 @@ export function useAutoSaveDraft() {
 	const schedule = useCallback(() => {
 		if (timerRef.current) clearTimeout(timerRef.current);
 		timerRef.current = setTimeout(() => {
+			timerRef.current = null;
 			void saveRef.current();
 		}, AUTOSAVE_MS);
 	}, []);
@@ -82,7 +94,13 @@ export function useAutoSaveDraft() {
 		editor.on("update", onUpdate);
 		return () => {
 			editor.off("update", onUpdate);
-			if (timerRef.current) clearTimeout(timerRef.current);
+			// Flush instead of dropping a pending save when leaving the editor
+			// (client-side navigation doesn't fire visibilitychange).
+			if (timerRef.current) {
+				clearTimeout(timerRef.current);
+				timerRef.current = null;
+				void saveRef.current();
+			}
 		};
 	}, [editor, schedule]);
 
@@ -101,6 +119,19 @@ export function useAutoSaveDraft() {
 		if (!store.hasUnsavedChanges) store.setHasUnsavedChanges(true);
 		schedule();
 	}, [subject, fromEmail, replyTo, previewText, schedule]);
+
+	// Replay a save skipped during publish/generation once it ends. Always
+	// replay: a failed publish leaves the edits unsaved, and a successful one
+	// only synced the content captured when it started.
+	useEffect(() => {
+		return useEditorStore.subscribe((state, prev) => {
+			const wasBusy = prev.isPublishing || prev.isGenerating;
+			const isBusy = state.isPublishing || state.isGenerating;
+			if (!wasBusy || isBusy || !skippedWhileBusyRef.current) return;
+			skippedWhileBusyRef.current = false;
+			schedule();
+		});
+	}, [schedule]);
 
 	useEffect(() => {
 		const flush = () => {

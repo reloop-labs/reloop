@@ -46,7 +46,8 @@ settingsNavigation.forEach((section) => {
 	});
 });
 
-function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
+/** Two-key G navigation (e.g. G E, G Shift+T). Ignores typing in inputs and modifier-only keydowns. */
+function useNavigationShortcuts(router: ReturnType<typeof useRouter>): void {
 	React.useEffect(() => {
 		let gTimeout: ReturnType<typeof setTimeout> | null = null;
 		let gPressed = false;
@@ -78,6 +79,7 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			p: "/contacts/properties",
 			g: "/contacts/groups",
 			h: "/contacts/channels",
+			x: "/contacts/suppression",
 			t: "/templates",
 			f: "/automation",
 			v: "/automation/triggers",
@@ -93,6 +95,8 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			u: "/settings",
 			b: "/settings/billing",
 			I: "/settings/dedicated-ip",
+			// Without an explicit entry, Shift+T fell back to "t" (/templates).
+			T: "/settings/teams",
 			W: "/settings/organization",
 			O: "/settings/organization",
 			A: "/settings/security/connected-apps",
@@ -106,10 +110,29 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			if (e.metaKey || e.ctrlKey || e.altKey) return;
 			if (isEditable(e.target)) return;
 
-			const key = e.key;
+			// Pressing Shift (for the "G Shift+X" settings shortcuts) fires its own
+			// keydown; it must not cancel the pending G.
+			if (
+				e.key === "Shift" ||
+				e.key === "Meta" ||
+				e.key === "Control" ||
+				e.key === "Alt"
+			) {
+				return;
+			}
+
+			// Normalise letters by the Shift state so "Shift+t" and "T" resolve
+			// the same way, and never fall back from a shifted key to the
+			// unshifted route (G Shift+T used to open /templates).
+			const key =
+				e.key.length === 1 && /[a-z]/i.test(e.key)
+					? e.shiftKey
+						? e.key.toUpperCase()
+						: e.key.toLowerCase()
+					: e.key;
 
 			if (gPressed) {
-				const path = routeMap[key] || routeMap[key.toLowerCase()];
+				const path = routeMap[key];
 				if (path) {
 					e.preventDefault();
 					e.stopPropagation();
@@ -183,6 +206,7 @@ function KbdBadge({ label }: { label: string }) {
 	);
 }
 
+/** Global command palette (mod+K) plus app-wide shortcuts: G navigation, T theme toggle and copy URL. */
 export function CommandMenuGlobal() {
 	const [open, setOpen] = React.useState(false);
 	const [search, setSearch] = React.useState("");
@@ -229,8 +253,14 @@ export function CommandMenuGlobal() {
 	});
 
 	useHotkeys("t", (e) => {
-		e.preventDefault();
-		setTheme(resolvedTheme === "light" ? "dark" : "light");
+		// Some pages bind T to their own action (disable API key, send test
+		// webhook, toggle tracking) and call preventDefault. Listener order
+		// depends on mount order, so wait for the whole keydown dispatch to
+		// finish and only toggle the theme if no page claimed the key.
+		const next = resolvedTheme === "light" ? "dark" : "light";
+		setTimeout(() => {
+			if (!e.defaultPrevented) setTheme(next);
+		}, 0);
 	});
 
 	const handleCopyUrl = React.useCallback(() => {

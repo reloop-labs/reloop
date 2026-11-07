@@ -74,10 +74,10 @@ const SwitchLook = ({
 						"data-[state=checked]:translate-x-3",
 						pending && "scale-95 animate-pulse opacity-75",
 						!disabled && [
-							"before:-translate-x-1/2 before:absolute before:inset-y-0 before:left-1/2 before:w-3 before:rounded-full before:bg-static-white",
+							"before:absolute before:inset-y-0 before:left-1/2 before:w-3 before:-translate-x-1/2 before:rounded-full before:bg-static-white",
 							"data-[state=checked]:before:bg-primary-foreground",
-							"before:[mask:--mask]",
-							"after:-translate-x-1/2 after:absolute after:inset-y-0 after:left-1/2 after:w-3 after:rounded-full after:shadow-switch-thumb",
+							"before:[mask:var(--mask)]",
+							"after:absolute after:inset-y-0 after:left-1/2 after:w-3 after:-translate-x-1/2 after:rounded-full after:shadow-switch-thumb",
 							"group-active/row:scale-[.833]",
 						],
 						disabled && "size-2.5 rounded-full bg-bg-soft-200 shadow-none",

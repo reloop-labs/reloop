@@ -50,6 +50,7 @@ interface CampaignsContextValue {
 
 const CampaignsContext = createContext<CampaignsContextValue | null>(null);
 
+/** Provides campaign actions (create, send, schedule, duplicate, delete) for the active organization and refreshes the affected queries. */
 export function CampaignsProvider({ children }: { children: ReactNode }) {
 	const { activeOrganization } = useActiveOrganization();
 	const orgId = activeOrganization?.id ?? "default_org";
@@ -60,6 +61,20 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			queryKey: queryKeys.campaigns.lists(orgId),
 		});
 	}, [orgId, queryClient]);
+
+	// Status-changing actions must also refresh the open detail page; the
+	// list-only invalidation left it showing the old status for up to 30s.
+	const invalidateWithDetail = useCallback(
+		async (id: string) => {
+			await Promise.all([
+				invalidate(),
+				queryClient.invalidateQueries({
+					queryKey: queryKeys.campaigns.detail(id),
+				}),
+			]);
+		},
+		[invalidate, queryClient],
+	);
 
 	const createCampaign = useCallback(
 		async (input: CreateCampaignInput, _recipientCount: number) => {
@@ -86,34 +101,34 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 		async (id: string) => {
 			const existing = findCachedCampaign(queryClient, orgId, id);
 			await sendCampaignRequest(id);
-			await invalidate();
+			await invalidateWithDetail(id);
 			toast.success(
 				existing
 					? `Campaign "${existing.name}" is sending`
 					: "Campaign is sending",
 			);
 		},
-		[invalidate, orgId, queryClient],
+		[invalidateWithDetail, orgId, queryClient],
 	);
 
 	const scheduleCampaign = useCallback(
 		async (id: string, scheduledAt: string) => {
 			await scheduleCampaignRequest(id, scheduledAt);
-			await invalidate();
+			await invalidateWithDetail(id);
 			toast.success(
 				`Campaign scheduled for ${new Date(scheduledAt).toLocaleString()}`,
 			);
 		},
-		[invalidate],
+		[invalidateWithDetail],
 	);
 
 	const unscheduleCampaign = useCallback(
 		async (id: string) => {
 			await unscheduleCampaignRequest(id);
-			await invalidate();
+			await invalidateWithDetail(id);
 			toast.success("Schedule removed. The campaign is a draft again.");
 		},
-		[invalidate],
+		[invalidateWithDetail],
 	);
 
 	const duplicateCampaign = useCallback(
@@ -201,6 +216,7 @@ export function useCampaignsListQuery(params: CampaignListParams) {
 	});
 }
 
+/** Campaign actions from the nearest CampaignsProvider. Throws when used outside one. */
 export function useCampaigns() {
 	const context = useContext(CampaignsContext);
 	if (!context) {
@@ -209,12 +225,14 @@ export function useCampaigns() {
 	return context;
 }
 
+/** Returns a function that invalidates every cached campaign query. */
 export function useInvalidateCampaigns() {
 	const queryClient = useQueryClient();
 	return () =>
 		queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
 }
 
+/** Loads one campaign by id, using the cached list row as placeholder data. */
 export function useCampaignQuery(id: string | undefined) {
 	const { activeOrganization } = useActiveOrganization();
 	const orgId = activeOrganization?.id ?? "default_org";
@@ -228,6 +246,7 @@ export function useCampaignQuery(id: string | undefined) {
 	});
 }
 
+/** Loads the first page of recipients for a campaign. */
 export function useCampaignRecipientsQuery(id: string | undefined) {
 	const { activeOrganization } = useActiveOrganization();
 	return useQuery({

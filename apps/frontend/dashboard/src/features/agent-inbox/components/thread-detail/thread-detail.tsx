@@ -136,6 +136,7 @@ const EmptyState = () => (
 // Main component
 // ---------------------------------------------------------------------------
 
+/** Reading pane for the selected inbox thread: messages, actions and composers. Marks the thread read once when opened. */
 export const ThreadDetail = ({
 	thread,
 	mailbox,
@@ -318,10 +319,16 @@ export const ThreadDetail = ({
 		);
 	}, [optimisticReplies.length, threadData, threadDataMatches]);
 
+	// Auto-mark read once per opened thread. Without this guard, "Mark as
+	// unread" flips `thread.unread` back to true, re-runs this effect and the
+	// thread is immediately marked read again.
+	const autoMarkedThreadRef = useRef<string | null>(null);
 	useEffect(() => {
 		if (!thread?.unread) return;
 		const id = thread.messageId || thread.id;
 		if (!id) return;
+		if (autoMarkedThreadRef.current === thread.id) return;
+		autoMarkedThreadRef.current = thread.id;
 		void markMessageRead(id, true, {
 			threadId: thread.threadId ?? null,
 		}).catch(() => {

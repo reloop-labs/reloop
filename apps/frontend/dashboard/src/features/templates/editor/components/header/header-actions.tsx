@@ -32,6 +32,7 @@ interface HeaderActionsProps {
 	isSynced: boolean;
 }
 
+/** Template editor header actions: discard draft, test email and publish, plus their modals. */
 export const HeaderActions = ({
 	connectionStatus,
 	isSynced,
@@ -191,6 +192,15 @@ export const HeaderActions = ({
 				credentials: "include",
 			});
 
+			const result = await response.json().catch(() => ({}));
+			if (!response.ok) {
+				throw new Error(
+					typeof result?.message === "string"
+						? result.message
+						: `Publish failed (${response.status})`,
+				);
+			}
+
 			// 2. Sync the template baseline so reopening always finds latest content
 			fetch(`/api/template/v1/${templateId}`, {
 				method: "PUT",
@@ -207,14 +217,16 @@ export const HeaderActions = ({
 				console.warn("[publish] Failed to sync template baseline:", err),
 			);
 
-			const result = await response.json();
-			const pubNum = result.publishNumber ?? null;
 			setLastSaved(null, new Date());
 			setHasUnsavedChanges(false);
 			mutate();
 		} catch (error) {
 			console.error("Failed to publish template:", error);
-			toast.error("Failed to publish template.");
+			toast.error(
+				error instanceof Error && error.message
+					? error.message
+					: "Failed to publish template.",
+			);
 			throw error;
 		} finally {
 			setIsPublishing(false);
