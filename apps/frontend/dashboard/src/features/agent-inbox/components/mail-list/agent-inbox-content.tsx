@@ -39,6 +39,7 @@ import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const INBOX_VIEW_IDS = new Set<string>(INBOX_VIEWS.map((view) => view.id));
 
+/** Reads the tab URL param, falling back to the all view for unknown values. */
 function parseInboxView(value: string): InboxView {
 	return INBOX_VIEW_IDS.has(value) ? (value as InboxView) : "all";
 }
@@ -88,6 +89,7 @@ const FOLDER_EMPTY_DESCRIPTIONS: Record<string, string> = {
 	needs_approval: "Agent drafts that need your approval will show up here.",
 };
 
+/** Empty-state description for a folder that has no threads. */
 const folderEmptyDescription = (folder: string): string =>
 	FOLDER_EMPTY_DESCRIPTIONS[folder] ??
 	(folder.startsWith("label:")
@@ -154,6 +156,7 @@ export const AgentInboxContent = ({
 		parseAsString.withDefault(""),
 	);
 	const activeTab = parseInboxView(tabParam);
+	const hasListFilters = searchQuery !== "" || activeFilterCount > 0;
 	const showInboxTabs = folder === "inbox";
 
 	const folderTitle = folder.startsWith("label:")
@@ -749,7 +752,9 @@ export const AgentInboxContent = ({
 				) : (listLoading || isLoadingMailboxes) &&
 					filteredThreads.length === 0 ? (
 					<MailListSkeleton />
-				) : filteredThreads.length === 0 && !threadsError ? (
+				) : filteredThreads.length === 0 && !threadsError && !hasListFilters ? (
+					// Folder or tab is empty. When search or filters hide every
+					// thread, ThreadList shows its no-matches state with clear filters.
 					<div className="flex min-h-0 flex-1 items-center justify-center p-6">
 						<InboxEmptyState
 							title={
@@ -779,7 +784,7 @@ export const AgentInboxContent = ({
 						selectedId={selectedThreadId}
 						onSelect={handleSelectThread}
 						isLoading={listLoading}
-						hasFilters={searchQuery !== "" || activeFilterCount > 0}
+						hasFilters={hasListFilters}
 						onClearFilters={() => {
 							setSearchQuery(null);
 							setFilterParam(null);
