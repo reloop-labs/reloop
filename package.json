@@ -310,7 +310,7 @@
 	"overrides": {
 		"@swc/helpers": "0.5.21"
 	},
-	"packageManager": "bun@1.3.14",
+	"packageManager": "bun@1.4.4",
 	"trustedDependencies": [
 		"@tailwindcss/oxide",
 		"dev",

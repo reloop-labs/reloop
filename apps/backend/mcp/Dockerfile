@@ -1,11 +1,11 @@
-FROM oven/bun:1-alpine AS build
+FROM oven/bun:1.4.4-alpine AS build
 WORKDIR /app
 COPY package.json bunfig.toml tsconfig.json ./
 RUN bun install
 COPY src ./src
 RUN bun run build:cli && bun install --production
 
-FROM oven/bun:1-alpine
+FROM oven/bun:1.4.4-alpine
 WORKDIR /app
 ARG RELOOP_COMMIT=dev
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000 RELOOP_COMMIT=$RELOOP_COMMIT

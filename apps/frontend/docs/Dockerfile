@@ -1,4 +1,4 @@
-FROM oven/bun:alpine AS base
+FROM oven/bun:1.4.4-alpine AS base
 RUN apk add --no-cache git libc6-compat
 
 # Stage 1: Install dependencies
