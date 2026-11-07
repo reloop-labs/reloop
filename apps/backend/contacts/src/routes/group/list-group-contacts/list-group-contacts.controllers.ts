@@ -5,6 +5,7 @@ import {
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import type { GroupModel } from "@be/contacts/model/group.model";
+import { parseStatusFilter } from "@be/contacts/routes/contact/list-contacts/list-contacts.controllers";
 import { db } from "@reloop/db/client";
 import {
 	afterCursor,
@@ -14,9 +15,14 @@ import {
 } from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, ilike, inArray, isNull, type SQL, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
+/**
+ * Contacts in a group, paginated in membership order. `search` (email) and
+ * `status` narrow the page and `total`; the subscribed/unsubscribed counts
+ * always cover the whole group, as in the main contacts list.
+ */
 export const listGroupContactsController = async ({
 	organizationId,
 	group_id,
@@ -28,6 +34,8 @@ export const listGroupContactsController = async ({
 		page?: number;
 		limit?: number;
 		cursor?: string;
+		search?: string;
+		status?: string;
 	};
 }): Promise<
 	| ContactModel.GroupContactListResponse
@@ -51,6 +59,37 @@ export const listGroupContactsController = async ({
 			isNull(schema.contactGroup.deletedAt),
 		);
 
+		// search/status were accepted by the route schema but ignored, so
+		// filtering only ever covered the page the client had loaded.
+		const matchFilters: SQL<unknown>[] = [];
+		const statuses = parseStatusFilter(query.status);
+		if (statuses.length > 0) {
+			matchFilters.push(inArray(schema.contact.status, statuses));
+		}
+		if (query.search) {
+			const escapedSearch = query.search.replace(/[%_\\]/g, "\\$&");
+			matchFilters.push(ilike(schema.contact.email, `%${escapedSearch}%`));
+		}
+		const matchSql = matchFilters.length > 0 ? and(...matchFilters) : undefined;
+		const pageWhere = matchSql
+			? and(
+					memberWhere,
+					inArray(
+						schema.contactGroup.contactId,
+						db
+							.select({ id: schema.contact.id })
+							.from(schema.contact)
+							.where(
+								and(
+									eq(schema.contact.organizationId, organizationId),
+									isNull(schema.contact.deletedAt),
+									matchSql,
+								),
+							),
+					),
+				)
+			: memberWhere;
+
 		// Run group fetch and member status counts in parallel
 		const [group, statusCountRows] = await Promise.all([
 			db.query.group.findFirst({
@@ -64,6 +103,9 @@ export const listGroupContactsController = async ({
 				.select({
 					status: schema.contact.status,
 					count: sql<number>`COUNT(*)`,
+					matching: matchSql
+						? sql<number>`COUNT(*) FILTER (WHERE ${matchSql})`
+						: sql<number>`COUNT(*)`,
 				})
 				.from(schema.contactGroup)
 				.innerJoin(
@@ -84,7 +126,7 @@ export const listGroupContactsController = async ({
 		let total = 0;
 		for (const row of statusCountRows) {
 			const count = Number(row.count ?? 0);
-			total += count;
+			total += Number(row.matching ?? 0);
 			if (row.status === "subscribed") subscribedContacts = count;
 			else if (row.status === "unsubscribed") unsubscribedContacts = count;
 		}
@@ -92,8 +134,8 @@ export const listGroupContactsController = async ({
 		// Fetch paginated contacts with properties via contactGroup relation
 		const rows = await db.query.contactGroup.findMany({
 			where: position
-				? and(memberWhere, afterCursor(schema.contactGroup, position, "asc"))
-				: memberWhere,
+				? and(pageWhere, afterCursor(schema.contactGroup, position, "asc"))
+				: pageWhere,
 			limit: limit + 1,
 			offset,
 			orderBy: cursorOrderBy(schema.contactGroup, "asc"),
