@@ -1,6 +1,10 @@
 FROM ghcr.io/kumocorp/kumomta:latest
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Upgrade base packages so libbrotli (used by curl and certbot) picks up the
+# distro fix for CVE-2026-111497 instead of whatever the base image shipped.
+RUN apt-get update && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends \
+    libbrotli1 \
     certbot \
     jq \
     openssl \
