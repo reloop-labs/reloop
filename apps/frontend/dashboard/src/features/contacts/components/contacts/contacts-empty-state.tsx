@@ -23,6 +23,11 @@ interface ContactsEmptyStateProps {
 	buttonText?: string;
 	/** Override the default single-key ActionKbd (e.g. sequence "A" "C"). */
 	shortcut?: ReactNode;
+	/**
+	 * Whether a filter is active. Defaults to the contacts list URL filters;
+	 * pass it when filters live elsewhere (e.g. local state on a group page).
+	 */
+	isFiltered?: boolean;
 }
 
 export function ContactsEmptyState({
@@ -33,6 +38,7 @@ export function ContactsEmptyState({
 	description,
 	buttonText,
 	shortcut,
+	isFiltered: isFilteredProp,
 }: ContactsEmptyStateProps) {
 	const router = useRouter();
 	const [statusFilter, setStatusFilter] = useQueryState(
@@ -53,9 +59,10 @@ export function ContactsEmptyState({
 	);
 
 	const isFiltered =
-		searchQuery.trim() !== "" ||
-		statusFilter.length > 0 ||
-		channelId.trim() !== "";
+		isFilteredProp ??
+		(searchQuery.trim() !== "" ||
+			statusFilter.length > 0 ||
+			channelId.trim() !== "");
 
 	const handleClearFilters = () => {
 		void setStatusFilter([]);

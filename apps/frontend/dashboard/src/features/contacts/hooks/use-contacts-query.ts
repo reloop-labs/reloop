@@ -268,23 +268,33 @@ export type GroupContactsResponse = {
 	limit: number;
 };
 
+/** One page of a group's contacts, filtered server-side by email search and status. */
 export function useGroupContactsQuery(params: {
 	groupId: string;
 	page: number;
 	limit: number;
+	search?: string;
+	status?: string;
 	enabled?: boolean;
 }) {
+	const { enabled, ...keyParams } = params;
 	return useQuery({
-		queryKey: queryKeys.contacts.groupContacts(params),
+		queryKey: queryKeys.contacts.groupContacts(keyParams),
 		queryFn: async () => {
+			const search = new URLSearchParams({
+				limit: String(params.limit),
+				page: String(params.page),
+			});
+			if (params.search) search.set("search", params.search);
+			if (params.status) search.set("status", params.status);
 			const res = await fetch(
-				`/api/contacts/v1/groups/${params.groupId}/contacts?limit=${params.limit}&page=${params.page}`,
+				`/api/contacts/v1/groups/${params.groupId}/contacts?${search.toString()}`,
 				{ credentials: "include" },
 			);
 			if (!res.ok) throw new Error("Failed to load group contacts");
 			return res.json() as Promise<GroupContactsResponse>;
 		},
-		enabled: params.enabled !== false && !!params.groupId,
+		enabled: enabled !== false && !!params.groupId,
 		placeholderData: (prev) => prev,
 	});
 }
