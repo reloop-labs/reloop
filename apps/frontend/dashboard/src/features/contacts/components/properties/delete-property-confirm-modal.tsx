@@ -39,6 +39,7 @@ const getBadgeColor = (type: string) => {
 	}
 };
 
+/** Confirms and deletes one or more contact properties. */
 export function DeletePropertyConfirmModal({
 	properties,
 	selectedProperties = [],

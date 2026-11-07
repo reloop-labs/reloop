@@ -20,6 +20,7 @@ import { ReceivedEmailTable } from "./received-email-table";
 
 const SEARCH_INPUT_ID = "received-emails-search-input";
 
+/** Received emails table with filters, search and pagination. */
 export function ReceivedEmailList() {
 	const { activeOrganization } = useActiveOrganization();
 	const queryClient = useQueryClient();

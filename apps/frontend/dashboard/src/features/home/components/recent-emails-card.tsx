@@ -19,6 +19,7 @@ const getEmailIconColorClass = (status: string) =>
 		? "text-information-base"
 		: emailStatusTone(status).text;
 
+/** Home card listing the latest sent emails, or a first-send prompt when there are none. */
 export function RecentEmailsCard({
 	enabled,
 	canSendFirstEmail,

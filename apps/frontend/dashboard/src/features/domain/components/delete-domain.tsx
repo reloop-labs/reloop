@@ -29,6 +29,7 @@ const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
+/** Confirms and deletes one or more domains, leaving the detail page first when deleting from it. */
 export function DeleteDomainModal({
 	domains,
 	selectedDomains = [],

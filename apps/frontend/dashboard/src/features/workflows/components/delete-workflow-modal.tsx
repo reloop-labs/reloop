@@ -26,6 +26,7 @@ const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
+/** Confirms and deletes one or more automations. */
 export function DeleteWorkflowModal({
 	workflows,
 	selectedWorkflows = [],

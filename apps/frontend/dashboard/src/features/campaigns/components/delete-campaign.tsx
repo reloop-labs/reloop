@@ -28,6 +28,7 @@ const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
+/** Confirms and deletes one or more campaigns, leaving the detail page first when deleting from it. */
 export function DeleteCampaignModal({
 	campaigns,
 	selectedCampaigns = [],

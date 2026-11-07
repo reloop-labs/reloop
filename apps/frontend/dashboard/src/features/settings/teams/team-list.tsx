@@ -138,6 +138,7 @@ import { RemoveMemberModal } from "./remove-member-modal";
 import { RevokeInviteModal } from "./revoke-invite-modal";
 import type { TeamFilterValue } from "./team-filter-dropdown";
 
+/** Members and pending invitations of the active organization, with an error state and retry. */
 export function TeamList({
 	searchQuery,
 	filters = "all",

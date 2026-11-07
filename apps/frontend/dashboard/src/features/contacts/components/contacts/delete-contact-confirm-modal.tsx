@@ -33,6 +33,7 @@ const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
+/** Confirms and deletes one or more contacts. */
 export function DeleteContactConfirmModal({
 	contacts,
 	selectedContacts = [],

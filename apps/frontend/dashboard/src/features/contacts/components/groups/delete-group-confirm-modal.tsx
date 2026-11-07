@@ -27,6 +27,7 @@ const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
+/** Confirms and deletes one or more contact groups. */
 export function DeleteGroupConfirmModal({
 	groups,
 	selectedGroups = [],

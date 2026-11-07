@@ -74,6 +74,7 @@ async function fetchContacts(
 	return res.json() as Promise<ContactListResponse>;
 }
 
+/** Fetches one contact by id. */
 export async function fetchContact(id: string): Promise<ContactDetail> {
 	const res = await fetch(`/api/contacts/retrieve/${id}`, {
 		credentials: "include",
@@ -82,6 +83,7 @@ export async function fetchContact(id: string): Promise<ContactDetail> {
 	return res.json() as Promise<ContactDetail>;
 }
 
+/** Paginated contacts list for the current filters. */
 export function useContactsQuery(params: ContactsListParams) {
 	return useQuery({
 		queryKey: queryKeys.contacts.list(params),
@@ -100,6 +102,7 @@ export type SubscriptionActivityResponse = {
 	event: string;
 };
 
+/** Subscribe and unsubscribe activity over the last given number of days. */
 export function useSubscriptionActivityQuery(days = 7, enabled = true) {
 	return useQuery({
 		queryKey: queryKeys.contacts.subscriptionActivity(days),
@@ -118,6 +121,7 @@ export function useSubscriptionActivityQuery(days = 7, enabled = true) {
 	});
 }
 
+/** One contact by id; disabled until an id is set. */
 export function useContactQuery(id: string | null | undefined) {
 	return useQuery({
 		queryKey: queryKeys.contacts.detail(id ?? ""),
@@ -126,6 +130,7 @@ export function useContactQuery(id: string | null | undefined) {
 	});
 }
 
+/** Returns a function that invalidates every contacts query. */
 export function useInvalidateContacts() {
 	const queryClient = useQueryClient();
 	return () =>
@@ -240,6 +245,7 @@ export type GroupDetail = {
 	createdBy?: GroupCreatedBy;
 };
 
+/** Fetches one contact group by id. */
 export async function fetchGroup(id: string): Promise<GroupDetail> {
 	const res = await fetch(`/api/contacts/v1/groups/${id}`, {
 		credentials: "include",
@@ -248,6 +254,7 @@ export async function fetchGroup(id: string): Promise<GroupDetail> {
 	return res.json() as Promise<GroupDetail>;
 }
 
+/** One contact group by id; disabled until an id is set. */
 export function useGroupQuery(id: string | null | undefined) {
 	return useQuery({
 		queryKey: queryKeys.contacts.groupDetail(id ?? ""),
@@ -305,6 +312,7 @@ export type GroupContactStats = {
 	unsubscribedContacts: number;
 };
 
+/** Member count for one contact group. */
 export function useGroupContactsCountQuery(groupId: string | null | undefined) {
 	return useQuery({
 		queryKey: queryKeys.contacts.groupCount(groupId ?? ""),
@@ -327,6 +335,7 @@ export function useGroupContactsCountQuery(groupId: string | null | undefined) {
 	});
 }
 
+/** First 100 contact properties, for pickers and filters. */
 export function useAllPropertiesQuery(enabled = true) {
 	return useQuery({
 		queryKey: queryKeys.contacts.propertiesAll(),
@@ -358,6 +367,7 @@ export type GroupListResponse = {
 	limit: number;
 };
 
+/** Paginated contact groups list. */
 export function useGroupsQuery(params: {
 	page: number;
 	limit: number;
@@ -402,6 +412,7 @@ export type PropertyListResponse = {
 	limit: number;
 };
 
+/** Paginated contact properties list. */
 export function usePropertiesQuery(params: {
 	page: number;
 	limit: number;
@@ -450,6 +461,7 @@ export type ChannelListResponse = {
 	limit: number;
 };
 
+/** First 100 subscription channels for the organization. */
 export function useChannelsQuery(enabled = true) {
 	return useQuery({
 		queryKey: queryKeys.contacts.channels(),

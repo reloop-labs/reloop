@@ -30,6 +30,7 @@ interface ContactsEmptyStateProps {
 	isFiltered?: boolean;
 }
 
+/** Empty state for a contacts table: a no-matches message when filtered, otherwise an add-contact prompt. */
 export function ContactsEmptyState({
 	onAddContact,
 	searchQuery = "",
