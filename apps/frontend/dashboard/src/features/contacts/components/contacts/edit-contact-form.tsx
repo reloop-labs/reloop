@@ -358,6 +358,7 @@ function EditContactFields({
 	);
 }
 
+/** Form for editing a contact (name, status, channels, groups, custom properties). Resets only when the contact changes. */
 export function EditContactForm({
 	contact,
 	onCancel,
@@ -398,7 +399,10 @@ export function EditContactForm({
 
 	const customProperties = propertiesData?.properties || [];
 
-	// Reset form when switching to a different contact
+	// Reset form only when switching to a different contact. Keying on the
+	// object reset in-progress edits on every background refetch, because
+	// callers pass a freshly built contact object each render.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset per contact id only
 	useEffect(() => {
 		const channelIds = getInitialChannelIds(contact);
 		const groupIds = getInitialGroupIds(contact);
@@ -410,8 +414,9 @@ export function EditContactForm({
 		setSelectedGroupIds(groupIds);
 		initialChannelIdsRef.current = channelIds;
 		initialGroupIdsRef.current = groupIds;
-	}, [contact]);
+	}, [contact.id]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset per contact id only
 	useEffect(() => {
 		if (contact.properties) {
 			const values: Record<string, string> = {};
@@ -424,7 +429,7 @@ export function EditContactForm({
 			}
 			setPropertyValues(values);
 		}
-	}, [contact, propertiesData?.properties]);
+	}, [contact.id, propertiesData?.properties]);
 
 	useHotkeys(
 		"escape",

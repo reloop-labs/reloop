@@ -15,6 +15,7 @@ import { useSidebarCollapse } from "./use-sidebar-collapse";
 const PEEK_OPEN_DELAY_MS = 60;
 const PEEK_CLOSE_DELAY_MS = 120;
 
+/** Primary dashboard sidebar with navigation and footer controls. */
 export function MainSidebar() {
 	const { isCollapsed, toggle } = useSidebarCollapse();
 	const [isHoverOpen, setIsHoverOpen] = useState(false);
@@ -386,6 +387,7 @@ export function MainSidebar() {
 	);
 }
 
+/** Theme toggle for the collapsed sidebar. Its label and icon render after mount to avoid a hydration mismatch. */
 export function CollapsedThemeToggle() {
 	const { setTheme, resolvedTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
@@ -400,7 +402,10 @@ export function CollapsedThemeToggle() {
 			type="button"
 			onClick={() => setTheme(nextTheme)}
 			className="flex h-7 w-7 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
-			title={`Switch to ${nextTheme} theme`}
+			// resolvedTheme is unknown on the server; gate the label on mount like
+			// the icon to avoid a hydration mismatch.
+			title={mounted ? `Switch to ${nextTheme} theme` : undefined}
+			aria-label={mounted ? `Switch to ${nextTheme} theme` : "Toggle theme"}
 		>
 			{/* Keep the 28px slot before mount so the footer doesn't jump. */}
 			{mounted ? (

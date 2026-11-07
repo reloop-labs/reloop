@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useClampPage } from "#/components/data-table/use-clamp-page";
 import type { Group } from "../../hooks/use-contacts-query";
 import { type GroupTableMeta, groupColumns } from "./columns";
 import { getGroupTableGridStyle } from "./constants";
@@ -32,6 +33,7 @@ interface GroupTableProps {
 	onClearSearch?: () => void;
 }
 
+/** Paginated contact groups table with row actions and an out-of-range page clamp. */
 export const GroupTable = ({
 	groups,
 	total = 0,
@@ -49,6 +51,7 @@ export const GroupTable = ({
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
 	const totalPages = Math.max(1, Math.ceil(total / (pageSize ?? 10)));
+	useClampPage(totalPages, !isLoading);
 
 	const handleEdit = useCallback((group: Group) => {
 		setEditingGroupId((prev) => (prev === group.id ? null : group.id));

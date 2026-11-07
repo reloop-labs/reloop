@@ -376,6 +376,7 @@ function StepItem({
 	);
 }
 
+/** API usage section for the blocklist checker tool page: example requests, prerequisites and docs links. */
 export function ApiSection() {
 	const [activeSlug, setActiveSlug] = useState("nodejs");
 	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
@@ -688,7 +689,7 @@ export function ApiSection() {
 								</li>
 								<li>
 									<a
-										href="/docs/setup/backend/tools"
+										href="/docs/api/tools/post-api-tools-v1blocklist-check"
 										className="group flex items-center gap-2 text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 									>
 										<Icon

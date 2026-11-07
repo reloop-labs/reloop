@@ -49,6 +49,7 @@ function normalizeStatusValues(values: string[]) {
 	return STATUS_VALUES.filter((value) => values.includes(value));
 }
 
+/** Single-select status filter for the domains list (the API filters by one status). */
 export function DomainStatusFilterChip({
 	value,
 	onChange,
@@ -59,7 +60,9 @@ export function DomainStatusFilterChip({
 	return (
 		<DataTableFacetedFilter
 			title="Status"
-			multiple
+			// The list API filters by a single status; multi-select silently
+			// showed every domain once a second status was ticked.
+			multiple={false}
 			options={[...statusOptions]}
 			selectedValues={normalizeStatusValues(value)}
 			onSelectedValuesChange={(values) => {

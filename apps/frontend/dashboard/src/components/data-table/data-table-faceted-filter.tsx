@@ -38,6 +38,7 @@ type DataTableFacetedFilterProps = {
 	showSearch?: boolean;
 };
 
+/** Toolbar filter chip with a popover of options; single- or multi-select, with a clear icon on the chip. */
 export function DataTableFacetedFilter({
 	title,
 	options,
@@ -98,6 +99,12 @@ export function DataTableFacetedFilter({
 								event.preventDefault();
 								event.stopPropagation();
 								onReset();
+							}}
+							// The trigger toggles on click, not pointerdown; stop it too or
+							// clearing the filter also opens the popover.
+							onClick={(event) => {
+								event.preventDefault();
+								event.stopPropagation();
 							}}
 						>
 							<XCircle className="size-4" />

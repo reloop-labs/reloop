@@ -2,10 +2,13 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryClient } from "@tanstack/react-query";
 import { parseAsString, useQueryState } from "nuqs";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { DomainSelector } from "#/features/emails/components/domain-selector";
-import { DateRangeFilter } from "#/features/logs/date-range-filter";
+import {
+	DateRangeFilter,
+	useRollingPresetRange,
+} from "#/features/logs/date-range-filter";
 import { DeliverabilityChart } from "#/features/metrics/components/deliverability-chart";
 import { RateChart } from "#/features/metrics/components/rate-chart";
 import { useEmailStatsQuery } from "#/features/metrics/hooks/use-email-stats-query";
@@ -13,8 +16,8 @@ import {
 	formatBucketDateLabel,
 	formatDateLabel,
 	generateContinuousDateList,
+	getBucketDayKey,
 	getBucketSize,
-	getLocalKey,
 	getYearMonthDayKey,
 } from "#/features/metrics/utils";
 import { queryKeys } from "#/lib/query-keys";
@@ -40,6 +43,9 @@ export function MetricsPage() {
 		"preset",
 		parseAsString.withDefault(""),
 	);
+	const [defaultRangeAnchor, setDefaultRangeAnchor] = useState(() =>
+		Date.now(),
+	);
 
 	const { effectiveStartDate, effectiveEndDate, effectivePreset } =
 		useMemo(() => {
@@ -49,12 +55,14 @@ export function MetricsPage() {
 
 			if (!start && !end) {
 				preset = datePreset || "15d";
-				const now = new Date();
+				// UTC days, matching the stats buckets. The current UTC day always
+				// contains now, so recent sends stay in range.
+				const now = new Date(defaultRangeAnchor);
 				const toDate = new Date(now);
-				toDate.setHours(23, 59, 59, 999);
+				toDate.setUTCHours(23, 59, 59, 999);
 				const fromDate = new Date(now);
-				fromDate.setDate(now.getDate() - 14); // 15 days inclusive
-				fromDate.setHours(0, 0, 0, 0);
+				fromDate.setUTCDate(now.getUTCDate() - 14); // 15 days inclusive
+				fromDate.setUTCHours(0, 0, 0, 0);
 
 				start = fromDate.toISOString();
 				end = toDate.toISOString();
@@ -65,7 +73,7 @@ export function MetricsPage() {
 				effectiveEndDate: end ?? "",
 				effectivePreset: preset ?? "",
 			};
-		}, [startDate, endDate, datePreset]);
+		}, [startDate, endDate, datePreset, defaultRangeAnchor]);
 
 	const handleDateChange = (
 		newStartDate: string | null,
@@ -75,6 +83,9 @@ export function MetricsPage() {
 		void setStartDate(newStartDate || "");
 		void setEndDate(newEndDate || "");
 		void setDatePreset(preset || "");
+		// Back to the default range: anchor it to now so it includes today, even
+		// if the page has been open since before midnight.
+		if (!newStartDate && !newEndDate) setDefaultRangeAnchor(Date.now());
 	};
 
 	const statsParams = {
@@ -88,7 +99,14 @@ export function MetricsPage() {
 		enabled: !!activeOrganization?.id,
 	});
 
+	const reanchorPreset = useRollingPresetRange(datePreset, (start, end) => {
+		void setStartDate(start);
+		void setEndDate(end);
+	});
+
 	const handleRefresh = () => {
+		reanchorPreset();
+		setDefaultRangeAnchor(Date.now());
 		void queryClient.invalidateQueries({
 			queryKey: queryKeys.metrics.emailStats(statsParams),
 		});
@@ -137,7 +155,7 @@ export function MetricsPage() {
 		for (let i = 0; i < data.dates.length; i++) {
 			const dateStr = data.dates[i];
 			if (!dateStr) continue;
-			const key = getLocalKey(dateStr);
+			const key = getBucketDayKey(dateStr);
 			if (key) {
 				statsMap.set(key, {
 					sent: data.sent[i] ?? 0,

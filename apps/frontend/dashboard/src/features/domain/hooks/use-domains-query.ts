@@ -9,7 +9,7 @@ import type {
 export type DomainsListParams = {
 	page: number;
 	limit: number;
-	/** Selected status values. Exactly one applies a filter (matches API keys). */
+	/** Selected status values. The chip is single-select; the API takes one status. */
 	status: string[];
 	q: string;
 	enabled?: boolean;
@@ -55,6 +55,7 @@ async function fetchNameservers(
 	return res.json() as Promise<DomainNameserversResponse>;
 }
 
+/** Paginated domains list for the active organization. */
 export function useDomainsQuery(params: DomainsListParams) {
 	return useQuery({
 		queryKey: queryKeys.domain.list({
@@ -73,6 +74,7 @@ export function useDomainsQuery(params: DomainsListParams) {
 	});
 }
 
+/** One domain by id. */
 export function useDomainDetailQuery(
 	domainId: string | null | undefined,
 	enabled = true,
@@ -86,6 +88,7 @@ export function useDomainDetailQuery(
 	});
 }
 
+/** Nameservers detected for a domain. */
 export function useDomainNameserversQuery(
 	domainId: string | null | undefined,
 	enabled = true,
@@ -98,6 +101,7 @@ export function useDomainNameserversQuery(
 	});
 }
 
+/** Returns a function that invalidates every cached domain query. */
 export function useInvalidateDomains() {
 	const queryClient = useQueryClient();
 	return () =>

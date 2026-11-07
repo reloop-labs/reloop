@@ -31,6 +31,7 @@ interface MappedVariable {
 	defaultValue: string | null;
 }
 
+/** Template editor panel listing detected variables, with edit and delete for each. */
 export function VariablesPanel({}: PanelProps = {}) {
 	const templateId = useTemplateId();
 
@@ -177,8 +178,6 @@ export function VariablesPanel({}: PanelProps = {}) {
 
 			toast.success(`Updated variable properties for ${updatedVar.name}`);
 			mutate();
-		} catch (error: any) {
-			toast.error(error.message || "Something went wrong");
 		} finally {
 			setIsSavingConfig(false);
 		}
@@ -213,6 +212,8 @@ export function VariablesPanel({}: PanelProps = {}) {
 		} catch (error) {
 			const err = error as Error;
 			toast.error(err.message || "Something went wrong");
+			// Rethrow so the delete modal stays open instead of showing success.
+			throw error;
 		} finally {
 			setIsSavingConfig(false);
 		}

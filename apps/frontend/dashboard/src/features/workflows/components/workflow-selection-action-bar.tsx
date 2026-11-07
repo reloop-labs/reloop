@@ -14,16 +14,21 @@ import {
 	ActionBarSelection,
 	ActionBarSeparator,
 } from "#/components/data-table/action-bar";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Workflow } from "../workflow-types";
 
+/** Floating bar for selected automations: bulk activate, pause and delete. Failed updates stay selected. */
 export function WorkflowSelectionActionBar({
 	table,
 	onBulkStatus,
 	onDelete,
 }: {
 	table: Table<Workflow>;
-	onBulkStatus?: (action: "active" | "paused") => Promise<void>;
+	/** Resolves to the ids that failed; those stay selected for a retry. */
+	onBulkStatus?: (action: "active" | "paused") => Promise<string[]>;
 	onDelete: () => void;
 }) {
 	const selectedRows = table.getFilteredSelectedRowModel().rows;
@@ -36,8 +41,14 @@ export function WorkflowSelectionActionBar({
 		if (selectedCount === 0 || busy || !onBulkStatus) return;
 		setBusy(true);
 		try {
-			await onBulkStatus(status);
-			clearSelection();
+			const failedIds = await onBulkStatus(status);
+			if (failedIds.length === 0) {
+				clearSelection();
+			} else {
+				table.setRowSelection(
+					Object.fromEntries(failedIds.map((id) => [id, true])),
+				);
+			}
 		} finally {
 			setBusy(false);
 		}
