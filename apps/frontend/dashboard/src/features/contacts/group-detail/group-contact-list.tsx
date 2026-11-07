@@ -2,7 +2,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ContactExportModal } from "#/features/contacts/components/contacts/contact-export-modal";
 import {
 	ContactFilterDropdown,
@@ -15,6 +15,9 @@ import {
 	actionKbdOnSolidClassName,
 } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
+const SEARCH_DEBOUNCE_MS = 250;
+
+/** Members of one contact group, with server-side search, status filter, pagination and export. */
 export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
@@ -24,6 +27,16 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	const [modal, setModal] = useQueryState("modal", { history: "replace" });
 	const [statusFilter, setStatusFilter] = useState<ContactFilterOption>(null);
 	const [searchQuery, setSearchQuery] = useState<string>("");
+	// The input updates searchQuery on every keystroke; the request and the
+	// filtered state follow the debounced value so the shown rows match them.
+	const [debouncedSearch, setDebouncedSearch] = useState("");
+	useEffect(() => {
+		const timer = setTimeout(
+			() => setDebouncedSearch(searchQuery.trim()),
+			SEARCH_DEBOUNCE_MS,
+		);
+		return () => clearTimeout(timer);
+	}, [searchQuery]);
 	const exportOpen = modal === "export-contacts";
 	const setExportOpen = (open: boolean) =>
 		void setModal(open ? "export-contacts" : null);
@@ -38,12 +51,12 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 		limit: pageSize ?? 10,
 		// Filter on the server: filtering the loaded page in the browser missed
 		// members on other pages and showed the group as empty.
-		search: searchQuery.trim() || undefined,
+		search: debouncedSearch || undefined,
 		status: statusFilter ?? undefined,
 	});
 
 	const contacts = data?.group?.contacts ?? [];
-	const isFiltered = searchQuery.trim() !== "" || statusFilter !== null;
+	const isFiltered = debouncedSearch !== "" || statusFilter !== null;
 	// total is the filtered count, so with a filter fall back to the
 	// whole-group status counts; export stays available while a filter
 	// matches nothing.
@@ -53,6 +66,7 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 		(data?.subscribedContacts ?? 0) + (data?.unsubscribedContacts ?? 0) > 0;
 	const clearFilters = () => {
 		setSearchQuery("");
+		setDebouncedSearch("");
 		setStatusFilter(null);
 		void setCurrentPage(1);
 	};
@@ -138,7 +152,7 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 				scope={{
 					groupId,
 					groupName: data?.group?.name,
-					search: searchQuery || undefined,
+					search: debouncedSearch || undefined,
 				}}
 				counts={{
 					total: data?.total ?? 0,
