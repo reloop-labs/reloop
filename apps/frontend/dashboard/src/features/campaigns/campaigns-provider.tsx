@@ -225,11 +225,30 @@ export function useCampaigns() {
 	return context;
 }
 
-/** Returns a function that invalidates every cached campaign query. */
-export function useInvalidateCampaigns() {
+/**
+ * Returns a function that invalidates every cached campaign query. Pass
+ * `exceptId` after deleting a campaign so its own detail and recipients
+ * queries aren't refetched (they would 404 on the open detail page).
+ */
+export function useInvalidateCampaigns(): (exceptId?: string) => Promise<void> {
 	const queryClient = useQueryClient();
-	return () =>
-		queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+	return (exceptId?: string) =>
+		queryClient.invalidateQueries({
+			queryKey: queryKeys.campaigns.all,
+			predicate: exceptId
+				? (query) => !query.queryKey.includes(exceptId)
+				: undefined,
+		});
+}
+
+/** Drops every cached query for a deleted campaign. */
+export function useForgetCampaign(): (id: string) => void {
+	const queryClient = useQueryClient();
+	return (id: string) =>
+		queryClient.removeQueries({
+			queryKey: queryKeys.campaigns.all,
+			predicate: (query) => query.queryKey.includes(id),
+		});
 }
 
 /** Loads one campaign by id, using the cached list row as placeholder data. */
