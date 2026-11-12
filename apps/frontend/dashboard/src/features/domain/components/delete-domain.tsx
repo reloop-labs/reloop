@@ -18,7 +18,10 @@ import {
 	ActionKbd,
 	actionKbdOnSolidClassName,
 } from "#/features/dashboard/keyboard-shortcuts-reveal";
-import { useInvalidateDomains } from "../hooks/use-domains-query";
+import {
+	useForgetDomain,
+	useInvalidateDomains,
+} from "../hooks/use-domains-query";
 import type { Domain } from "../types";
 
 /** Light keycap so it reads on the red/destructive FancyButton fill. */
@@ -26,6 +29,7 @@ const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
+/** Confirms and deletes one or more domains, leaving the detail page first when deleting from it. */
 export function DeleteDomainModal({
 	domains,
 	selectedDomains = [],
@@ -46,6 +50,7 @@ export function DeleteDomainModal({
 	const pathname = usePathname();
 	const router = useRouter();
 	const invalidate = useInvalidateDomains();
+	const forgetDomain = useForgetDomain();
 
 	const isBulk = deleteId === "bulk" || deleteId === "selected";
 
@@ -147,11 +152,14 @@ export function DeleteDomainModal({
 		try {
 			setDeleteState("deleting");
 			const deletedName = domainToDelete.domain;
-			await axios.delete(`/api/domain/v1/${domainToDelete.id}`, {
+			const deletedId = domainToDelete.id;
+			await axios.delete(`/api/domain/v1/${deletedId}`, {
 				withCredentials: true,
 			});
 			setDeleteState("success");
-			await invalidate();
+			// Don't refetch the deleted domain: on its detail page that 404s and
+			// the not-found state replaced the page before the redirect.
+			await invalidate(deletedId);
 
 			setTimeout(() => {
 				onDeleteSuccess?.(deletedName);
@@ -159,7 +167,12 @@ export function DeleteDomainModal({
 				if (isOnDetailPage) {
 					setTimeout(() => {
 						router.push("/domain");
+						// Drop the cached item once the detail page has unmounted;
+						// removing an active query makes it refetch and 404.
+						setTimeout(() => forgetDomain(deletedId), 1000);
 					}, 100);
+				} else {
+					forgetDomain(deletedId);
 				}
 				setTimeout(() => {
 					setDeleteState("idle");
@@ -244,7 +257,7 @@ export function DeleteDomainModal({
 				<div>
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						{isBulk
-							? `Delete ${bulkDomainsToDelete.length || "selected"} domains`
+							? `Delete ${bulkDomainsToDelete.length || "selected"} ${bulkDomainsToDelete.length === 1 ? "domain" : "domains"}`
 							: "Delete domain"}
 					</Modal.Title>
 					<Modal.Description className="text-sm text-text-sub-600 leading-relaxed">

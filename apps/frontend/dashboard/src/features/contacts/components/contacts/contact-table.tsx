@@ -35,6 +35,8 @@ interface ContactTableProps {
 	onAddContact?: () => void;
 	searchQuery?: string;
 	onClearSearch?: () => void;
+	/** Passed to the empty state when filters aren't in the contacts list URL. */
+	isFiltered?: boolean;
 	emptyStateTitle?: string;
 	emptyStateDescription?: string;
 	emptyStateButtonText?: string;
@@ -55,6 +57,7 @@ export const ContactTable = ({
 	onAddContact,
 	searchQuery,
 	onClearSearch,
+	isFiltered,
 	emptyStateTitle,
 	emptyStateDescription,
 	emptyStateButtonText,
@@ -193,6 +196,7 @@ export const ContactTable = ({
 									onAddContact={onAddContact}
 									searchQuery={searchQuery}
 									onClearSearch={onClearSearch}
+									isFiltered={isFiltered}
 									title={emptyStateTitle}
 									description={emptyStateDescription}
 									buttonText={emptyStateButtonText}

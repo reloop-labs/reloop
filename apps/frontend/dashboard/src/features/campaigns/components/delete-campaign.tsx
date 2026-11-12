@@ -19,12 +19,16 @@ import {
 } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Campaign } from "../campaign-types";
 import { deleteCampaignRequest } from "../campaigns-api";
-import { useInvalidateCampaigns } from "../campaigns-provider";
+import {
+	useForgetCampaign,
+	useInvalidateCampaigns,
+} from "../campaigns-provider";
 
 const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
+/** Confirms and deletes one or more campaigns, leaving the detail page first when deleting from it. */
 export function DeleteCampaignModal({
 	campaigns,
 	selectedCampaigns = [],
@@ -43,6 +47,7 @@ export function DeleteCampaignModal({
 	const pathname = usePathname();
 	const router = useRouter();
 	const invalidate = useInvalidateCampaigns();
+	const forgetCampaign = useForgetCampaign();
 
 	const isBulk = deleteId === "bulk" || deleteId === "selected";
 
@@ -144,9 +149,12 @@ export function DeleteCampaignModal({
 		try {
 			setDeleteState("deleting");
 			const deletedName = campaignToDelete.name;
-			await deleteCampaignRequest(campaignToDelete.id);
+			const deletedId = campaignToDelete.id;
+			await deleteCampaignRequest(deletedId);
 			setDeleteState("success");
-			await invalidate();
+			// Don't refetch the deleted campaign: on its detail page that 404s
+			// and the error state replaced the page before the redirect.
+			await invalidate(deletedId);
 
 			setTimeout(() => {
 				void setDeleteId(null);
@@ -154,7 +162,12 @@ export function DeleteCampaignModal({
 				if (isOnDetailPage) {
 					setTimeout(() => {
 						router.push("/campaigns");
+						// Drop the cached item once the detail page has unmounted;
+						// removing an active query makes it refetch and 404.
+						setTimeout(() => forgetCampaign(deletedId), 1000);
 					}, 100);
+				} else {
+					forgetCampaign(deletedId);
 				}
 				setTimeout(() => {
 					setDeleteState("idle");
@@ -227,7 +240,7 @@ export function DeleteCampaignModal({
 				<div>
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						{isBulk
-							? `Delete ${bulkCampaignsToDelete.length || "selected"} campaigns`
+							? `Delete ${bulkCampaignsToDelete.length || "selected"} ${bulkCampaignsToDelete.length === 1 ? "campaign" : "campaigns"}`
 							: "Delete campaign"}
 					</Modal.Title>
 					<Modal.Description className="text-sm text-text-sub-600 leading-relaxed">

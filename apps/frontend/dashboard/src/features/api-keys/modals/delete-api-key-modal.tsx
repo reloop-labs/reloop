@@ -252,7 +252,7 @@ export function DeleteApiKeyModal({
 							<Icon name="trash" className="size-4 text-text-sub-600" />
 							<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight">
 								{isBulk
-									? `Delete ${bulkKeysToDelete.length || "selected"} API keys`
+									? `Delete ${bulkKeysToDelete.length || "selected"} ${bulkKeysToDelete.length === 1 ? "API key" : "API keys"}`
 									: "Delete API key"}
 							</Modal.Title>
 						</div>

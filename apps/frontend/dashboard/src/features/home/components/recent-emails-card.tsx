@@ -19,6 +19,7 @@ const getEmailIconColorClass = (status: string) =>
 		? "text-information-base"
 		: emailStatusTone(status).text;
 
+/** Home card listing the latest sent emails, or a first-send prompt when there are none. */
 export function RecentEmailsCard({
 	enabled,
 	canSendFirstEmail,
@@ -128,7 +129,9 @@ export function RecentEmailsCard({
 						<p className="mt-1.5 max-w-[260px] text-paragraph-sm text-text-sub-600">
 							{readyDomainName
 								? `${readyDomainName} is ready. One click sends a test email from hello@${readyDomainName}.`
-								: "One click sends a test email to you from your verified domain."}
+								: canSendFirstEmail
+									? "One click sends a test email to you from your verified domain."
+									: "Add and verify a domain to send your first email."}
 						</p>
 						{canSendFirstEmail ? (
 							<div className="mt-5">

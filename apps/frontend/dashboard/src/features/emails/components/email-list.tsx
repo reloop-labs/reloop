@@ -19,6 +19,7 @@ import {
 import { queryKeys } from "#/lib/query-keys";
 import { ApiKeySelector } from "./api-key-selector";
 import { DomainSelector } from "./domain-selector";
+import { EmailListError } from "./email-list-error";
 import { RefreshButton } from "./email-refresh-button";
 import { EmailTable } from "./email-table";
 import { StatusSelector } from "./status-selector";
@@ -159,17 +160,6 @@ export function EmailList() {
 		{ enableOnFormTags: false, preventDefault: true },
 	);
 
-	if (error) {
-		return (
-			<div className="flex flex-col items-center justify-center gap-2 p-4">
-				<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
-				<p className="text-center text-sm text-text-sub-600">
-					Failed to load email logs
-				</p>
-			</div>
-		);
-	}
-
 	return (
 		<div>
 			<div className="space-y-2">
@@ -286,22 +276,30 @@ export function EmailList() {
 			</div>
 
 			<div className="mt-4">
-				<EmailTable
-					logs={data?.data || []}
-					isLoading={isLoading}
-					loadingRows={pageSize ?? 10}
-					currentPage={currentPage ?? 1}
-					pageSize={pageSize ?? 10}
-					totalLogs={totalLogs}
-					onPageChange={(page) => void setCurrentPage(page)}
-					onPageSizeChange={(value) => {
-						void setPageSize(value);
-						void setCurrentPage(1);
-					}}
-					hasFilters={hasAnyFilter}
-					onClearFilters={handleClearAll}
-					variant="sent"
-				/>
+				{/* Keep the toolbar on errors so filters and search can be changed. */}
+				{error ? (
+					<EmailListError
+						message="Failed to load email logs"
+						onRetry={handleRefresh}
+					/>
+				) : (
+					<EmailTable
+						logs={data?.data || []}
+						isLoading={isLoading}
+						loadingRows={pageSize ?? 10}
+						currentPage={currentPage ?? 1}
+						pageSize={pageSize ?? 10}
+						totalLogs={totalLogs}
+						onPageChange={(page) => void setCurrentPage(page)}
+						onPageSizeChange={(value) => {
+							void setPageSize(value);
+							void setCurrentPage(1);
+						}}
+						hasFilters={hasAnyFilter}
+						onClearFilters={handleClearAll}
+						variant="sent"
+					/>
+				)}
 			</div>
 		</div>
 	);

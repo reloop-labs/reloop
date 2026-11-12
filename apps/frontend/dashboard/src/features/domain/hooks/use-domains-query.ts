@@ -101,9 +101,28 @@ export function useDomainNameserversQuery(
 	});
 }
 
-/** Returns a function that invalidates every cached domain query. */
-export function useInvalidateDomains() {
+/**
+ * Returns a function that invalidates every cached domain query. Pass
+ * `exceptId` after deleting a domain so its own detail queries aren't
+ * refetched (they would 404 on the open detail page).
+ */
+export function useInvalidateDomains(): (exceptId?: string) => Promise<void> {
 	const queryClient = useQueryClient();
-	return () =>
-		queryClient.invalidateQueries({ queryKey: queryKeys.domain.all });
+	return (exceptId?: string) =>
+		queryClient.invalidateQueries({
+			queryKey: queryKeys.domain.all,
+			predicate: exceptId
+				? (query) => !query.queryKey.includes(exceptId)
+				: undefined,
+		});
+}
+
+/** Drops every cached query for a deleted domain. */
+export function useForgetDomain(): (id: string) => void {
+	const queryClient = useQueryClient();
+	return (id: string) =>
+		queryClient.removeQueries({
+			queryKey: queryKeys.domain.all,
+			predicate: (query) => query.queryKey.includes(id),
+		});
 }
