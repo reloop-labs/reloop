@@ -1,5 +1,6 @@
 import { writeAdminAudit } from "@reloop/admin/utils/audit";
 import { db } from "@reloop/db/client";
+import { usablePrepaidCredits } from "@reloop/db/reserve-send-credits";
 import {
 	apikey,
 	domain,
@@ -39,6 +40,8 @@ export async function getUserController(userId: string) {
 			creditsRemaining: organizationCredits.creditsRemaining,
 			creditsUsed: organizationCredits.creditsUsed,
 			monthlyCredits: organizationCredits.monthlyCredits,
+			prepaidCredits: organizationCredits.prepaidCredits,
+			prepaidExpiresAt: organizationCredits.prepaidExpiresAt,
 		})
 		.from(member)
 		.innerJoin(organization, eq(member.organizationId, organization.id))
@@ -146,6 +149,17 @@ export async function getUserController(userId: string) {
 			creditsRemaining: m.creditsRemaining ?? null,
 			creditsUsed: m.creditsUsed ?? null,
 			monthlyCredits: m.monthlyCredits ?? null,
+			prepaidCredits:
+				m.prepaidCredits == null
+					? null
+					: usablePrepaidCredits(
+							{
+								prepaidCredits: m.prepaidCredits,
+								prepaidExpiresAt: m.prepaidExpiresAt,
+							},
+							new Date(),
+						),
+			prepaidExpiresAt: m.prepaidExpiresAt ?? null,
 			planId: planMap.get(m.organizationId) ?? null,
 		})),
 		apiKeys: apiKeys.map((k) => ({

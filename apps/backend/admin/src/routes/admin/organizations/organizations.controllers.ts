@@ -6,7 +6,10 @@ import {
 	getRegistrarCreationDate,
 	resolveEffectiveDailyCap,
 } from "@reloop/db/domain-age-cap";
-import { utcDayStart } from "@reloop/db/reserve-send-credits";
+import {
+	usablePrepaidCredits,
+	utcDayStart,
+} from "@reloop/db/reserve-send-credits";
 import {
 	adminAuditLog,
 	apikey,
@@ -117,6 +120,8 @@ export async function listOrganizationsController({
 			createdAt: organization.createdAt,
 			billingEmail: organization.billingEmail,
 			creditsRemaining: organizationCredits.creditsRemaining,
+			prepaidCredits: organizationCredits.prepaidCredits,
+			prepaidExpiresAt: organizationCredits.prepaidExpiresAt,
 			planId: organizationPlan.planId,
 			isSuspect: organization.isSuspect,
 			suspectReason: organization.suspectReason,
@@ -176,6 +181,8 @@ export async function listOrganizationsController({
 		domainCounts.map((row) => [row.organizationId, row.value]),
 	);
 
+	const now = new Date();
+
 	return {
 		items: orgs.map((o) => ({
 			id: o.id,
@@ -187,6 +194,16 @@ export async function listOrganizationsController({
 			memberCount: memberMap.get(o.id) ?? 0,
 			domainCount: domainMap.get(o.id) ?? 0,
 			creditsRemaining: o.creditsRemaining ?? null,
+			prepaidCredits:
+				o.prepaidCredits == null
+					? null
+					: usablePrepaidCredits(
+							{
+								prepaidCredits: o.prepaidCredits,
+								prepaidExpiresAt: o.prepaidExpiresAt,
+							},
+							now,
+						),
 			planId: o.planId ?? null,
 			isSuspect: o.isSuspect ?? false,
 			suspectReason: o.suspectReason ?? null,
@@ -579,6 +596,8 @@ export async function getOrganizationController(organizationId: string) {
 					status: credits.status,
 					currentPeriodStart: credits.currentPeriodStart,
 					currentPeriodEnd: credits.currentPeriodEnd,
+					prepaidCredits: usablePrepaidCredits(credits, new Date()),
+					prepaidExpiresAt: credits.prepaidExpiresAt ?? null,
 				}
 			: null,
 		plan: plan

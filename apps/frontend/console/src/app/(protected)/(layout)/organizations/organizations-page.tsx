@@ -1,6 +1,7 @@
 "use client";
 
 import { InlineActionPanel } from "@fe/console/components/inline-action-panel";
+import { SuspectionDrawer } from "@fe/console/components/suspection-drawer";
 import {
 	DataTable,
 	PageFrame,
@@ -8,7 +9,6 @@ import {
 } from "@fe/console/components/ui/page-frame";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
 import { TablePagination } from "@fe/console/components/ui/table-pagination";
-import { SuspectionDrawer } from "@fe/console/components/suspection-drawer";
 import { adminGet, adminPatch } from "@fe/console/lib/admin-api";
 import { formatNumber, formatRelativeTime } from "@fe/console/lib/format";
 import * as Button from "@reloop/ui/button";
@@ -28,6 +28,7 @@ type OrgItem = {
 	memberCount: number;
 	domainCount: number;
 	creditsRemaining: number | null;
+	prepaidCredits: number | null;
 	billingEmail: string | null;
 	createdAt: string;
 	planId: string | null;
@@ -45,6 +46,7 @@ const PLAN_LABEL: Record<string, string> = {
 	individual: "Pro",
 	startup: "Growth",
 	enterprise: "Enterprise",
+	payg: "Pay as you go",
 };
 function planLabel(planId?: string | null): string {
 	return PLAN_LABEL[planId ?? "free"] ?? planId ?? "Free";
@@ -235,7 +237,7 @@ export default function OrganizationsPage() {
 									</p>
 								</td>
 								<td className="px-4 py-3">
-									<div className="flex flex-col gap-1 items-start">
+									<div className="flex flex-col items-start gap-1">
 										<StatusPill status={org.status} />
 										{org.isSuspect ? (
 											<StatusPill
@@ -259,6 +261,11 @@ export default function OrganizationsPage() {
 								<td className="px-4 py-3 tabular-nums">{org.domainCount}</td>
 								<td className="px-4 py-3 tabular-nums">
 									{formatNumber(org.creditsRemaining)}
+									{org.prepaidCredits ? (
+										<span className="ml-1 text-[11px] text-text-sub-600">
+											+ {formatNumber(org.prepaidCredits)} prepaid
+										</span>
+									) : null}
 								</td>
 								<td className="px-4 py-3 text-text-sub-600">
 									<span
@@ -277,7 +284,7 @@ export default function OrganizationsPage() {
 											onClick={() => setSuspectTarget(org)}
 											title="Mark or edit suspect status"
 										>
-											<ShieldAlert className="size-3 mr-1" />
+											<ShieldAlert className="mr-1 size-3" />
 											{org.isSuspect ? "Suspect" : "Suspect"}
 										</Button.Root>
 										<Button.Root

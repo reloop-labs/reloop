@@ -1,6 +1,7 @@
 "use client";
 
 import { InlineActionPanel } from "@fe/console/components/inline-action-panel";
+import { SuspectionDrawer } from "@fe/console/components/suspection-drawer";
 import { EntityTabs } from "@fe/console/components/ui/entity-tabs";
 import { MetricGrid } from "@fe/console/components/ui/metric-grid";
 import {
@@ -19,7 +20,6 @@ import {
 	formatRelativeTime,
 	truncateId,
 } from "@fe/console/lib/format";
-import { SuspectionDrawer } from "@fe/console/components/suspection-drawer";
 import { authClient } from "@reloop/auth/client";
 import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import * as Button from "@reloop/ui/button";
@@ -36,6 +36,7 @@ const PLAN_LABEL: Record<string, string> = {
 	individual: "Pro",
 	startup: "Growth",
 	enterprise: "Enterprise",
+	payg: "Pay as you go",
 };
 function planLabel(planId?: string | null): string {
 	return PLAN_LABEL[planId ?? "free"] ?? planId ?? "Free";
@@ -72,6 +73,8 @@ type UserDetail = {
 		creditsRemaining: number | null;
 		creditsUsed: number | null;
 		monthlyCredits: number | null;
+		prepaidCredits: number | null;
+		prepaidExpiresAt: string | null;
 		planId: string | null;
 	}>;
 	apiKeys: Array<{
@@ -295,7 +298,7 @@ export default function UserDetailPage() {
 			{data.isSuspect ? (
 				<div className="flex items-start justify-between gap-3 rounded-2xl border border-red-500/30 bg-red-500/[0.06] p-4 text-[13px] dark:border-red-500/40 dark:bg-red-500/10">
 					<div className="flex items-start gap-3">
-						<ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+						<ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
 						<div>
 							<p className="font-semibold text-red-700 dark:text-red-300">
 								Marked as Suspect ({data.suspectCategory || "Spam"}) ·{" "}
@@ -474,7 +477,11 @@ export default function UserDetailPage() {
 						label: "Credits (primary)",
 						value: formatNumber(primaryOrg?.creditsRemaining),
 						hint: primaryOrg
-							? `${formatNumber(primaryOrg.creditsUsed)} used`
+							? `${formatNumber(primaryOrg.creditsUsed)} used of ${formatNumber(primaryOrg.monthlyCredits)} monthly${
+									primaryOrg.prepaidCredits
+										? ` · + ${formatNumber(primaryOrg.prepaidCredits)} prepaid`
+										: ""
+								}`
 							: "-",
 						href: primaryOrg
 							? `/credits?organizationId=${primaryOrg.id}`
@@ -605,6 +612,9 @@ export default function UserDetailPage() {
 												<p className="text-[12px] text-text-sub-600">
 													{org.slug} · {org.domainCount} domains ·{" "}
 													{formatNumber(org.creditsRemaining)} credits
+													{org.prepaidCredits
+														? ` + ${formatNumber(org.prepaidCredits)} prepaid`
+														: ""}
 												</p>
 											</Link>
 											<div className="flex items-center gap-2">
@@ -695,6 +705,11 @@ export default function UserDetailPage() {
 									<td className="px-4 py-3">{org.domainCount}</td>
 									<td className="px-4 py-3 tabular-nums">
 										{formatNumber(org.creditsRemaining)}
+										{org.prepaidCredits ? (
+											<span className="ml-1 text-[11px] text-text-sub-600">
+												+ {formatNumber(org.prepaidCredits)} prepaid
+											</span>
+										) : null}
 									</td>
 									<td className="px-4 py-3 text-text-sub-600">
 										{formatRelativeTime(org.joinedAt)}
@@ -857,4 +872,3 @@ export default function UserDetailPage() {
 		</PageFrame>
 	);
 }
-

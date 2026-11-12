@@ -44,6 +44,7 @@ const PLAN_LABEL: Record<string, string> = {
 	individual: "Pro",
 	startup: "Growth",
 	enterprise: "Enterprise",
+	payg: "Pay as you go",
 };
 function planLabel(planId?: string | null): string {
 	return PLAN_LABEL[planId ?? "free"] ?? planId ?? "Free";
@@ -94,6 +95,9 @@ type OrgDetail = {
 		status: string;
 		currentPeriodStart: string;
 		currentPeriodEnd: string;
+		/** Unexpired pay-as-you-go balance, spent after the monthly pool. */
+		prepaidCredits: number;
+		prepaidExpiresAt: string | null;
 	} | null;
 	plan: {
 		planId: string;
@@ -836,7 +840,11 @@ export default function OrganizationDetailPage() {
 						label: "Credits left",
 						value: formatNumber(data.credits?.creditsRemaining),
 						hint: data.credits
-							? `${formatNumber(data.credits.creditsUsed)} used · ${formatNumber(data.credits.monthlyCredits)} monthly`
+							? `${formatNumber(data.credits.creditsUsed)} used · ${formatNumber(data.credits.monthlyCredits)} monthly${
+									data.credits.prepaidCredits > 0
+										? ` · + ${formatNumber(data.credits.prepaidCredits)} prepaid`
+										: ""
+								}`
 							: "Not provisioned",
 						href: `/credits?organizationId=${data.id}`,
 					},
@@ -1249,6 +1257,30 @@ export default function OrganizationDetailPage() {
 												{formatNumber(data.credits.monthlyCredits)}
 											</p>
 										</div>
+										{data.plan?.planId === "payg" ||
+										data.credits.prepaidCredits > 0 ||
+										data.credits.prepaidExpiresAt ? (
+											<div className="col-span-3 flex items-baseline justify-between gap-3 rounded-lg bg-bg-weak-50 px-3 py-2 dark:bg-white/[0.04]">
+												<div>
+													<p className="text-[11px] text-text-sub-600">
+														Prepaid credits (spent after the monthly pool)
+													</p>
+													<p className="mt-0.5 font-semibold text-[16px] tabular-nums">
+														{formatNumber(data.credits.prepaidCredits)}
+													</p>
+												</div>
+												<p className="text-right text-[12px] text-text-sub-600">
+													{data.credits.prepaidExpiresAt
+														? `${
+																new Date(data.credits.prepaidExpiresAt) >
+																new Date()
+																	? "Valid until"
+																	: "Expired"
+															} ${formatDateTime(data.credits.prepaidExpiresAt)}`
+														: "No prepaid balance"}
+												</p>
+											</div>
+										) : null}
 										<div className="col-span-3 text-[12px] text-text-sub-600">
 											Period {formatDateTime(data.credits.currentPeriodStart)} →{" "}
 											{formatDateTime(data.credits.currentPeriodEnd)} · status{" "}
