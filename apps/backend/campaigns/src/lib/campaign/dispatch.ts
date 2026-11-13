@@ -102,6 +102,12 @@ export async function sendCampaignBatch(params: {
 	for (const recipientId of recipientIds) {
 		const result = await sendCampaignRecipient(recipientId);
 		if (result.outcome === "quota_exceeded") {
+			await enqueueCampaignBatch({
+				campaignId: params.campaignId,
+				organizationId: params.organizationId,
+				batchIndex: params.batchIndex + 1,
+				delayMs: nextBatchDelayMs({ quotaExceeded: true }),
+			});
 			return;
 		}
 		if (result.outcome === "rate_limited") {
@@ -130,6 +136,29 @@ export async function sendCampaignBatch(params: {
 	}
 
 	await maybeCompleteCampaign(params.campaignId);
+}
+
+/**
+ * Re-queue a `sending` campaign whose batch loop stopped with recipients still
+ * pending (e.g. it hit a quota before quota retries existed). Only `pending`
+ * recipients are sent, so nobody receives the campaign twice. No-op when a
+ * batch is already queued; completes the campaign when nothing is left.
+ */
+export async function resumeCampaignSend(params: {
+	campaignId: string;
+	organizationId: string;
+}): Promise<void> {
+	if (!(await hasPendingRecipients(params.campaignId))) {
+		await maybeCompleteCampaign(params.campaignId);
+		return;
+	}
+	if (await campaignHasQueuedSend(params.campaignId)) return;
+
+	await enqueueCampaignBatch({
+		campaignId: params.campaignId,
+		organizationId: params.organizationId,
+		batchIndex: 0,
+	});
 }
 
 async function loadNextRecipientIds(campaignId: string): Promise<string[]> {

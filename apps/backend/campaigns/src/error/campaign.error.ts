@@ -85,6 +85,13 @@ export const CampaignErrors = {
 			why: `Campaign "${id}" is ${status}.`,
 			fix: "Only scheduled or sending campaigns can be cancelled.",
 		}),
+	cannotResume: (id: string, status: string) =>
+		createError({
+			status: 409,
+			message: "Campaign cannot be resumed",
+			why: `Campaign "${id}" is ${status}.`,
+			fix: "Only sending campaigns can be resumed. Send a draft or scheduled campaign instead.",
+		}),
 	cannotDelete: (id: string, status: string) =>
 		createError({
 			status: 409,

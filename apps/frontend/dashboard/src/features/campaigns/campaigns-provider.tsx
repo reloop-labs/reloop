@@ -29,6 +29,7 @@ import {
 	getCampaignById,
 	listCampaignRecipients,
 	listCampaigns,
+	resumeCampaignRequest,
 	scheduleCampaignRequest,
 	sendCampaignRequest,
 	unscheduleCampaignRequest,
@@ -42,6 +43,7 @@ interface CampaignsContextValue {
 	) => Promise<Campaign>;
 	updateCampaign: (id: string, input: UpdateCampaignInput) => Promise<Campaign>;
 	sendCampaign: (id: string) => Promise<void>;
+	resumeCampaign: (id: string) => Promise<void>;
 	scheduleCampaign: (id: string, scheduledAt: string) => Promise<void>;
 	unscheduleCampaign: (id: string) => Promise<void>;
 	duplicateCampaign: (id: string) => Promise<Campaign>;
@@ -111,6 +113,15 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 		[invalidateWithDetail, orgId, queryClient],
 	);
 
+	const resumeCampaign = useCallback(
+		async (id: string) => {
+			await resumeCampaignRequest(id);
+			await invalidateWithDetail(id);
+			toast.success("Campaign resumed. Remaining recipients will be sent.");
+		},
+		[invalidateWithDetail],
+	);
+
 	const scheduleCampaign = useCallback(
 		async (id: string, scheduledAt: string) => {
 			await scheduleCampaignRequest(id, scheduledAt);
@@ -161,6 +172,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			createCampaign,
 			updateCampaign,
 			sendCampaign,
+			resumeCampaign,
 			scheduleCampaign,
 			unscheduleCampaign,
 			duplicateCampaign,
@@ -170,6 +182,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			createCampaign,
 			updateCampaign,
 			sendCampaign,
+			resumeCampaign,
 			scheduleCampaign,
 			unscheduleCampaign,
 			duplicateCampaign,

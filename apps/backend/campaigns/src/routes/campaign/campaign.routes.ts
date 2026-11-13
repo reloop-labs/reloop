@@ -21,6 +21,7 @@ import {
 	getCampaignController,
 	listCampaignsController,
 	listRecipientsController,
+	resumeCampaignController,
 	scheduleCampaignController,
 	sendCampaignController,
 	testCampaignController,
@@ -150,6 +151,30 @@ export const campaignRoutes = new Elysia({
 			afterResponse: auditLogHook({
 				resourceType: "campaign",
 				action: "sent",
+			}),
+		},
+	)
+	.post(
+		"/:id/resume",
+		async ({ params, organizationId }) => {
+			return await resumeCampaignController({
+				id: params.id,
+				organizationId,
+			});
+		},
+		{
+			auth: true,
+			params: t.Object({ id: t.String() }),
+			response: { 200: campaignResponseSchema, ...errorResponses },
+			detail: {
+				tags: ["Campaigns"],
+				summary: "Resume a sending campaign",
+				description:
+					"Restarts delivery for a campaign that is sending but has stalled, for example after it ran out of credits or hit the daily limit. Only recipients that have not been sent yet are delivered, so nobody receives the campaign twice. Does nothing if a send is already queued.",
+			},
+			afterResponse: auditLogHook({
+				resourceType: "campaign",
+				action: "resumed",
 			}),
 		},
 	)

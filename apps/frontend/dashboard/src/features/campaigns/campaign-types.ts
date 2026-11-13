@@ -27,6 +27,8 @@ export type Campaign = {
 	clickedCount: number;
 	failedCount: number;
 	skippedCount?: number;
+	/** Why the latest send attempt stopped (quota, rate limit, delivery error). */
+	lastError?: string;
 	templateId?: string;
 	templateName?: string;
 	content?: unknown[];

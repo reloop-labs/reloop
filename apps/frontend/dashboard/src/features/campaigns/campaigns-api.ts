@@ -141,6 +141,15 @@ export async function testCampaignRequest(
 	if (!res.ok) throw new Error(await parseError(res));
 }
 
+export async function resumeCampaignRequest(id: string): Promise<Campaign> {
+	const res = await fetch(`${BASE}/${id}/resume`, {
+		method: "POST",
+		credentials: "include",
+	});
+	if (!res.ok) throw new Error(await parseError(res));
+	return (await res.json()) as Campaign;
+}
+
 export async function cancelCampaignRequest(id: string): Promise<Campaign> {
 	const res = await fetch(`${BASE}/${id}/cancel`, {
 		method: "POST",

@@ -8,6 +8,12 @@
 export const CAMPAIGN_BATCH_SIZE = 40;
 export const CAMPAIGN_BATCH_DELAY_MS = 60_000;
 export const CAMPAIGN_RATE_LIMIT_FALLBACK_SECONDS = 60;
+/**
+ * Out of credits or over the plan's daily cap (402). Retry on a slow poll so
+ * the campaign resumes on its own after a top-up, an upgrade or the daily
+ * reset, instead of stalling with pending recipients forever.
+ */
+export const CAMPAIGN_QUOTA_RETRY_DELAY_MS = 15 * 60_000;
 
 export function parseRetryAfter(
 	value: string | null | undefined,
@@ -28,8 +34,10 @@ export function parseRetryAfter(
 
 export function nextBatchDelayMs(params: {
 	rateLimited?: boolean;
+	quotaExceeded?: boolean;
 	retryAfterSeconds?: number;
 }): number {
+	if (params.quotaExceeded) return CAMPAIGN_QUOTA_RETRY_DELAY_MS;
 	if (params.rateLimited) {
 		const retryMs =
 			(params.retryAfterSeconds ?? CAMPAIGN_RATE_LIMIT_FALLBACK_SECONDS) * 1000;

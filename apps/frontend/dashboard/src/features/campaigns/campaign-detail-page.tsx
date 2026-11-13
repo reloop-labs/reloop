@@ -14,6 +14,7 @@ import {
 import { CampaignEngagementCard } from "./components/campaign-engagement-card";
 import { CampaignHeader } from "./components/campaign-header";
 import { CampaignMetricsCards } from "./components/campaign-metrics-cards";
+import { CampaignPausedBanner } from "./components/campaign-paused-banner";
 import { CampaignPreviewTabs } from "./components/campaign-preview-tabs";
 import {
 	CampaignRecipientIssuesCard,
@@ -28,8 +29,12 @@ function CampaignDetailContent() {
 	const router = useRouter();
 	const campaignId = params?.campaignId as string;
 	const [, setDeleteId] = useQueryState("delete");
-	const { sendCampaign, duplicateCampaign, unscheduleCampaign } =
-		useCampaigns();
+	const {
+		sendCampaign,
+		resumeCampaign,
+		duplicateCampaign,
+		unscheduleCampaign,
+	} = useCampaigns();
 	const campaignQuery = useCampaignQuery(campaignId);
 
 	const [actionPending, setActionPending] = useState(false);
@@ -96,6 +101,20 @@ function CampaignDetailContent() {
 		} catch (err) {
 			toast.error(
 				err instanceof Error ? err.message : "Failed to send campaign",
+			);
+		} finally {
+			setActionPending(false);
+		}
+	};
+
+	const handleResume = async () => {
+		if (!campaign) return;
+		setActionPending(true);
+		try {
+			await resumeCampaign(campaign.id);
+		} catch (err) {
+			toast.error(
+				err instanceof Error ? err.message : "Failed to resume campaign",
 			);
 		} finally {
 			setActionPending(false);
@@ -248,6 +267,12 @@ function CampaignDetailContent() {
 					onDelete={handleDelete}
 					onUnschedule={() => void handleUnschedule()}
 					actionPending={actionPending}
+				/>
+
+				<CampaignPausedBanner
+					campaign={campaign}
+					onResume={() => void handleResume()}
+					resumePending={actionPending}
 				/>
 
 				{/* High-level Metric Cards */}

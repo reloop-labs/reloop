@@ -4,7 +4,10 @@ import {
 	htmlToText,
 	normalizeCsvEmails,
 } from "@be/campaigns/lib/campaign/audience";
-import { scheduleCampaignStart } from "@be/campaigns/lib/campaign/dispatch";
+import {
+	resumeCampaignSend,
+	scheduleCampaignStart,
+} from "@be/campaigns/lib/campaign/dispatch";
 import {
 	campaignMergeVars,
 	interpolate,
@@ -17,6 +20,7 @@ import {
 	canCancel,
 	canDelete,
 	canEdit,
+	canResume,
 	canSchedule,
 	canSend,
 } from "@be/campaigns/lib/campaign/status";
@@ -336,6 +340,23 @@ export async function sendCampaignController(params: {
 	if (!row.subject.trim()) throw CampaignErrors.subjectRequired();
 	await assertVerifiedFromDomain(params.organizationId, row.fromEmail);
 	await enqueueCampaignStart({
+		campaignId: row.id,
+		organizationId: params.organizationId,
+	});
+	const fresh = await requireCampaign(row.id, params.organizationId);
+	return toCampaignResponse(fresh, await templateNameFor(fresh.templateId));
+}
+
+export async function resumeCampaignController(params: {
+	id: string;
+	organizationId: string;
+}) {
+	const row = await requireCampaign(params.id, params.organizationId);
+	if (!canResume(row.status)) {
+		throw CampaignErrors.cannotResume(row.id, row.status);
+	}
+	await assertVerifiedFromDomain(params.organizationId, row.fromEmail);
+	await resumeCampaignSend({
 		campaignId: row.id,
 		organizationId: params.organizationId,
 	});

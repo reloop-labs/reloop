@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
 	CAMPAIGN_BATCH_DELAY_MS,
 	CAMPAIGN_BATCH_SIZE,
+	CAMPAIGN_QUOTA_RETRY_DELAY_MS,
 	nextBatchDelayMs,
 	parseRetryAfter,
 } from "../src/lib/campaign/batch";
@@ -25,6 +26,15 @@ describe("campaign batch workflow", () => {
 			90_000,
 		);
 		expect(nextBatchDelayMs({ rateLimited: true })).toBe(
+			CAMPAIGN_BATCH_DELAY_MS,
+		);
+	});
+
+	test("polls slowly after a quota block so the campaign resumes on its own", () => {
+		expect(nextBatchDelayMs({ quotaExceeded: true })).toBe(
+			CAMPAIGN_QUOTA_RETRY_DELAY_MS,
+		);
+		expect(CAMPAIGN_QUOTA_RETRY_DELAY_MS).toBeGreaterThan(
 			CAMPAIGN_BATCH_DELAY_MS,
 		);
 	});

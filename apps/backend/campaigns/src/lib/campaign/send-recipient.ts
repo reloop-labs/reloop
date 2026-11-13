@@ -151,6 +151,8 @@ export async function sendCampaignRecipient(
 			.update(schema.campaign)
 			.set({
 				sentCount: sql`${schema.campaign.sentCount} + 1`,
+				// A send went through, so any earlier quota/rate-limit pause is over.
+				lastError: null,
 				updatedAt: new Date(),
 			})
 			.where(eq(schema.campaign.id, campaign.id));
