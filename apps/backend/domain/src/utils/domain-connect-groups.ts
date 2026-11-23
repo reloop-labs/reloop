@@ -17,7 +17,18 @@ export interface GroupOptions {
 	dmarcGroup: boolean;
 	/** Result of `lookupDmarc()` for the sending domain. */
 	dmarc: DmarcPresence;
+	/**
+	 * The configured policy is the one the template publishes. The signed apply URL can't carry a
+	 * policy, so a different configured policy must not be applied silently.
+	 */
+	policyMatchesTemplate?: boolean;
 }
+
+/** The policy the published `dmarc` group writes. */
+export const TEMPLATE_DMARC_POLICY = "reject";
+/** Same deadline as the other TXT checks, so a slow resolver can't stall the apply request. */
+export const DMARC_LOOKUP_TIMEOUT_MS = 5_000;
+const DMARC_VERSION_TAG = /^v[ \t]*=[ \t]*DMARC1[ \t]*(;|$)/i;
 
 export function determineGroupIds(
 	domain: {
@@ -33,7 +44,8 @@ export function determineGroupIds(
 	if (domain.isSendingEmailEnabled !== false) {
 		groups.push("sending"); // SPF (+ DMARC on templates without a dmarc group)
 		// Only "absent" adds it: a failed lookup must not risk a second _dmarc record.
-		if (options.dmarcGroup && options.dmarc === "absent") {
+		const policyMatches = options.policyMatchesTemplate ?? true;
+		if (options.dmarcGroup && options.dmarc === "absent" && policyMatches) {
 			groups.push("dmarc");
 		}
 	}
@@ -47,21 +59,44 @@ export function determineGroupIds(
 	return groups;
 }
 
-/** Looks up `_dmarc.<domain>` and reports whether a `v=DMARC1` record is already published. */
+/**
+ * Looks up `_dmarc.<domain>` and reports whether a `v=DMARC1` record is already published.
+ * Pass an authoritative lookup: a public resolver can still serve a cached "not found" after
+ * the customer has published DMARC. Only a definite "no such record" counts as absent; a
+ * timeout or any other failure is "unknown".
+ */
 export async function lookupDmarc(
 	domain: string,
 	resolveTxt: TxtLookup,
+	timeoutMs = DMARC_LOOKUP_TIMEOUT_MS,
 ): Promise<DmarcPresence> {
 	try {
-		const records = await resolveTxt(`_dmarc.${domain}`);
+		const records = await withDeadline(
+			resolveTxt(`_dmarc.${domain}`),
+			timeoutMs,
+		);
 		return records.some((chunks) =>
-			chunks.join("").trim().toLowerCase().startsWith("v=dmarc1"),
+			DMARC_VERSION_TAG.test(chunks.join("").trim()),
 		)
 			? "present"
 			: "absent";
 	} catch (error) {
 		return classifyDnsError(error) === "mismatch" ? "absent" : "unknown";
 	}
+}
+
+function withDeadline<T>(promise: Promise<T>, ms: number): Promise<T> {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	const deadline = new Promise<never>((_, reject) => {
+		timer = setTimeout(
+			() =>
+				reject(
+					Object.assign(new Error("DNS query timeout"), { code: "ETIMEOUT" }),
+				),
+			ms,
+		);
+	});
+	return Promise.race([promise, deadline]).finally(() => clearTimeout(timer));
 }
 
 const DMARC_POLICIES = new Set(["none", "quarantine", "reject"]);

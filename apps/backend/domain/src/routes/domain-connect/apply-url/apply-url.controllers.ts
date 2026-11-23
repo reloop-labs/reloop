@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { resolver } from "@reloop/dns/resolver";
+import { resolveTxtAuthoritative } from "@reloop/dns/authoritative";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import { redis } from "@reloop/domain/lib/redis";
@@ -9,6 +9,7 @@ import { discoverDomainConnect } from "@reloop/domain/utils/domain-connect-disco
 import {
 	determineGroupIds,
 	lookupDmarc,
+	TEMPLATE_DMARC_POLICY,
 } from "@reloop/domain/utils/domain-connect-groups";
 import { getDomainConnectParts } from "@reloop/domain/utils/domain-connect-parts";
 import { signDomainConnectRequest } from "@reloop/domain/utils/domain-connect-signer";
@@ -103,10 +104,10 @@ export async function applyUrlController({
 				dmarcGroup,
 				dmarc:
 					dmarcGroup && domainRecord.isSendingEmailEnabled !== false
-						? await lookupDmarc(domainRecord.domain, (name) =>
-								resolver.resolveTxt(name),
-							)
+						? await lookupDmarc(domainRecord.domain, resolveTxtAuthoritative)
 						: "unknown",
+				policyMatchesTemplate:
+					domainConfig.DMARC_DEFAULT_POLICY === TEMPLATE_DMARC_POLICY,
 			});
 
 	// 6. Generate nonce for CSRF protection

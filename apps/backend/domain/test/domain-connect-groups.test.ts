@@ -29,6 +29,16 @@ describe("determineGroupIds", () => {
 		).toEqual(["verification", "sending"]);
 	});
 
+	it("does not apply a template whose policy differs from the configured one", () => {
+		expect(
+			determineGroupIds(sending, {
+				dmarcGroup: true,
+				dmarc: "absent",
+				policyMatchesTemplate: false,
+			}),
+		).not.toContain("dmarc");
+	});
+
 	it("never adds dmarc when the lookup failed or sending is off", () => {
 		expect(
 			determineGroupIds(sending, { dmarcGroup: true, dmarc: "unknown" }),
@@ -66,6 +76,33 @@ describe("lookupDmarc", () => {
 		expect(
 			await lookupDmarc("a.com", async () => {
 				throw dnsError("ETIMEOUT");
+			}),
+		).toBe("unknown");
+	});
+});
+
+describe("lookupDmarc edge cases (review)", () => {
+	it("recognises spaces and tabs around = in the version tag", async () => {
+		expect(
+			await lookupDmarc("a.com", async () => [["v = DMARC1; p=reject;"]]),
+		).toBe("present");
+		expect(
+			await lookupDmarc("a.com", async () => [["v\t=\tDMARC1;p=none"]]),
+		).toBe("present");
+		expect(
+			await lookupDmarc("a.com", async () => [["v=DMARC10; p=none"]]),
+		).toBe("absent");
+	});
+
+	it("treats a lookup that misses the deadline as unknown", async () => {
+		const never = () => new Promise<string[][]>(() => {});
+		expect(await lookupDmarc("a.com", never, 20)).toBe("unknown");
+	});
+
+	it("treats a zone with no authoritative nameservers as unknown", async () => {
+		expect(
+			await lookupDmarc("a.com", async () => {
+				throw dnsError("ENOAUTH");
 			}),
 		).toBe("unknown");
 	});
