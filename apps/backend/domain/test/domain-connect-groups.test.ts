@@ -7,6 +7,9 @@ import {
 
 const sending = { isSendingEmailEnabled: true, isReceivingEmailEnabled: false };
 const dnsError = (code: string) => Object.assign(new Error(code), { code });
+const noAlias = async (): Promise<string[]> => {
+	throw dnsError("ENOTFOUND");
+};
 
 describe("determineGroupIds", () => {
 	it("keeps today's groups when the template has no dmarc group", () => {
@@ -67,16 +70,28 @@ describe("lookupDmarc", () => {
 	});
 
 	it("treats NXDOMAIN / no data as absent and other failures as unknown", async () => {
-		expect(await lookupDmarc("a.com", async () => [])).toBe("absent");
+		expect(await lookupDmarc("a.com", async () => [], undefined, noAlias)).toBe(
+			"absent",
+		);
 		expect(
-			await lookupDmarc("a.com", async () => {
-				throw dnsError("ENOTFOUND");
-			}),
+			await lookupDmarc(
+				"a.com",
+				async () => {
+					throw dnsError("ENOTFOUND");
+				},
+				undefined,
+				noAlias,
+			),
 		).toBe("absent");
 		expect(
-			await lookupDmarc("a.com", async () => {
-				throw dnsError("ETIMEOUT");
-			}),
+			await lookupDmarc(
+				"a.com",
+				async () => {
+					throw dnsError("ETIMEOUT");
+				},
+				undefined,
+				noAlias,
+			),
 		).toBe("unknown");
 	});
 });
@@ -90,7 +105,12 @@ describe("lookupDmarc edge cases (review)", () => {
 			await lookupDmarc("a.com", async () => [["v\t=\tDMARC1;p=none"]]),
 		).toBe("present");
 		expect(
-			await lookupDmarc("a.com", async () => [["v=DMARC10; p=none"]]),
+			await lookupDmarc(
+				"a.com",
+				async () => [["v=DMARC10; p=none"]],
+				undefined,
+				noAlias,
+			),
 		).toBe("absent");
 	});
 
@@ -105,6 +125,29 @@ describe("lookupDmarc edge cases (review)", () => {
 				throw dnsError("ENOAUTH");
 			}),
 		).toBe("unknown");
+	});
+});
+
+describe("lookupDmarc with a _dmarc CNAME (review)", () => {
+	const noTxt = async (): Promise<string[][]> => {
+		throw dnsError("ENOTFOUND");
+	};
+
+	it("counts a _dmarc alias to a DMARC provider as present", async () => {
+		expect(
+			await lookupDmarc("a.com", noTxt, undefined, async () => [
+				"a-com.dmarc.provider.example",
+			]),
+		).toBe("present");
+	});
+
+	it("is unknown when the alias lookup fails or is unavailable", async () => {
+		expect(
+			await lookupDmarc("a.com", noTxt, undefined, async () => {
+				throw dnsError("ESERVFAIL");
+			}),
+		).toBe("unknown");
+		expect(await lookupDmarc("a.com", noTxt)).toBe("unknown");
 	});
 });
 

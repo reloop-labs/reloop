@@ -1,7 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { resolveTxtAuthoritative } from "@reloop/dns/authoritative";
+import {
+	resolveCnameAuthoritative,
+	resolveTxtAuthoritative,
+} from "@reloop/dns/authoritative";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import { redis } from "@reloop/domain/lib/redis";
@@ -104,7 +107,12 @@ export async function applyUrlController({
 				dmarcGroup,
 				dmarc:
 					dmarcGroup && domainRecord.isSendingEmailEnabled !== false
-						? await lookupDmarc(domainRecord.domain, resolveTxtAuthoritative)
+						? await lookupDmarc(
+								domainRecord.domain,
+								resolveTxtAuthoritative,
+								undefined,
+								resolveCnameAuthoritative,
+							)
 						: "unknown",
 				policyMatchesTemplate:
 					domainConfig.DMARC_DEFAULT_POLICY === TEMPLATE_DMARC_POLICY,

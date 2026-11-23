@@ -1,4 +1,8 @@
-import { classifyDnsError, type TxtLookup } from "@reloop/dns/verify-records";
+import {
+	type CnameLookup,
+	classifyDnsError,
+	type TxtLookup,
+} from "@reloop/dns/verify-records";
 
 /**
  * Domain Connect record groups for the email-setup template (issue #170).
@@ -69,17 +73,25 @@ export async function lookupDmarc(
 	domain: string,
 	resolveTxt: TxtLookup,
 	timeoutMs = DMARC_LOOKUP_TIMEOUT_MS,
+	resolveCname?: CnameLookup,
 ): Promise<DmarcPresence> {
+	const name = `_dmarc.${domain}`;
 	try {
-		const records = await withDeadline(
-			resolveTxt(`_dmarc.${domain}`),
-			timeoutMs,
-		);
-		return records.some((chunks) =>
-			DMARC_VERSION_TAG.test(chunks.join("").trim()),
-		)
-			? "present"
-			: "absent";
+		const records = await withDeadline(resolveTxt(name), timeoutMs);
+		if (
+			records.some((chunks) => DMARC_VERSION_TAG.test(chunks.join("").trim()))
+		) {
+			return "present";
+		}
+	} catch (error) {
+		if (classifyDnsError(error) !== "mismatch") return "unknown";
+	}
+	// An authoritative server doesn't follow a CNAME, so `_dmarc` delegated to a DMARC
+	// provider looks like "no TXT". Only call it absent when there is no alias either.
+	if (!resolveCname) return "unknown";
+	try {
+		const targets = await withDeadline(resolveCname(name), timeoutMs);
+		return targets.length > 0 ? "present" : "absent";
 	} catch (error) {
 		return classifyDnsError(error) === "mismatch" ? "absent" : "unknown";
 	}
