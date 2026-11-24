@@ -149,6 +149,28 @@ describe("lookupDmarc with a _dmarc CNAME (review)", () => {
 		).toBe("unknown");
 		expect(await lookupDmarc("a.com", noTxt)).toBe("unknown");
 	});
+
+	it("gives the TXT and alias lookups one shared deadline", async () => {
+		const slowNoTxt = async (): Promise<string[][]> => {
+			await new Promise((resolve) => setTimeout(resolve, 80));
+			throw dnsError("ENOTFOUND");
+		};
+		const never = () => new Promise<string[]>(() => {});
+
+		const started = performance.now();
+		expect(await lookupDmarc("a.com", slowNoTxt, 100, never)).toBe("unknown");
+		// 80 ms went to TXT, so the alias lookup has ~20 ms left, not another 100.
+		expect(performance.now() - started).toBeLessThan(150);
+	});
+
+	it("still answers from the alias lookup inside the remaining time", async () => {
+		const slowNoTxt = async (): Promise<string[][]> => {
+			await new Promise((resolve) => setTimeout(resolve, 30));
+			throw dnsError("ENOTFOUND");
+		};
+
+		expect(await lookupDmarc("a.com", slowNoTxt, 100, noAlias)).toBe("absent");
+	});
 });
 
 describe("parseDmarcPolicy", () => {

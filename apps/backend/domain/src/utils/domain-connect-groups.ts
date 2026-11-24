@@ -76,6 +76,8 @@ export async function lookupDmarc(
 	resolveCname?: CnameLookup,
 ): Promise<DmarcPresence> {
 	const name = `_dmarc.${domain}`;
+	// One budget for both queries, so the whole lookup stays within `timeoutMs`.
+	const deadlineAt = Date.now() + timeoutMs;
 	try {
 		const records = await withDeadline(resolveTxt(name), timeoutMs);
 		if (
@@ -90,7 +92,10 @@ export async function lookupDmarc(
 	// provider looks like "no TXT". Only call it absent when there is no alias either.
 	if (!resolveCname) return "unknown";
 	try {
-		const targets = await withDeadline(resolveCname(name), timeoutMs);
+		const targets = await withDeadline(
+			resolveCname(name),
+			Math.max(0, deadlineAt - Date.now()),
+		);
 		return targets.length > 0 ? "present" : "absent";
 	} catch (error) {
 		return classifyDnsError(error) === "mismatch" ? "absent" : "unknown";
