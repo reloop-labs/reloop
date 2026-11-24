@@ -163,8 +163,9 @@ export function applyPlanChange(args: {
 			continue;
 		}
 
+		// null means no cap, which is always the higher limit.
 		if (currentValue === null || nextValue === null) {
-			result[key] = (currentValue ?? nextValue) as never;
+			result[key] = null as never;
 			continue;
 		}
 

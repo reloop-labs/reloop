@@ -80,6 +80,26 @@ describe("applyPlanChange", () => {
 		expect(next.maxWebhooks).toBe(3);
 		expect(next.monthlyEmails).toBe(6000);
 	});
+
+	test("drops a stale Free daily cap when the org upgrades", () => {
+		const current = { ...getPlanLimits("free"), dailyEmailLimit: 100 };
+		const next = applyPlanChange({ current, nextPlanId: "individual" });
+		expect(next.dailyEmailLimit).toBeNull();
+	});
+
+	test("drops a gifted Free daily cap when the org upgrades", () => {
+		const current = { ...getPlanLimits("free"), dailyEmailLimit: 1000 };
+		const next = applyPlanChange({ current, nextPlanId: "startup" });
+		expect(next.dailyEmailLimit).toBeNull();
+	});
+
+	test("restores the Free daily cap on downgrade", () => {
+		const next = applyPlanChange({
+			current: getPlanLimits("individual"),
+			nextPlanId: "free",
+		});
+		expect(next.dailyEmailLimit).toBe(200);
+	});
 });
 
 describe("closePeriodSnapshot", () => {
