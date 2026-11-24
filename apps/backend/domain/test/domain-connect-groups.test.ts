@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, setSystemTime, spyOn } from "bun:test";
 import {
 	determineGroupIds,
 	lookupDmarc,
@@ -151,16 +151,44 @@ describe("lookupDmarc with a _dmarc CNAME (review)", () => {
 	});
 
 	it("gives the TXT and alias lookups one shared deadline", async () => {
-		const slowNoTxt = async (): Promise<string[][]> => {
-			await new Promise((resolve) => setTimeout(resolve, 80));
-			throw dnsError("ENOTFOUND");
-		};
-		const never = () => new Promise<string[]>(() => {});
+		// The test owns the clock: the TXT lookup "takes" 80 ms by moving it forward,
+		// so the result doesn't depend on how fast the runner is.
+		const startedAt = new Date("2026-01-01T00:00:00Z");
+		setSystemTime(startedAt);
+		const budgets = spyOn(globalThis, "setTimeout");
+		try {
+			const slowNoTxt = async (): Promise<string[][]> => {
+				setSystemTime(new Date(startedAt.getTime() + 80));
+				throw dnsError("ENOTFOUND");
+			};
+			const never = () => new Promise<string[]>(() => {});
 
-		const started = performance.now();
-		expect(await lookupDmarc("a.com", slowNoTxt, 100, never)).toBe("unknown");
-		// 80 ms went to TXT, so the alias lookup has ~20 ms left, not another 100.
-		expect(performance.now() - started).toBeLessThan(150);
+			expect(await lookupDmarc("a.com", slowNoTxt, 100, never)).toBe("unknown");
+			// 80 ms went to TXT, so the alias lookup gets the 20 ms left, not another 100.
+			expect(budgets.mock.calls.map(([, ms]) => ms)).toEqual([100, 20]);
+		} finally {
+			budgets.mockRestore();
+			setSystemTime();
+		}
+	});
+
+	it("gives the alias lookup no extra time once the deadline has passed", async () => {
+		const startedAt = new Date("2026-01-01T00:00:00Z");
+		setSystemTime(startedAt);
+		const budgets = spyOn(globalThis, "setTimeout");
+		try {
+			const lateNoTxt = async (): Promise<string[][]> => {
+				setSystemTime(new Date(startedAt.getTime() + 250));
+				throw dnsError("ENOTFOUND");
+			};
+			const never = () => new Promise<string[]>(() => {});
+
+			expect(await lookupDmarc("a.com", lateNoTxt, 100, never)).toBe("unknown");
+			expect(budgets.mock.calls.map(([, ms]) => ms)).toEqual([100, 0]);
+		} finally {
+			budgets.mockRestore();
+			setSystemTime();
+		}
 	});
 
 	it("still answers from the alias lookup inside the remaining time", async () => {
