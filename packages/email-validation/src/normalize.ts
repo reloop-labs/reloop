@@ -59,7 +59,11 @@ export function parseInput(raw: string): ParsedInput {
 		return { ok: false, normalizedInput, failure: "domain-invalid" };
 	}
 
-	const ascii = domainToASCII(withoutRootDot);
+	// ASCII needs no IDNA conversion. Newer Bun returns "" for hosts like
+	// "example.123" (bad IPv4), which would hide the real syntax failure.
+	const ascii = /^[\x21-\x7e]+$/.test(withoutRootDot)
+		? withoutRootDot
+		: domainToASCII(withoutRootDot);
 	if (ascii === "") {
 		return { ok: false, normalizedInput, failure: "domain-invalid" };
 	}
