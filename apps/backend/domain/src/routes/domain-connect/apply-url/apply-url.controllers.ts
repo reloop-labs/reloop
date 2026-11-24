@@ -1,10 +1,19 @@
 import { randomUUID } from "node:crypto";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import {
+	resolveCnameAuthoritative,
+	resolveTxtAuthoritative,
+} from "@reloop/dns/authoritative";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import { redis } from "@reloop/domain/lib/redis";
 import { discoverDomainConnect } from "@reloop/domain/utils/domain-connect-discovery";
+import {
+	determineGroupIds,
+	lookupDmarc,
+	TEMPLATE_DMARC_POLICY,
+} from "@reloop/domain/utils/domain-connect-groups";
 import { getDomainConnectParts } from "@reloop/domain/utils/domain-connect-parts";
 import { signDomainConnectRequest } from "@reloop/domain/utils/domain-connect-signer";
 import { and, eq, isNull } from "drizzle-orm";
@@ -91,9 +100,23 @@ export async function applyUrlController({
 	);
 
 	// 5. Determine which groupIds to apply
+	const dmarcGroup = domainConfig.DOMAIN_CONNECT_DMARC_GROUP;
 	const resolvedGroupIds = groupIds
 		? groupIds.split(",").map((g) => g.trim())
-		: determineGroupIds(domainRecord);
+		: determineGroupIds(domainRecord, {
+				dmarcGroup,
+				dmarc:
+					dmarcGroup && domainRecord.isSendingEmailEnabled !== false
+						? await lookupDmarc(
+								domainRecord.domain,
+								resolveTxtAuthoritative,
+								undefined,
+								resolveCnameAuthoritative,
+							)
+						: "unknown",
+				policyMatchesTemplate:
+					domainConfig.DMARC_DEFAULT_POLICY === TEMPLATE_DMARC_POLICY,
+			});
 
 	// 6. Generate nonce for CSRF protection
 	const nonce = randomUUID();
@@ -138,28 +161,4 @@ export async function applyUrlController({
 		applyUrl,
 		provider: discovery.provider!,
 	};
-}
-
-/**
- * Determine which record groups to apply based on domain settings.
- */
-function determineGroupIds(domain: {
-	isSendingEmailEnabled?: boolean | null;
-	isReceivingEmailEnabled?: boolean | null;
-	isClickTrackingEnabled?: boolean | null;
-	isOpenTrackingEnabled?: boolean | null;
-}): string[] {
-	const groups = ["verification"]; // DKIM always included
-
-	if (domain.isSendingEmailEnabled !== false) {
-		groups.push("sending"); // SPF + DMARC
-	}
-	if (domain.isReceivingEmailEnabled !== false) {
-		groups.push("receiving"); // MX
-	}
-	if (domain.isClickTrackingEnabled || domain.isOpenTrackingEnabled) {
-		groups.push("tracking"); // CNAME
-	}
-
-	return groups;
 }

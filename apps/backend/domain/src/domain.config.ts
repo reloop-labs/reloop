@@ -1,3 +1,5 @@
+import { parseDmarcPolicy } from "./utils/domain-connect-groups";
+
 export const domainConfig = {
 	port: Number(process.env.PORT || "8011"),
 	PG_URL:
@@ -32,6 +34,10 @@ export const domainConfig = {
 		process.env.DOMAIN_CONNECT_PROVIDER_ID || "reloop.sh",
 	DOMAIN_CONNECT_SERVICE_ID:
 		process.env.DOMAIN_CONNECT_SERVICE_ID || "email-setup",
+	/** The published template has a separate `dmarc` group (#170). Off until the template is updated. */
+	DOMAIN_CONNECT_DMARC_GROUP: process.env.DOMAIN_CONNECT_DMARC_GROUP === "true",
+	/** Policy for the DMARC record Reloop suggests: none | quarantine | reject (default reject). */
+	DMARC_DEFAULT_POLICY: parseDmarcPolicy(process.env.DMARC_DEFAULT_POLICY),
 	// Coolify/Docker often store multiline PEMs with literal `\n` — normalize those.
 	DOMAIN_CONNECT_SIGNING_PRIVATE_KEY: (
 		process.env.DOMAIN_CONNECT_SIGNING_PRIVATE_KEY || ""

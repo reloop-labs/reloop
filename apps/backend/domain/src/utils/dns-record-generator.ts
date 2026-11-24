@@ -53,8 +53,9 @@ export function generateSPFRecord(
 export function generateDMARCRecord(
 	domain: string,
 	rootDomain: string,
+	policy: string = domainConfig.DMARC_DEFAULT_POLICY,
 ): DNSTypes.DNSRecord {
-	const dmarcValue = "v=DMARC1; p=reject;";
+	const dmarcValue = `v=DMARC1; p=${policy};`;
 	const isApex = domain === "@";
 	const name = isApex ? "_dmarc" : `_dmarc.${domain}`;
 
